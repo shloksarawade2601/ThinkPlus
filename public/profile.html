@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,8 +32,15 @@
         }
 
         @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .orbs {
@@ -81,12 +89,16 @@
         }
 
         @keyframes float {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translate(0, 0) scale(1);
             }
+
             33% {
                 transform: translate(50px, -50px) scale(1.1);
             }
+
             66% {
                 transform: translate(-30px, 30px) scale(0.9);
             }
@@ -99,33 +111,32 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
             pointer-events: none;
         }
-        
+
         .container {
             position: relative;
             z-index: 2;
             max-width: 1000px;
-            margin: 2rem auto; 
+            margin: 2rem auto;
             padding: 0 2rem;
         }
 
         .profile-header {
             background: rgba(15, 23, 42, 0.5);
             backdrop-filter: blur(20px) saturate(180%);
-            /* KEPT REDUCED PADDING: 2rem */
-            padding: 2rem; 
+            padding: 2rem;
             border-radius: 20px;
-            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5), 
-                        0 0 0 1px rgba(167, 139, 250, 0.15);
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(167, 139, 250, 0.15);
             margin-bottom: 1.5rem;
             border: 1px solid rgba(167, 139, 250, 0.25);
             animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative; 
+            position: relative;
         }
 
         @keyframes slideUp {
@@ -133,6 +144,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -141,7 +153,7 @@
 
         .profile-top {
             display: flex;
-            align-items: center; 
+            align-items: center;
             gap: 4rem;
             margin-bottom: 2rem;
         }
@@ -267,8 +279,8 @@
             background: rgba(15, 23, 42, 0.5);
             backdrop-filter: blur(20px) saturate(180%);
             border-radius: 20px;
-            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5), 
-                        0 0 0 1px rgba(167, 139, 250, 0.15);
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(167, 139, 250, 0.15);
             overflow: hidden;
             border: 1px solid rgba(167, 139, 250, 0.25);
             animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -317,11 +329,6 @@
         .menu-icon.security {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-        }
-
-        .menu-icon.settings {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
         }
 
         .menu-icon.help {
@@ -374,7 +381,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         #avatarInput {
@@ -405,6 +414,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="gradient-bg"></div>
     <div class="orbs">
@@ -427,7 +437,7 @@
 
         const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
-        
+
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: {
                 storage: window.sessionStorage,
@@ -487,7 +497,7 @@
             }
 
             const user = session.user;
-            
+
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('full_name, avatar_url')
@@ -515,10 +525,10 @@
                     <div class="user-menu">
                         <div class="user-info">
                             <div class="user-avatar" id="navUserAvatar">
-                                ${avatarUrl ? 
-                                    `<img src="${avatarUrl}" alt="${fullName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : 
-                                    initials
-                                }
+                                ${avatarUrl ?
+                    `<img src="${avatarUrl}" alt="${fullName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` :
+                    initials
+                }
                             </div>
                             <span class="user-name">${fullName}</span>
                         </div>
@@ -556,7 +566,6 @@
                 document.head.appendChild(style);
             }
 
-
             const existingNav = document.querySelector('.navbar');
             if (existingNav) {
                 existingNav.outerHTML = navbarHTML;
@@ -580,20 +589,15 @@
         function attachNavigationListeners() {
             const navigationMap = {
                 'personalInfoLink': 'personalinfo.html',
-                // UPDATED NAVIGATION LINKS
                 'securityPrivacyLink': 'security_and_privacy.html',
-                'settingsLink': 'settings.html',
                 'helpSupportLink': 'help_and_support.html',
                 'aboutThinkPlusLink': 'about_thinkplus.html',
-                'reportCardNav': '/report_card.html', 
-                'dashboardNav': '/dashboard.html',
             };
 
             for (const [id, url] of Object.entries(navigationMap)) {
                 const linkElement = document.getElementById(id);
                 if (linkElement) {
                     linkElement.addEventListener('click', (e) => {
-                        // Remove the '#' check logic since all utility links are now implemented
                         if (linkElement.tagName === 'A') {
                             e.preventDefault();
                         }
@@ -603,12 +607,11 @@
             }
         }
 
-
         async function loadProfile() {
-            const navData = await initNavbar('profile'); 
-            
+            const navData = await initNavbar('profile');
+
             if (!navData) {
-                await checkAuth(); 
+                await checkAuth();
                 return;
             }
 
@@ -627,14 +630,13 @@
 
             const content = `
                 <div class="profile-header">
-                    
                     <div class="profile-top">
                         <div class="avatar-container">
                             <div class="user-avatar-large" id="userAvatarLarge">
-                                ${avatarUrl ? 
-                                    `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : 
-                                    initials
-                                }
+                                ${avatarUrl ?
+                    `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` :
+                    initials
+                }
                             </div>
                             <div class="avatar-upload-btn" id="avatarUploadBtn">📷</div>
                         </div>
@@ -678,18 +680,7 @@
                             <div class="menu-icon security">🔒</div>
                             <div class="menu-text">
                                 <h4>Security & Privacy</h4>
-                                <p>Change password and privacy settings</p>
-                            </div>
-                        </div>
-                        <div class="menu-arrow">›</div>
-                    </div>
-
-                    <div class="menu-item" id="settingsLink">
-                        <div class="menu-item-content">
-                            <div class="menu-icon settings">⚙️</div>
-                            <div class="menu-text">
-                                <h4>Settings</h4>
-                                <p>Manage notifications and preferences</p>
+                                <p>Change password and email address</p>
                             </div>
                         </div>
                         <div class="menu-arrow">›</div>
@@ -721,7 +712,6 @@
 
             document.getElementById('mainContent').innerHTML = content;
             setupAvatarUpload();
-
             attachNavigationListeners();
         }
 
@@ -757,9 +747,9 @@
                     uploadBtn.style.pointerEvents = 'none';
 
                     const reader = new FileReader();
-                    reader.onload = async function(event) {
+                    reader.onload = async function (event) {
                         const base64Image = event.target.result;
-                        
+
                         try {
                             const { error: updateError } = await supabase
                                 .from('profiles')
@@ -775,13 +765,13 @@
                             uploadBtn.style.pointerEvents = 'auto';
                         }
                     };
-                    
-                    reader.onerror = function() {
+
+                    reader.onerror = function () {
                         alert('Failed to read image file');
                         uploadBtn.innerHTML = originalContent;
                         uploadBtn.style.pointerEvents = 'auto';
                     };
-                    
+
                     reader.readAsDataURL(file);
                 } catch (error) {
                     console.error('Error uploading avatar:', error);
@@ -789,8 +779,9 @@
                 }
             });
         }
-        
+
         loadProfile();
     </script>
 </body>
+
 </html>
