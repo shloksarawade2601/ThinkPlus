@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkPlus - Verify Email</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* --- BASE THEME STYLES (Matching Dashboard/Profile) --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* --- CONTAINER & CARD STYLES --- */
+        .page-container {
+            position: relative;
+            z-index: 10;
+            padding: 100px 20px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .confirmation-card {
+            background-color: rgba(26, 20, 55, 0.9); /* Darker background */
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(45, 27, 78, 0.5);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .confirmation-card h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: #7c3aed; /* Purple color for emphasis */
+        }
+
+        .confirmation-card p {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .icon {
+            font-size: 4rem;
+            display: block;
+            margin: 0 auto 30px;
+        }
+
+        .resend-link {
+            display: block;
+            margin-top: 20px;
+            color: #a78bfa;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .resend-link:hover {
+            text-decoration: underline;
+        }
+
+        /* --- Button Style (Matching others) --- */
+        .btn-primary {
+            display: inline-block;
+            background-color: #7c3aed;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #6d28d9;
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+
+    <div class="page-container">
+        <div class="confirmation-card">
+            <span class="icon">📧</span>
+            <h2>Check Your Email!</h2>
+            <p>
+                We've sent a confirmation link to your email address. Please click the link to verify your account and complete the sign-up process for **ThinkPlus**.
+            </p>
+            <p style="font-size: 0.9rem; color: #94a3b8;">
+                If you don't see it, please check your spam folder.
+            </p>
+            
+            <a href="index.html" class="btn-primary">Return to Login Page</a>
+
+            <a href="index.html" class="resend-link" id="resendLink">I didn't receive an email.</a>
+        </div>
+    </div>
+
+    <script>
+        // Supabase is not strictly needed for this static page, but keeping the script tag for consistency
+        // The main goal is to display the message and provide a path back to login.
+
+        document.getElementById('resendLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            // In a real application, clicking this link would navigate back to the sign-in/sign-up page
+            // and trigger a function to resend the confirmation email.
+            alert('Please try logging in again on the main page to trigger the resend mechanism.');
+            window.location.href = 'index.html'; 
+        });
+    </script>
+</body>
+</html>
