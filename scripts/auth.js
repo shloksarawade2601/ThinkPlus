@@ -43,16 +43,26 @@ if (signupForm) {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
 
+    // The URL the user lands on AFTER they click the email confirmation link.
+    // This is your live Vercel domain + the page they should see when logged in.
+    const POST_CONFIRMATION_URL = 'https://think-plus-ten.vercel.app/dashboard.html'; 
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        // This URL is embedded in the confirmation email link by Supabase
+        emailRedirectTo: POST_CONFIRMATION_URL,
+      },
     });
 
     if (error) {
       alert("Signup failed: " + error.message);
     } else {
+      // Immediate redirect for user experience: sends them to the "Check your email" message.
+      // This page is hosted on GitHub Pages.
       alert("Check your email to confirm your signup!");
-      window.location.href = "login.html";
+      window.location.href = "https://shloksarawade2601.github.io/ThinkPlus/public/email_confirmation.html";
     }
   });
 }
