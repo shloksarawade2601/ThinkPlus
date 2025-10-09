@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThinkPlus - Verify Email</title>
+    <title>ThinkPlus - Account Verified</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -20,7 +20,7 @@
             min-height: 100vh;
             color: #e2e8f0;
             overflow-x: hidden;
-            /* CENTER THE CONTENT VERTICALLY AND HORIZONTALLY, LIKE LOGIN.HTML */
+            /* Center the content vertically and horizontally, like login.html */
             display: flex; 
             align-items: center; 
             justify-content: center;
@@ -35,6 +35,7 @@
             width: 100%;
             height: 100%;
             z-index: 0;
+            /* The matrix/gradient background from login.html */
             background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
@@ -49,9 +50,6 @@
         .page-container {
             position: relative;
             z-index: 10;
-            /* Removed flex centering here, as it's now on the body */
-            display: block; 
-            min-height: auto;
             width: 100%;
             max-width: 400px; /* Tighter width like the login form */
         }
@@ -62,15 +60,13 @@
             border-radius: 12px;
             /* Enhanced box-shadow for a deeper look, matching login.html */
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(45, 27, 78, 0.5);
-            border: none; /* Border replaced by box-shadow border */
             padding: 40px;
             width: 100%;
             text-align: center;
-            margin-top: 0; /* Centered by body flex, so no top margin needed */
         }
 
         .confirmation-card h2 {
-            font-size: 1.8rem; /* Slightly smaller to fit the tighter card */
+            font-size: 1.8rem; 
             margin-bottom: 5px;
             color: #7c3aed; 
             font-weight: 700;
@@ -82,52 +78,41 @@
             color: #a0aec0; /* Lighter color for subtitle */
         }
 
-        .confirmation-card p {
-            font-size: 1rem;
-            margin-bottom: 20px;
-            line-height: 1.5;
-            text-align: left; /* Align text left for better readability in the tight box */
-            background-color: rgba(255, 255, 255, 0.05); /* Simulates input background */
-            padding: 15px; 
-            border-radius: 8px;
-            border: 1px solid rgba(124, 58, 237, 0.4); /* Purple border like focused input */
-        }
-
         .icon {
-            font-size: 3.5rem; /* Slightly smaller icon */
+            font-size: 3.5rem; 
             display: block;
             margin: 0 auto 20px;
-            color: #7c3aed; /* Give the icon the primary purple color */
+            color: #48bb78; /* Use green checkmark for success! */
         }
 
-        .resend-link {
+        .manual-link {
             display: block;
-            margin-top: 25px;
+            margin-top: 15px;
             color: #a78bfa;
             text-decoration: none;
             font-weight: 500;
             font-size: 0.9rem;
         }
 
-        .resend-link:hover {
+        .manual-link:hover {
             text-decoration: underline;
         }
 
         /* --- Button Style (Matching others) --- */
         .btn-primary {
-            width: 100%; /* Full width button like in login.html */
+            width: 100%; 
             display: block;
             background-color: #7c3aed;
             color: #ffffff;
             padding: 12px 20px;
             border: none;
-            border-radius: 8px; /* Slightly larger border radius */
+            border-radius: 8px; 
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.1s ease;
             text-decoration: none;
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         .btn-primary:hover {
@@ -141,38 +126,26 @@
 
     <div class="page-container">
         <div class="confirmation-card">
-            <span class="icon">📧</span>
-            <h2>Check Your Email!</h2>
+            <span class="icon">✅</span>
+            <h2>Email Confirmed!</h2>
             <p class="subtitle">
-                A verification link has been sent to your email address.
+                Your email has been successfully verified by **ThinkPlus**.
             </p>
 
-            <p>
-                **Action Required:** Please open the link in the email from ThinkPlus to confirm your account and gain access to the dashboard.
-            </p>
-            <p style="font-size: 0.9rem; color: #94a3b8; border: none; background: none; padding: 0; text-align: center; margin-top: 5px;">
-                Check your spam folder if you don't see it immediately.
+            <p style="font-size: 1rem; margin-bottom: 25px; line-height: 1.5; color: #e2e8f0;">
+                Click the button below to continue to your dashboard.
             </p>
             
-            <a href="index.html" class="btn-primary">Return to Login Screen</a>
+            <a href="https://think-plus-ten.vercel.app/dashboard.html" class="btn-primary" id="continueBtn">Continue to Dashboard</a>
 
-            <a href="index.html" class="resend-link" id="resendLink">I didn't receive an email.</a>
+            <p style="font-size: 0.9rem; color: #94a3b8; margin-top: 20px;">
+                If the button doesn't work, please navigate to the website manually.
+            </p>
+            <a href="https://think-plus-ten.vercel.app/dashboard.html" class="manual-link">
+                https://think-plus-ten.vercel.app/dashboard.html
+            </a>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const resendLink = document.getElementById('resendLink');
-
-            if (resendLink) {
-                resendLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    // This alert informs the user where the resend mechanism lives (on the main login page).
-                    alert('Please try logging in again on the main page to trigger the resend mechanism, or try the "Forgot Password" link.');
-                    window.location.href = 'index.html'; 
-                });
-            }
-        });
-    </script>
-</body>
+    </body>
 </html>
