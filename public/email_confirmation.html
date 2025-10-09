@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* --- BASE THEME STYLES (Matching Dashboard/Profile) --- */
+        /* --- BASE THEME STYLES (MATCHING LOGIN.HTML) --- */
         * {
             margin: 0;
             padding: 0;
@@ -20,8 +20,14 @@
             min-height: 100vh;
             color: #e2e8f0;
             overflow-x: hidden;
+            /* CENTER THE CONTENT VERTICALLY AND HORIZONTALLY, LIKE LOGIN.HTML */
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            padding: 1rem;
         }
 
+        /* Animated Gradient Background */
         .gradient-bg {
             position: fixed;
             top: 0;
@@ -39,54 +45,68 @@
             50% { background-position: 100% 50%; }
         }
 
-        /* --- CONTAINER & CARD STYLES --- */
+        /* --- CARD STYLES (ADOPTED FROM LOGIN.HTML) --- */
         .page-container {
             position: relative;
             z-index: 10;
-            padding: 100px 20px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            /* Removed flex centering here, as it's now on the body */
+            display: block; 
+            min-height: auto;
+            width: 100%;
+            max-width: 400px; /* Tighter width like the login form */
         }
 
         .confirmation-card {
-            background-color: rgba(26, 20, 55, 0.9); /* Darker background */
+            background-color: rgba(26, 20, 55, 0.9); 
             backdrop-filter: blur(10px);
             border-radius: 12px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(45, 27, 78, 0.5);
+            /* Enhanced box-shadow for a deeper look, matching login.html */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(45, 27, 78, 0.5);
+            border: none; /* Border replaced by box-shadow border */
             padding: 40px;
-            max-width: 500px;
             width: 100%;
             text-align: center;
-            margin-top: 50px;
+            margin-top: 0; /* Centered by body flex, so no top margin needed */
         }
 
         .confirmation-card h2 {
-            font-size: 2.2rem;
-            margin-bottom: 15px;
-            color: #7c3aed; /* Purple color for emphasis */
+            font-size: 1.8rem; /* Slightly smaller to fit the tighter card */
+            margin-bottom: 5px;
+            color: #7c3aed; 
+            font-weight: 700;
+        }
+
+        .confirmation-card .subtitle {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            color: #a0aec0; /* Lighter color for subtitle */
         }
 
         .confirmation-card p {
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-            line-height: 1.6;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            text-align: left; /* Align text left for better readability in the tight box */
+            background-color: rgba(255, 255, 255, 0.05); /* Simulates input background */
+            padding: 15px; 
+            border-radius: 8px;
+            border: 1px solid rgba(124, 58, 237, 0.4); /* Purple border like focused input */
         }
 
         .icon {
-            font-size: 4rem;
+            font-size: 3.5rem; /* Slightly smaller icon */
             display: block;
-            margin: 0 auto 30px;
+            margin: 0 auto 20px;
+            color: #7c3aed; /* Give the icon the primary purple color */
         }
 
         .resend-link {
             display: block;
-            margin-top: 20px;
+            margin-top: 25px;
             color: #a78bfa;
             text-decoration: none;
             font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .resend-link:hover {
@@ -95,21 +115,24 @@
 
         /* --- Button Style (Matching others) --- */
         .btn-primary {
-            display: inline-block;
+            width: 100%; /* Full width button like in login.html */
+            display: block;
             background-color: #7c3aed;
             color: #ffffff;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px; /* Slightly larger border radius */
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.1s ease;
             text-decoration: none;
+            margin-top: 15px;
         }
 
         .btn-primary:hover {
             background-color: #6d28d9;
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -120,29 +143,35 @@
         <div class="confirmation-card">
             <span class="icon">📧</span>
             <h2>Check Your Email!</h2>
-            <p>
-                We've sent a confirmation link to your email address. Please click the link to verify your account and complete the sign-up process for **ThinkPlus**.
+            <p class="subtitle">
+                A verification link has been sent to your email address.
             </p>
-            <p style="font-size: 0.9rem; color: #94a3b8;">
-                If you don't see it, please check your spam folder.
+
+            <p>
+                **Action Required:** Please open the link in the email from ThinkPlus to confirm your account and gain access to the dashboard.
+            </p>
+            <p style="font-size: 0.9rem; color: #94a3b8; border: none; background: none; padding: 0; text-align: center; margin-top: 5px;">
+                Check your spam folder if you don't see it immediately.
             </p>
             
-            <a href="index.html" class="btn-primary">Return to Login Page</a>
+            <a href="index.html" class="btn-primary">Return to Login Screen</a>
 
             <a href="index.html" class="resend-link" id="resendLink">I didn't receive an email.</a>
         </div>
     </div>
 
     <script>
-        // Supabase is not strictly needed for this static page, but keeping the script tag for consistency
-        // The main goal is to display the message and provide a path back to login.
+        document.addEventListener('DOMContentLoaded', () => {
+            const resendLink = document.getElementById('resendLink');
 
-        document.getElementById('resendLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            // In a real application, clicking this link would navigate back to the sign-in/sign-up page
-            // and trigger a function to resend the confirmation email.
-            alert('Please try logging in again on the main page to trigger the resend mechanism.');
-            window.location.href = 'index.html'; 
+            if (resendLink) {
+                resendLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // This alert informs the user where the resend mechanism lives (on the main login page).
+                    alert('Please try logging in again on the main page to trigger the resend mechanism, or try the "Forgot Password" link.');
+                    window.location.href = 'index.html'; 
+                });
+            }
         });
     </script>
 </body>
