@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkPlus - Start Exam</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0e27; /* Base dark color */
+            min-height: 100vh;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+        
+        /* --- THEME BACKGROUND STYLES --- */
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+            top: -250px;
+            left: -250px;
+        }
+
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+            top: 50%;
+            right: -200px;
+            animation-delay: 5s;
+        }
+
+        .orb3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+            bottom: -150px;
+            left: 30%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-image: 
+                linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* --- LAYOUT AND CARD STYLES (MATCHING THEME) --- */
+
+        .page-wrapper {
+            position: relative;
+            z-index: 2;
+            padding: 3rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .exam-setup-card {
+            max-width: 700px;
+            width: 95%;
+            /* Themed translucent card style */
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(167, 139, 250, 0.15);
+            border: 1px solid rgba(167, 139, 250, 0.25);
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header Styles */
+        .card-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .card-header h1 {
+            font-size: 2.5rem;
+            /* Primary gradient for titles */
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-header p {
+            font-size: 1.1rem;
+            color: #94a3b8;
+        }
+
+        /* Difficulty Badge */
+        .exam-badge {
+            display: inline-block;
+            padding: 0.4rem 1.25rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.75rem;
+            border: 1px solid;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Themed badge colors */
+        .easy {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+        .medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+        .hard {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        /* Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            /* Secondary translucent card style */
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .detail-item p {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-item strong {
+            font-size: 1.8rem;
+            font-weight: 800;
+            /* Primary gradient for values */
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+        }
+
+        /* Rules Section */
+        .exam-rules {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .exam-rules h2 {
+            font-size: 1.5rem;
+            color: #f1f5f9;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .exam-rules ul {
+            list-style-type: '⚡'; /* Custom bullet */
+            padding-left: 1.5rem;
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .exam-rules ul li {
+            font-size: 1rem;
+            line-height: 1.5;
+            padding-left: 0.5rem;
+        }
+
+        /* Checkbox and Button */
+        .start-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .agreement {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            color: #cbd5e1;
+            cursor: pointer;
+        }
+
+        .agreement input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #a78bfa; /* Theme accent color for checkbox */
+        }
+
+        .btn-start {
+            width: 100%;
+            max-width: 300px;
+            padding: 1rem 2rem;
+            /* Main action gradient */
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-start:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(167, 139, 250, 0.6);
+        }
+
+        .btn-start:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+
+        /* Footer Time */
+        .current-time {
+            text-align: center;
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-top: 1rem;
+        }
+
+        .current-time strong {
+            color: #a78bfa;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .exam-setup-card {
+                padding: 1.5rem;
+            }
+            .card-header h1 {
+                font-size: 2rem;
+            }
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            .btn-start {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="orbs">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+    <div class="page-wrapper">
+        <div class="exam-setup-card">
+            
+            <div class="card-header">
+                <p id="currentDateTime">Oct 8, 2025 | 10:00:00 AM</p>
+                <h1 id="examTitle">Welcome to the JavaScript Fundamentals Exam</h1>
+                <span id="difficultyBadge" class="exam-badge easy">Easy Level</span>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-item">
+                    <p>Duration</p>
+                    <strong id="duration">30</strong>
+                    <p style="margin-top: 0; color: #cbd5e1; font-weight: 500; font-size: 0.9rem;">Minutes</p>
+                </div>
+                <div class="detail-item">
+                    <p>Total Questions</p>
+                    <strong id="totalQuestions">20</strong>
+                    <p style="margin-top: 0; color: #cbd5e1; font-weight: 500; font-size: 0.9rem;">Questions</p>
+                </div>
+                <div class="detail-item">
+                    <p>Total Marks</p>
+                    <strong id="totalMarks">20</strong>
+                    <p style="margin-top: 0; color: #cbd5e1; font-weight: 500; font-size: 0.9rem;">Marks</p>
+                </div>
+                <div class="detail-item">
+                    <p>Passing Score</p>
+                    <strong id="passingScore">70%</strong>
+                    <p style="margin-top: 0; color: #cbd5e1; font-weight: 500; font-size: 0.9rem;">Minimum</p>
+                </div>
+            </div>
+
+            <div class="exam-rules">
+                <h2>Exam Instructions</h2>
+                <ul>
+                    <li>The exam duration is **30 minutes**. The timer will start immediately upon clicking "Start Exam".</li>
+                    <li>There are **20 multiple-choice questions** in total, each carrying 1 mark.</li>
+                    <li>You must score at least **70%** to pass this assessment.</li>
+                    <li>You can navigate freely between questions using the navigation panel.</li>
+                    <li>Ensure you have a stable internet connection. Closing the browser will submit your exam.</li>
+                </ul>
+            </div>
+
+            <div class="start-action">
+                <label class="agreement">
+                    <input type="checkbox" id="agreementCheckbox">
+                    I have read and understood all the instructions above.
+                </label>
+                <button class="btn-start" id="startExamButton" disabled>Start Exam</button>
+            </div>
+            
+            <p class="current-time">Current System Time: <strong id="timeFooter"></strong></p>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkbox = document.getElementById('agreementCheckbox');
+            const startButton = document.getElementById('startExamButton');
+
+            // Helper function to update current time display
+            function updateDateTime() {
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', month: 'short', day: 'numeric', 
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', 
+                    hour12: true 
+                };
+                const formattedTime = now.toLocaleTimeString('en-US', options);
+                
+                document.getElementById('currentDateTime').textContent = formattedTime.split(' | ')[0];
+                document.getElementById('timeFooter').textContent = formattedTime.split(', ')[1];
+            }
+
+            // Helper to get exam data from URL (passed from dashboard)
+            function getExamDataFromURL() {
+                const urlParams = new URLSearchParams(window.location.search);
+                // Return defaults if parameters are missing, to ensure exam.html doesn't break
+                return {
+                    examId: urlParams.get('examId') || 'js-fund',
+                    examTitle: urlParams.get('examTitle') || 'JavaScript Fundamentals Exam',
+                    difficulty: urlParams.get('difficulty') || 'easy',
+                    duration: urlParams.get('duration') || '30',
+                    questions: urlParams.get('questions') || '20',
+                    passingScore: urlParams.get('passingScore') || '70'
+                };
+            }
+
+            // Enable/Disable Start Button
+            checkbox.addEventListener('change', () => {
+                startButton.disabled = !checkbox.checked;
+            });
+
+            // *** UPDATED START BUTTON LOGIC ***
+            startButton.addEventListener('click', () => {
+                if (checkbox.checked) {
+                    const examData = getExamDataFromURL();
+                    const params = new URLSearchParams();
+                    // Pass the data received from the dashboard directly to exam.html
+                    for (const key in examData) {
+                        params.append(key, examData[key]);
+                    }
+                    // Navigate to exam.html with the parameters
+                    window.location.href = `exam.html?${params.toString()}`;
+                }
+            });
+
+            // Load exam details from URL parameters
+            function loadExamDetails() {
+                const examData = getExamDataFromURL();
+
+                // Update page with exam data
+                document.getElementById('examTitle').textContent = examData.examTitle;
+                
+                // Set difficulty badge
+                const badge = document.getElementById('difficultyBadge');
+                const difficultyText = examData.difficulty.charAt(0).toUpperCase() + examData.difficulty.slice(1);
+                badge.textContent = difficultyText + ' Level';
+                badge.className = `exam-badge ${examData.difficulty}`;
+                
+                // Update exam details
+                document.getElementById('duration').textContent = examData.duration;
+                document.getElementById('totalQuestions').textContent = examData.questions;
+                document.getElementById('passingScore').textContent = examData.passingScore + '%';
+                document.getElementById('totalMarks').textContent = examData.questions;
+            }
+
+            // Initialize
+            updateDateTime();
+            loadExamDetails();
+            
+            // Update time every second
+            setInterval(updateDateTime, 1000);
+        });
+    </script>
+</body>
+</html>

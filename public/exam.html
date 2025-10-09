@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkPlus - Exam</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0e27; /* Base dark color */
+            min-height: 100vh;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* --- THEME BACKGROUND STYLES --- */
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+            top: -250px;
+            left: -250px;
+        }
+
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+            top: 50%;
+            right: -200px;
+            animation-delay: 5s;
+        }
+
+        .orb3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+            bottom: -150px;
+            left: 30%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-image: 
+                linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* --- EXAM COMPONENTS STYLES (UPDATED) --- */
+
+        .exam-header {
+            background: rgba(15, 23, 42, 0.5); /* Semi-transparent background */
+            backdrop-filter: blur(20px) saturate(180%); /* Increased blur for theme */
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Darker shadow */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.25); /* Theme border color */
+        }
+
+        .exam-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .exam-title h1 {
+            font-size: 1.5rem;
+            /* Using theme gradient */
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .exam-title span {
+            color: #475569; /* Slightly darker separator */
+        }
+
+        .exam-title h2 {
+            font-size: 1.25rem;
+            color: #f1f5f9;
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            /* Retaining red for time warning, but using theme's box style */
+            background: rgba(239, 68, 68, 0.2);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .timer-icon {
+            font-size: 1.5rem;
+            color: #fca5a5;
+        }
+
+        .timer-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fca5a5;
+        }
+
+        .btn-submit {
+            padding: 0.75rem 2rem;
+            /* Green gradient for final submission action */
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+        }
+
+        /* Main Content */
+        .exam-container {
+            position: relative;
+            z-index: 2; /* Ensures content is above the background */
+            display: flex;
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            gap: 2rem;
+        }
+
+        /* Question Section & Nav Panel (Themed Cards) */
+        .question-section, .nav-panel, .modal-content {
+            background: rgba(15, 23, 42, 0.7); /* Darker semi-transparent */
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(167, 139, 250, 0.15); /* Theme shadow/border */
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+        
+        .question-section {
+            flex: 1;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .question-number {
+            font-size: 1.25rem;
+            font-weight: 600;
+            /* Theme gradient for primary text */
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .question-marks {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .question-text {
+            font-size: 1.125rem;
+            color: #f1f5f9;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .option:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(167, 139, 250, 0.5);
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .option.selected {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: #a78bfa;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+        }
+
+        .option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+            cursor: pointer;
+            accent-color: #a78bfa;
+        }
+
+        .option-label {
+            font-size: 1rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+             transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-clear:hover {
+            background: rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-mark-review {
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .btn-mark-review:hover {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-save-next {
+            /* Theme primary action gradient (Purple) - default */
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-save-next:hover {
+            box-shadow: 0 6px 20px rgba(167, 139, 250, 0.6);
+        }
+        
+        /* Style for Final Button Action */
+        .btn-save-next.btn-final-action {
+            /* Use the green gradient like the main submit button */
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-save-next.btn-final-action:hover {
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-previous {
+            background: rgba(71, 85, 105, 0.5);
+            color: #cbd5e1;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            backdrop-filter: blur(5px);
+            box-shadow: none;
+        }
+
+        .btn-previous:hover {
+            background: rgba(71, 85, 105, 0.7);
+        }
+
+        /* Navigation Panel */
+        .nav-panel {
+            width: 350px;
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+
+        .nav-panel h3 {
+            color: #f1f5f9;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            /* Theme gradient for panel title */
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Status Colors (Matching Theme) */
+        .legend-box.answered, .question-box.answered, .btn-confirm {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* Green */
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .legend-box.not-answered, .question-box.not-answered {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); /* Red */
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .legend-box.marked, .question-box.marked {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); /* Purple */
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .legend-box.not-visited, .question-box.not-visited {
+            background: rgba(71, 85, 105, 0.5); /* Gray */
+            color: #cbd5e1;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            box-shadow: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .legend-text {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+        }
+
+        .question-box {
+            aspect-ratio: 1;
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .question-box:hover {
+            transform: scale(1.1);
+        }
+
+        .question-box.current {
+            border: 3px solid #f472b6; /* Highlight border */
+            box-shadow: 0 0 20px rgba(244, 114, 182, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px); 
+            z-index: 1000;
+            /* Center the modal content using flex */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal:not(.active) {
+            display: none; /* Only hide when not active, otherwise use flex */
+        }
+
+        .modal-content {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(25px) saturate(200%);
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+            /* Center text content */
+            text-align: center;
+        }
+        
+        /* Ensure modal summary is left-aligned while modal is centered */
+        #modalSummary {
+            text-align: left;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            backdrop-filter: blur(5px);
+            margin-bottom: 1.5rem; /* Added margin for separation */
+        }
+
+        .modal-content h3 {
+            color: #f1f5f9;
+            margin-bottom: 0.5rem; /* Reduced margin */
+            /* Theme gradient */
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem; /* Increased size */
+        }
+
+        .modal-content p {
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        #modalSummary p {
+            color: #e2e8f0;
+            margin: 0;
+            line-height: 1.8; /* Increased line-height for readability */
+            font-size: 0.95rem;
+        }
+
+        #modalSummary strong {
+            color: #a78bfa;
+            font-weight: 700;
+            display: inline-block;
+            width: 150px; /* Aligned summary key */
+        }
+        
+        /* Buttons should be centered nicely */
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center; /* Center the buttons */
+        }
+
+        .btn-cancel {
+            background: rgba(71, 85, 105, 0.5);
+            color: #cbd5e1;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            box-shadow: none;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(71, 85, 105, 0.7);
+            transform: translateY(-2px);
+        }
+
+        /* .btn-confirm uses .legend-box.answered styling (Green gradient) */
+        .btn-confirm {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .btn-confirm:hover {
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="orbs">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+    <div class="exam-header">
+        <div class="exam-title">
+            <h1>ThinkPlus</h1>
+            <span>|</span>
+            <h2 id="examTitle">JavaScript Fundamentals</h2>
+        </div>
+        <div class="timer-container">
+            <div class="timer">
+                <span class="timer-icon">⏱️</span>
+                <span class="timer-text" id="timer">30:00</span>
+            </div>
+            <button class="btn-submit" onclick="showSubmitModal()">Submit Exam</button>
+        </div>
+    </div>
+
+    <div class="exam-container">
+        <div class="question-section">
+            <div class="question-header">
+                <span class="question-number" id="questionNumber">Question 1 of 5</span>
+                <span class="question-marks" id="questionMarks">Marks: 1</span>
+            </div>
+
+            <div class="question-text" id="questionText">
+                What is the correct syntax for referring to an external script called "app.js"?
+            </div>
+
+            <div class="options-container" id="optionsContainer">
+                </div>
+
+            <div class="action-buttons">
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="previousQuestion()">Previous</button>
+                    <button class="btn btn-clear" onclick="clearResponse()">Clear Response</button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-mark-review" onclick="markForReview()">Mark for Review</button>
+                    <button class="btn btn-save-next" onclick="saveAndNext()">Save & Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-panel">
+            <h3>Question Navigation</h3>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-box answered">A</div>
+                    <span class="legend-text">Answered</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box not-answered">N/A</div>
+                    <span class="legend-text">Not Answered</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box marked">M</div>
+                    <span class="legend-text">Marked</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box not-visited">V</div>
+                    <span class="legend-text">Not Visited</span>
+                </div>
+            </div>
+
+            <div class="question-grid" id="questionGrid">
+                </div>
+        </div>
+    </div>
+
+    <div class="modal" id="submitModal">
+        <div class="modal-content">
+            <h3>Submit Exam?</h3>
+            <p>Are you sure you want to submit your exam? You won't be able to change your answers after submission.</p>
+            <div id="modalSummary"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" onclick="closeSubmitModal()">Cancel</button>
+                <button class="btn btn-confirm answered" onclick="submitExam()">Confirm & Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample exam data 
+        const examData = {
+            title: "JavaScript Fundamentals",
+            duration: 30, // in minutes
+            questions: [
+                {
+                    id: 1,
+                    text: "What is the correct syntax for referring to an external script called 'app.js'?",
+                    options: [
+                        '&lt;script src="app.js"&gt;', // A (Correct)
+                        '&lt;script href="app.js"&gt;',
+                        '&lt;script name="app.js"&gt;',
+                        '&lt;script link="app.js"&gt;'
+                    ],
+                    marks: 1
+                },
+                {
+                    id: 2,
+                    text: "Which company developed JavaScript?",
+                    options: ["Microsoft", "Netscape", "Oracle", "IBM"], // B (Correct)
+                    marks: 1
+                },
+                {
+                    id: 3,
+                    text: "What is the correct way to write a JavaScript array?",
+                    options: [
+                        'var colors = "red", "green", "blue"',
+                        'var colors = (1:"red", 2:"green", 3:"blue")',
+                        'var colors = ["red", "green", "blue"]', // C (Correct)
+                        'var colors = 1 = ("red"), 2 = ("green"), 3 = ("blue")'
+                    ],
+                    marks: 1
+                },
+                {
+                    id: 4,
+                    text: "How do you create a function in JavaScript?",
+                    options: [
+                        "function myFunction()", // A (Correct)
+                        "function:myFunction()",
+                        "function = myFunction()",
+                        "create myFunction()"
+                    ],
+                    marks: 1
+                },
+                {
+                    id: 5,
+                    text: "How do you call a function named 'myFunction'?",
+                    options: [
+                        "call myFunction()",
+                        "myFunction()", // B (Correct)
+                        "call function myFunction()",
+                        "execute myFunction()"
+                    ],
+                    marks: 1
+                }
+            ]
+        };
+
+        // Correct answer keys for local scoring validation (A, B, C, A, B)
+        const correctAnswers = ['A', 'B', 'C', 'A', 'B'];
+
+        let currentQuestion = 0;
+        let timeRemaining = examData.duration * 60;
+        let timerInterval;
+        let examState = examData.questions.map(() => ({
+            visited: false,
+            answered: false,
+            marked: false,
+            selectedAnswer: null
+        }));
+
+        function initExam() {
+            generateQuestionGrid();
+            loadQuestion(0);
+            startTimer();
+            examState[0].visited = true;
+            document.getElementById('examTitle').textContent = examData.title;
+            updateQuestionGrid();
+        }
+
+        function generateQuestionGrid() {
+            const grid = document.getElementById('questionGrid');
+            grid.innerHTML = '';
+            examData.questions.forEach((q, index) => {
+                const box = document.createElement('div');
+                box.className = 'question-box not-visited';
+                box.textContent = index + 1;
+                box.onclick = () => navigateToQuestion(index);
+                grid.appendChild(box);
+            });
+        }
+
+        function loadQuestion(index) {
+            const question = examData.questions[index];
+            document.getElementById('questionNumber').textContent = `Question ${index + 1} of ${examData.questions.length}`;
+            document.getElementById('questionMarks').textContent = `Marks: ${question.marks}`;
+            document.getElementById('questionText').innerHTML = question.text; 
+
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            question.options.forEach((option, i) => {
+                const label = document.createElement('label');
+                label.className = 'option';
+                const optionLetter = String.fromCharCode(65 + i);
+                
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'answer';
+                input.value = optionLetter;
+                
+                if (examState[index].selectedAnswer === optionLetter) {
+                    input.checked = true;
+                    label.classList.add('selected');
+                }
+                
+                const span = document.createElement('span');
+                span.className = 'option-label';
+                span.innerHTML = option;
+                
+                label.appendChild(input);
+                label.appendChild(span);
+                container.appendChild(label);
+                
+                label.addEventListener('click', (event) => {
+                    if (event.target !== input) {
+                        input.checked = true;
+                    }
+                    document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+                    label.classList.add('selected');
+                });
+                
+                input.addEventListener('change', () => {
+                    document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+                    label.classList.add('selected');
+                });
+            });
+
+            currentQuestion = index;
+            examState[index].visited = true;
+            
+            // Logic to change button text and style on last question
+            const saveNextBtn = document.querySelector('.btn-save-next');
+            if (index === examData.questions.length - 1) {
+                saveNextBtn.textContent = 'Save & Finish';
+                saveNextBtn.classList.add('btn-final-action');
+            } else {
+                saveNextBtn.textContent = 'Save & Next';
+                saveNextBtn.classList.remove('btn-final-action');
+            }
+            
+            // Disable 'Previous' button on the first question
+            document.querySelector('.btn-previous').disabled = (index === 0);
+            
+            updateQuestionGrid();
+        }
+
+        function navigateToQuestion(index) {
+            saveCurrentAnswer();
+            loadQuestion(index);
+        }
+
+        function saveCurrentAnswer() {
+            const selected = document.querySelector('input[name="answer"]:checked');
+            if (selected) {
+                examState[currentQuestion].selectedAnswer = selected.value;
+                examState[currentQuestion].answered = true;
+            } else {
+                // If an answer was cleared, update state
+                if (examState[currentQuestion].selectedAnswer !== null) {
+                    examState[currentQuestion].answered = false;
+                }
+                examState[currentQuestion].selectedAnswer = null;
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                saveCurrentAnswer();
+                loadQuestion(currentQuestion - 1);
+            }
+        }
+
+        function saveAndNext() {
+            saveCurrentAnswer();
+            updateQuestionGrid();
+            if (currentQuestion < examData.questions.length - 1) {
+                loadQuestion(currentQuestion + 1);
+            } else {
+                // If on the last question, show the submit modal
+                showSubmitModal();
+            }
+        }
+
+        function clearResponse() {
+            document.querySelectorAll('input[name="answer"]').forEach(input => {
+                input.checked = false;
+            });
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            examState[currentQuestion].selectedAnswer = null;
+            examState[currentQuestion].answered = false;
+            
+            // Only clear 'marked' status if it was not answered.
+            if (!examState[currentQuestion].answered) {
+                examState[currentQuestion].marked = false;
+            }
+            updateQuestionGrid();
+        }
+
+        function markForReview() {
+            saveCurrentAnswer();
+            examState[currentQuestion].marked = true;
+            updateQuestionGrid();
+            if (currentQuestion < examData.questions.length - 1) {
+                loadQuestion(currentQuestion + 1);
+            } else {
+                updateQuestionGrid(); 
+            }
+        }
+
+        function updateQuestionGrid() {
+            const boxes = document.querySelectorAll('.question-box');
+            boxes.forEach((box, index) => {
+                box.className = 'question-box';
+                
+                if (index === currentQuestion) {
+                    box.classList.add('current');
+                }
+                
+                // Determine status based on examState
+                if (examState[index].marked) {
+                    box.classList.add('marked');
+                } else if (examState[index].answered) {
+                    box.classList.add('answered');
+                } else if (examState[index].visited) {
+                    box.classList.add('not-answered');
+                } else {
+                    box.classList.add('not-visited');
+                }
+            });
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    // Automatically submit the exam when time runs out
+                    alert("Time's up! Submitting exam automatically.");
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function showSubmitModal() {
+            // Ensure the current answer is saved before showing the summary
+            saveCurrentAnswer();
+            
+            const answered = examState.filter(s => s.answered).length;
+            const notAnswered = examState.filter(s => s.visited && !s.answered).length;
+            const marked = examState.filter(s => s.marked).length;
+            const notVisited = examData.questions.length - examState.filter(s => s.visited).length;
+
+            document.getElementById('modalSummary').innerHTML = `
+                <p>
+                    <strong>Total Questions:</strong> ${examData.questions.length}<br>
+                    <strong>Answered:</strong> <span style="color: #10b981;">${answered}</span><br>
+                    <strong>Not Answered:</strong> <span style="color: #ef4444;">${notAnswered}</span><br>
+                    <strong>Marked for Review:</strong> <span style="color: #8b5cf6;">${marked}</span><br>
+                    <strong>Not Visited:</strong> ${notVisited}
+                </p>
+            `;
+            
+            // Check if the modal is currently hidden by CSS (display: none)
+            const modal = document.getElementById('submitModal');
+            modal.style.display = 'flex'; 
+            modal.classList.add('active');
+        }
+
+        function closeSubmitModal() {
+            const modal = document.getElementById('submitModal');
+            modal.classList.remove('active');
+            // Explicitly set display to none to ensure full hide
+            modal.style.display = 'none'; 
+        }
+
+        function submitExam() {
+            clearInterval(timerInterval);
+            
+            // Final save before submission
+            saveCurrentAnswer();
+
+            // 1. Calculate Results
+            let score = 0;
+            const totalQuestions = examData.questions.length;
+            
+            examState.forEach((state, index) => {
+                // Check if the user answered and if the answer matches the correct key
+                if (state.answered && state.selectedAnswer === correctAnswers[index]) {
+                    score++;
+                }
+            });
+            
+            const timeSpentSeconds = (examData.duration * 60) - timeRemaining;
+            const scorePercentage = Math.round((score / totalQuestions) * 100);
+
+            // 2. Prepare Data for Report Card (URL Parameters)
+            const params = new URLSearchParams();
+            params.append('title', examData.title);
+            params.append('total', totalQuestions);
+            params.append('score', score);
+            params.append('percent', scorePercentage);
+            params.append('time', timeSpentSeconds);
+
+            // Pass the selected answers for calculating attempted/incorrect counts on the report card
+            // We only pass the selected answers (null if not answered)
+            params.append('state', JSON.stringify(examState.map(s => s.selectedAnswer)));
+
+            // 3. Redirect to the Report Card
+            // This is the line that performs the navigation:
+            window.location.href = `report_card.html?${params.toString()}`;
+        }
+        
+        initExam();
+    </script>
+</body>
+</html>

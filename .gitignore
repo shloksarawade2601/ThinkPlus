@@ -1,0 +1,7 @@
+# Dependencies (if you add any node modules later)
+/node_modules
+
+# Local files/logs
+.DS_Store
+.env
+*.log

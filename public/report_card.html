@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkPlus - Exam Report</title>
+    <style>
+        /* --- THEME & BASE STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0e27; /* Base dark color */
+            min-height: 100vh;
+            color: #e2e8f0;
+            display: flex;
+            /* 💡 FIX: Set flex-direction to column to allow vertical stacking and scrolling */
+            flex-direction: column; 
+            justify-content: flex-start; /* Start content at the top */
+            align-items: center;
+            padding: 2rem;
+            /* ❌ FIX: Removed 'overflow: hidden;' to allow scrolling */
+        }
+
+        /* --- THEME BACKGROUND STYLES (Matching Dashboard) --- */
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s infinite ease-in-out;
+            background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+        }
+
+        .orb1 { width: 500px; height: 500px; top: -250px; left: -250px; }
+        .orb2 { width: 400px; height: 400px; top: 50%; right: -200px; animation-delay: 5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -50px) scale(1.1); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-image: 
+                linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+
+        /* --- REPORT CARD CONTAINER --- */
+        .report-card {
+            /* 💡 ADJUSTMENT: Removed min-height from body, so added margin-top for spacing */
+            margin-top: 4rem; 
+            margin-bottom: 4rem; 
+            
+            position: relative;
+            z-index: 2;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(25px) saturate(180%);
+            padding: 3rem 4rem;
+            border-radius: 1rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(167, 139, 250, 0.25);
+            max-width: 580px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .report-card:hover {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px #a78bfa;
+        }
+
+        /* Header Styling */
+        .report-card-header {
+            margin-bottom: 2rem;
+        }
+
+        .report-card-header h1 {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+        
+        .report-card-header h2 {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        /* --- SCORE PROGRESS RING --- */
+        .score-ring-container {
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        
+        .score-ring {
+            --progress: 0%; 
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 50%;
+            background: conic-gradient(
+                #a78bfa var(--progress), 
+                rgba(167, 139, 250, 0.15) var(--progress)
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(167, 139, 250, 0.3); 
+        }
+
+        .score-content {
+            background: #0f172a; 
+            width: 175px;
+            height: 175px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(167, 139, 250, 0.3);
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .score-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 0.2rem;
+            transition: color 0.5s ease;
+        }
+        
+        .score-value.pass { 
+            color: #10b981; 
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+        }
+        
+        .score-value.fail { 
+            color: #f472b6; 
+            text-shadow: 0 0 15px rgba(244, 114, 182, 0.6);
+        }
+
+        .score-label {
+            font-size: 1rem;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        /* --- DETAILS SECTION --- */
+        .details {
+            text-align: left;
+            margin-bottom: 3rem;
+            padding: 0 1rem;
+        }
+
+        .details p {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            padding: 0.9rem 0;
+            border-bottom: 1px dashed rgba(139, 92, 246, 0.1);
+        }
+        
+        .details p:last-child { border-bottom: none; }
+
+        .details span.label {
+            color: #94a3b8;
+        }
+        
+        .details strong {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        
+        .details strong.success { color: #10b981; }
+        .details strong.danger { color: #f472b6; }
+        .details strong.warning { color: #fbbf24; }
+
+        /* Action Button */
+        .back-button {
+            padding: 0.8rem 3rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5);
+        }
+
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="orbs">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+    </div>
+    <div class="grid-overlay"></div> 
+    
+    <div class="report-card">
+        <div class="report-card-header">
+            <h1>EXAM REPORT</h1>
+            <h2 id="examTitle">...</h2>
+        </div>
+
+        <div class="score-ring-container">
+            <div id="scoreRing" class="score-ring">
+                <div class="score-content">
+                    <div id="scoreValue" class="score-value">--%</div>
+                    <div class="score-label">Percentage</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="details">
+            <p>
+                <span class="label">Total Questions:</span>
+                <strong id="totalQuestions">--</strong>
+            </p>
+            <p>
+                <span class="label">Correct Answers:</span>
+                <strong id="correctAnswers" class="success">--</strong>
+            </p>
+            <p>
+                <span class="label">Incorrect Answers:</span>
+                <strong id="incorrectAnswers" class="danger">--</strong>
+            </p>
+            <p>
+                <span class="label">Unanswered:</span>
+                <strong id="unanswered" class="warning">--</strong>
+            </p>
+            <p>
+                <span class="label">Time Spent:</span>
+                <strong id="timeSpent">--</strong>
+            </p>
+        </div>
+
+        <a href="dashboard.html" class="back-button">Return to Dashboard</a>
+    </div>
+
+    <script>
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            
+            let timeStr = '';
+            if (minutes > 0) {
+                timeStr += `${minutes}m`;
+            }
+            if (remainingSeconds > 0 || minutes === 0) {
+                if (minutes > 0 && remainingSeconds > 0) timeStr += ' ';
+                timeStr += `${remainingSeconds}s`;
+            }
+            return timeStr || '0s';
+        }
+
+        function loadReport() {
+            const params = new URLSearchParams(window.location.search);
+            const title = params.get('title') || 'Exam Results';
+            const total = parseInt(params.get('total')) || 0;
+            const score = parseInt(params.get('score')) || 0;
+            const percent = parseInt(params.get('percent')) || 0;
+            const timeSeconds = parseInt(params.get('time')) || 0;
+            const stateJSON = params.get('state');
+
+            // --- Calculate Derived Metrics ---
+            let unanswered = 0;
+            const correctAnswers = score;
+            
+            if (stateJSON) {
+                try {
+                    const state = JSON.parse(stateJSON);
+                    unanswered = state.filter(answer => answer === null).length;
+                } catch (e) {
+                    unanswered = total - score;
+                }
+            } else {
+                unanswered = total - score;
+            }
+            
+            const attempted = total - unanswered;
+            const incorrect = attempted - correctAnswers;
+
+            // --- Update DOM & Theme ---
+            document.getElementById('examTitle').textContent = title;
+            
+            const scoreRing = document.getElementById('scoreRing');
+            const scoreValue = document.getElementById('scoreValue');
+            
+            // 1. Set the CSS variable for the progress ring
+            scoreRing.style.setProperty('--progress', `${percent}%`);
+            
+            // 2. Set the text value and color class
+            scoreValue.textContent = `${percent}%`;
+            
+            // Use 70% as the passing threshold
+            if (percent >= 70) {
+                scoreValue.classList.add('pass');
+            } else {
+                scoreValue.classList.add('fail');
+            }
+
+            // 3. Update the details section
+            document.getElementById('totalQuestions').textContent = total;
+            document.getElementById('correctAnswers').textContent = correctAnswers;
+            document.getElementById('incorrectAnswers').textContent = incorrect;
+            document.getElementById('unanswered').textContent = unanswered;
+            document.getElementById('timeSpent').textContent = formatTime(timeSeconds);
+        }
+
+        window.onload = loadReport;
+    </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+/* Dashboard Page Styling */
+
+.container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+h1, h2 {
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.stat-card h3 {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.exams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.exam-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.exam-card:hover {
+  transform: translateY(-3px);
+}
+
+.exam-card h3 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.exam-card p {
+  color: #555;
+  margin-bottom: 0.8rem;
+}
+
+.exam-card small {
+  display: block;
+  color: #888;
+  margin-bottom: 1rem;
+}
+
+.start-exam-btn {
+  display: inline-block;
+  background: #007bff;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.3s;
+  border: none;
+}
+
+.start-exam-btn:hover {
+  background: #0056b3;
+}

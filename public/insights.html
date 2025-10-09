@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkPlus - Insights</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+            top: -250px;
+            left: -250px;
+        }
+
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+            top: 50%;
+            right: -200px;
+            animation-delay: 5s;
+        }
+
+        .orb3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+            bottom: -150px;
+            left: 30%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-image: 
+                linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        .insights-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+        }
+
+        /* Navbar CSS (Defined inside JS, but shown here for context/completeness) */
+        .navbar {
+            position: relative;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.25);
+            position: sticky;
+            top: 0;
+        }
+        /* ... rest of your navbar styles ... */
+
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 3rem;
+        }
+
+        .page-header {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(167, 139, 250, 0.15);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(167, 139, 250, 0.25);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .page-header p {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .performance-card {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 1.75rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .performance-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+
+        .performance-card h3 {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .performance-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .performance-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            color: #10b981;
+        }
+
+        .trend-down {
+            color: #ef4444;
+        }
+
+        .chart-section {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .chart-header h2 {
+            color: #f1f5f9;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .chart-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            color: #94a3b8;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(139, 92, 246, 0.4);
+            color: #cbd5e1;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 1.125rem;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .subject-performance {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .subject-performance h2 {
+            color: #f1f5f9;
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subject-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .subject-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .subject-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateX(8px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .subject-info {
+            flex: 1;
+        }
+
+        .subject-name {
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+
+        .progress-bar-container {
+            background: rgba(30, 41, 59, 0.8);
+            height: 8px;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            border-radius: 1rem;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+        }
+
+        .subject-score {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            min-width: 70px;
+            text-align: right;
+        }
+
+        .recent-exams {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            overflow-x: auto;
+        }
+
+        .recent-exams h2 {
+            color: #f1f5f9;
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .exam-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .exam-table thead {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .exam-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: #94a3b8;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .exam-table td {
+            padding: 1rem;
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
+            color: #cbd5e1;
+        }
+
+        .exam-table tr {
+            transition: all 0.3s ease;
+        }
+
+        .exam-table tr:hover {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .exam-status {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .status-passed {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .status-failed {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .score-cell {
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .performance-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="orbs">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <div class="insights-container">
+        <div class="container">
+            <div class="page-header">
+                <h1>Performance Insights</h1>
+                <p>Track your exam performance and identify areas for improvement</p>
+            </div>
+
+            <div class="performance-grid">
+                <div class="performance-card">
+                    <h3>Overall Performance</h3>
+                    <div class="performance-value">85%</div>
+                    <div class="performance-trend trend-up">
+                        <span>↑ 5%</span>
+                        <span>vs last month</span>
+                    </div>
+                </div>
+                <div class="performance-card">
+                    <h3>Average Score</h3>
+                    <div class="performance-value">82</div>
+                    <div class="performance-trend trend-up">
+                        <span>↑ 3 points</span>
+                        <span>improvement</span>
+                    </div>
+                </div>
+                <div class="performance-card">
+                    <h3>Pass Rate</h3>
+                    <div class="performance-value">92%</div>
+                    <div class="performance-trend trend-up">
+                        <span>↑ 8%</span>
+                        <span>this week</span>
+                    </div>
+                </div>
+                <div class="performance-card">
+                    <h3>Time Spent</h3>
+                    <div class="performance-value">12.5h</div>
+                    <div class="performance-trend trend-down">
+                        <span>↓ 2h</span>
+                        <span>vs last week</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h2>Score Trends</h2>
+                    <div class="chart-filters">
+                        <button class="filter-btn">7 Days</button>
+                        <button class="filter-btn active">30 Days</button>
+                        <button class="filter-btn">90 Days</button>
+                        <button class="filter-btn">All Time</button>
+                    </div>
+                </div>
+                <div class="chart-placeholder">
+                    📊 Chart visualization will be displayed here
+                </div>
+            </div>
+
+            <div class="subject-performance">
+                <h2>Performance by Subject</h2>
+                <div class="subject-list">
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name">JavaScript Fundamentals</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div class="subject-score">92%</div>
+                    </div>
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name">React Advanced Concepts</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="subject-score">85%</div>
+                    </div>
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name">Data Structures & Algorithms</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 78%"></div>
+                            </div>
+                        </div>
+                        <div class="subject-score">78%</div>
+                    </div>
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name">Node.js Backend Development</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 88%"></div>
+                            </div>
+                        </div>
+                        <div class="subject-score">88%</div>
+                    </div>
+                    <div class="subject-item">
+                        <div class="subject-info">
+                            <div class="subject-name">Database Management</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 81%"></div>
+                            </div>
+                        </div>
+                        <div class="subject-score">81%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-exams">
+                <h2>Recent Exam Results</h2>
+                <table class="exam-table">
+                    <thead>
+                        <tr>
+                            <th>Exam Name</th>
+                            <th>Date</th>
+                            <th>Score</th>
+                            <th>Time Taken</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>JavaScript Fundamentals</td>
+                            <td>Oct 5, 2025</td>
+                            <td class="score-cell">92%</td>
+                            <td>28 min</td>
+                            <td><span class="exam-status status-passed">Passed</span></td>
+                        </tr>
+                        <tr>
+                            <td>React Advanced Concepts</td>
+                            <td>Oct 3, 2025</td>
+                            <td class="score-cell">85%</td>
+                            <td>42 min</td>
+                            <td><span class="exam-status status-passed">Passed</span></td>
+                        </tr>
+                        <tr>
+                            <td>Data Structures & Algorithms</td>
+                            <td>Oct 1, 2025</td>
+                            <td class="score-cell">78%</td>
+                            <td>55 min</td>
+                            <td><span class="exam-status status-passed">Passed</span></td>
+                        </tr>
+                        <tr>
+                            <td>Node.js Backend Development</td>
+                            <td>Sep 28, 2025</td>
+                            <td class="score-cell">88%</td>
+                            <td>38 min</td>
+                            <td><span class="exam-status status-passed">Passed</span></td>
+                        </tr>
+                        <tr>
+                            <td>Database Management</td>
+                            <td>Sep 25, 2025</td>
+                            <td class="score-cell">65%</td>
+                            <td>45 min</td>
+                            <td><span class="exam-status status-failed">Failed</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: window.sessionStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        // =========================================================
+        // FIX 1: SYNCHRONOUS FUNCTION TO RENDER STATIC NAVBAR INSTANTLY
+        // =========================================================
+        function renderNavbarStructure(activePage = 'insights') {
+            
+            // 1. Define the STATIC HTML structure for the navbar here
+            const navbarHTML = `
+                <nav class="navbar">
+                    <div class="navbar-brand">
+                        <div class="navbar-logo">T+</div>
+                        <div class="navbar-text">
+                            <h1 class="navbar-title">ThinkPlus</h1>
+                            <p class="navbar-subtitle">Exam Portal</p>
+                        </div>
+                    </div>
+                    <div class="navbar-menu">
+                        <a href="dashboard.html" class="nav-link ${activePage === 'dashboard' ? 'active' : ''}" id="nav-dashboard">Dashboard</a>
+                        <a href="insights.html" class="nav-link ${activePage === 'insights' ? 'active' : ''}" id="nav-insights">Insights</a>
+                        <a href="profile.html" class="nav-link ${activePage === 'profile' ? 'active' : ''}" id="nav-profile">Profile</a>
+                    </div>
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <div class="user-avatar" id="navUserAvatar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <span class="user-name" id="navUserName">Loading...</span>
+                        </div>
+                        <button class="btn-logout" id="navLogoutBtn">Logout</button>
+                    </div>
+                </nav>
+            `;
+
+            // 2. Add styles if not present (only run once)
+            if (!document.getElementById('navbar-styles')) {
+                const style = document.createElement('style');
+                style.id = 'navbar-styles';
+                style.textContent = `
+                    .navbar {
+                        position: relative;
+                        z-index: 100;
+                        background: rgba(15, 23, 42, 0.5);
+                        backdrop-filter: blur(20px) saturate(180%);
+                        padding: 1rem 2rem;
+                        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 1px solid rgba(167, 139, 250, 0.25);
+                        position: sticky;
+                        top: 0;
+                    }
+                    .navbar-brand {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.875rem;
+                    }
+                    .navbar-logo {
+                        width: 48px;
+                        height: 48px;
+                        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+                        border-radius: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: 900;
+                        font-size: 1.4rem;
+                        box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
+                        flex-shrink: 0;
+                        position: relative;
+                    }
+                    .navbar-logo::after {
+                        content: '';
+                        position: absolute;
+                        inset: -2px;
+                        border-radius: 12px;
+                        background: linear-gradient(135deg, #a78bfa, #ec4899);
+                        opacity: 0.3;
+                        filter: blur(10px);
+                        animation: navPulse 3s ease-in-out infinite;
+                        z-index: -1;
+                    }
+                    @keyframes navPulse {
+                        0%, 100% { opacity: 0.3; transform: scale(1); }
+                        50% { opacity: 0.6; transform: scale(1.05); }
+                    }
+                    .navbar-text {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.125rem;
+                    }
+                    .navbar-title {
+                        font-size: 1.5rem;
+                        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f59e0b 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                        font-weight: 800;
+                        letter-spacing: -0.5px;
+                        line-height: 1;
+                        margin: 0;
+                    }
+                    .navbar-subtitle {
+                        font-size: 0.75rem;
+                        color: #94a3b8;
+                        font-weight: 500;
+                        letter-spacing: 0.025em;
+                        margin: 0;
+                    }
+                    .navbar-menu {
+                        display: flex;
+                        gap: 2rem;
+                        align-items: center;
+                    }
+                    .navbar-menu a {
+                        text-decoration: none;
+                        color: #cbd5e1;
+                        font-weight: 600;
+                        transition: all 0.3s ease;
+                        position: relative;
+                        padding: 0.5rem 0;
+                    }
+                    .navbar-menu a:hover {
+                        color: #a78bfa;
+                    }
+                    .navbar-menu a.active {
+                        color: #a78bfa;
+                    }
+                    .navbar-menu a.active::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 2px;
+                        background: linear-gradient(90deg, #a78bfa, #ec4899);
+                        border-radius: 2px;
+                    }
+                    .user-menu {
+                        display: flex;
+                        align-items: center;
+                        gap: 1rem;
+                    }
+                    .user-info {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+                        padding: 0.5rem 1rem;
+                        background: rgba(30, 41, 59, 0.5);
+                        border-radius: 50px;
+                        border: 1px solid rgba(167, 139, 250, 0.2);
+                        backdrop-filter: blur(10px);
+                    }
+                    .user-avatar {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: 700;
+                        font-size: 0.95rem;
+                        box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+                        flex-shrink: 0;
+                    }
+                    .user-avatar svg {
+                        width: 60%;
+                        height: 60%;
+                    }
+                    .user-name {
+                        color: #e2e8f0;
+                        font-size: 0.95rem;
+                        font-weight: 600;
+                        white-space: nowrap;
+                    }
+                    .btn-logout {
+                        padding: 0.75rem 1.5rem;
+                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+                    }
+                    .btn-logout:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+                    }
+                    @media (max-width: 968px) {
+                        .navbar {
+                            flex-wrap: wrap;
+                            gap: 1rem;
+                            padding: 1rem 1.5rem;
+                        }
+                        .navbar-menu {
+                            order: 3;
+                            width: 100%;
+                            justify-content: center;
+                            gap: 1.5rem;
+                        }
+                    }
+                    @media (max-width: 640px) {
+                        .navbar-logo {
+                            width: 40px;
+                            height: 40px;
+                            font-size: 1.2rem;
+                        }
+                        .navbar-title {
+                            font-size: 1.25rem;
+                        }
+                        .navbar-subtitle {
+                            font-size: 0.7rem;
+                        }
+                        .user-name {
+                            display: none;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // 3. Insert the static HTML immediately
+            const insightsContainer = document.querySelector('.insights-container');
+            const existingNav = document.querySelector('.navbar');
+
+            // If the nav doesn't exist, insert it at the beginning of the container.
+            if (!existingNav) {
+                insightsContainer.insertAdjacentHTML('afterbegin', navbarHTML);
+            }
+        }
+
+
+        // =========================================================
+        // FIX 2: ASYNCHRONOUS FUNCTION TO FETCH USER DATA
+        // =========================================================
+        async function initNavbarData() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            const user = session.user;
+            
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('full_name, avatar_url')
+                .eq('id', user.id)
+                .single();
+
+            const fullName = profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0];
+            const avatarUrl = profile?.avatar_url;
+            
+            function getInitials(name) {
+                if (!name) return '?';
+                const parts = name.trim().split(' ');
+                if (parts.length >= 2) {
+                    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                }
+                return parts[0].substring(0, 2).toUpperCase();
+            }
+
+            const initials = getInitials(fullName);
+            const userAvatarElement = document.getElementById('navUserAvatar');
+            const userNameElement = document.getElementById('navUserName');
+
+            // Update user name
+            if (userNameElement) {
+                userNameElement.textContent = fullName;
+            }
+
+            // Update avatar
+            if (userAvatarElement) {
+                if (avatarUrl) {
+                    userAvatarElement.innerHTML = `<img src="${avatarUrl}" alt="${fullName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                } else {
+                    userAvatarElement.textContent = initials;
+                    userAvatarElement.style.background = 'linear-gradient(135deg, #a78bfa 0%, #ec4899 100%)';
+                }
+            }
+
+            // Add logout listener only once
+            document.getElementById('navLogoutBtn').addEventListener('click', async () => {
+                try {
+                    await supabase.auth.signOut();
+                    window.location.href = 'index.html';
+                } catch (err) {
+                    console.error('Logout error:', err);
+                    alert('Failed to logout. Please try again.');
+                }
+            });
+
+            return { user, profile, fullName };
+        }
+
+        // =========================================================
+        // MAIN ENTRY POINT
+        // =========================================================
+        async function initInsights() {
+            try {
+                // 1. Render the static HTML for the navbar immediately (SYNCHRONOUS)
+                renderNavbarStructure('insights');
+
+                // 2. Fetch the user data and update the name/avatar (ASYNCHRONOUS)
+                await initNavbarData();
+
+            } catch (err) {
+                console.error('Insights init error:', err);
+                // On any error during session check/data fetch, redirect.
+                window.location.href = 'index.html';
+            }
+        }
+
+        initInsights();
+    </script>
+</body>
+</html>
