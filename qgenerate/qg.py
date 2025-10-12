@@ -3,6 +3,7 @@ from flask_cors import CORS
 import random
 import csv
 import os
+import json
 
 app = Flask(__name__)
 CORS(app)  # Allow requests from your website
@@ -67,13 +68,46 @@ def format_question(q_data, question_id):
     # Parse options - they're in format "['opt1', 'opt2', 'opt3', 'opt4']"
     options_str = q_data['options']
     
-    # Remove brackets and quotes, then split by comma
-    if isinstance(options_str, str):
-        # Remove the outer brackets and split
-        options_str = options_str.strip("[]'\"")
-        options = [opt.strip().strip("'\"") for opt in options_str.split("','")]
-    else:
-        options = ["Option A", "Option B", "Option C", "Option D"]
+    # Try multiple parsing methods to handle different CSV formats
+    options = []
+    
+    try:
+        # Method 1: Try JSON parsing first (for proper JSON arrays)
+        options = json.loads(options_str)
+    except:
+        try:
+            # Method 2: Try eval for Python list format (safer with literal_eval)
+            import ast
+            options = ast.literal_eval(options_str)
+        except:
+            # Method 3: Manual parsing for string format like "['opt1', 'opt2', 'opt3', 'opt4']"
+            if isinstance(options_str, str):
+                # Remove outer brackets
+                cleaned = options_str.strip().strip('[]')
+                
+                # Split by comma, but handle quotes properly
+                if "','" in cleaned or '","' in cleaned:
+                    # Split by ',' or ","
+                    parts = cleaned.replace('","', "','").split("','")
+                    options = [opt.strip().strip('"\'') for opt in parts]
+                else:
+                    # Fallback: simple comma split
+                    options = [opt.strip().strip('"\'') for opt in cleaned.split(',')]
+            else:
+                options = ["Option A", "Option B", "Option C", "Option D"]
+    
+    # Clean up each option (remove extra quotes and whitespace)
+    options = [str(opt).strip().strip('"\'') for opt in options if opt]
+    
+    # Ensure we have exactly 4 options
+    if len(options) < 4:
+        print(f"⚠️ Warning: Question {question_id} has only {len(options)} options. Expected 4.")
+        # Pad with empty options if needed
+        while len(options) < 4:
+            options.append(f"Option {len(options) + 1}")
+    elif len(options) > 4:
+        print(f"⚠️ Warning: Question {question_id} has {len(options)} options. Using first 4.")
+        options = options[:4]
     
     return {
         'id': question_id,
