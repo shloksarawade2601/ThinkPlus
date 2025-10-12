@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import random
-import pandas as pd
+import csv
 import os
 
 app = Flask(__name__)
@@ -20,13 +20,23 @@ def load_questions_from_csv():
     global questions_db
     
     try:
-        # Read CSV file without headers
-        df = pd.read_csv(CSV_FILE_PATH, header=None, names=[
-            'id', 'topic', 'difficulty', 'question', 'options', 'answer', 'explanation'
-        ])
+        questions_db = []
         
-        # Convert DataFrame to list of dictionaries
-        questions_db = df.to_dict('records')
+        # Read CSV file without pandas
+        with open(CSV_FILE_PATH, 'r', encoding='utf-8') as file:
+            csv_reader = csv.reader(file)
+            
+            for row in csv_reader:
+                if len(row) >= 7:  # Ensure row has all required columns
+                    questions_db.append({
+                        'id': row[0],
+                        'topic': row[1],
+                        'difficulty': row[2],
+                        'question': row[3],
+                        'options': row[4],
+                        'answer': row[5],
+                        'explanation': row[6]
+                    })
         
         print(f"✅ Successfully loaded {len(questions_db)} questions from CSV")
         return True
