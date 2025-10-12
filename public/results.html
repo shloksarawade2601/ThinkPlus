@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkPlus - Exam Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .loading-screen.hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(167, 139, 250, 0.3);
+            border-top-color: #a78bfa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            color: #a78bfa;
+        }
+
+        .navbar {
+            position: relative;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.25);
+            position: sticky;
+            top: 0;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+        }
+
+        .navbar-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 900;
+            font-size: 1.4rem;
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
+        }
+
+        .navbar-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .navbar-title {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .navbar-subtitle {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .navbar-menu a {
+            text-decoration: none;
+            color: #cbd5e1;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-menu a:hover {
+            color: #a78bfa;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 50px;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .user-name {
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 3rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header h1 {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .result-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.959);
+            margin-bottom: 2rem;
+        }
+
+        .exam-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .meta-item {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 0.75rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(214, 210, 224, 0.856);
+        }
+
+        .meta-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta-value {
+            color: #f1f5f9;
+            font-size: 1.1rem;
+            font-weight: 700;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+        }
+
+        .score-circle {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 40px rgba(167, 139, 250, 0.6);
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            width: 190px;
+            height: 190px;
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 50%;
+        }
+
+        .score-content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-value {
+            font-size: 4.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .score-percent {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-status {
+            font-size: 4rem;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .result-status.passed {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-status.failed {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 0.75rem;
+            border-radius: 1rem;
+            border: 1px solid rgb(182, 177, 192);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .question-review {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(167, 139, 250, 0.25);
+            margin-bottom: 2rem;
+        }
+
+        .question-review h2 {
+            color: #f1f5f9;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .question-item {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.15);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .question-number {
+            font-weight: 700;
+            color: #a78bfa;
+            font-size: 1.1rem;
+        }
+
+        .question-status {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-correct {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .status-incorrect {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .question-text {
+            color: #e2e8f0;
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .answer-info {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .answer-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .answer-label {
+            color: #94a3b8;
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        .answer-value {
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .answer-value.correct {
+            color: #10b981;
+        }
+
+        .answer-value.incorrect {
+            color: #ef4444;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 3rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(167, 139, 250, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.7);
+            color: #cbd5e1;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .navbar {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .navbar-menu {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .score-circle {
+                width: 180px;
+                height: 180px;
+            }
+
+            .score-circle::before {
+                width: 155px;
+                height: 155px;
+            }
+
+            .score-value {
+                font-size: 3.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="gradient-bg"></div>
+
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading your results...</div>
+    </div>
+
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-logo">T+</div>
+            <div class="navbar-text">
+                <h1 class="navbar-title">ThinkPlus</h1>
+                <p class="navbar-subtitle">Exam Portal</p>
+            </div>
+        </div>
+        <div class="navbar-menu">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="insights.html">Insights</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <div class="user-menu">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span class="user-name" id="userName">User</span>
+            </div>
+            <button class="btn-logout" id="logoutBtn">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Exam Results</h1>
+            <p id="examTitle">Your exam performance summary</p>
+        </div>
+
+        <div class="result-card">
+            <div class="exam-meta">
+                <div class="meta-item">
+                    <div class="meta-label">📋 Exam ID</div>
+                    <div class="meta-value" id="displayExamId">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">👤 Student ID</div>
+                    <div class="meta-value" id="displayStudentId">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">📅 Date</div>
+                    <div class="meta-value" id="examDate">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">⏱️ Duration</div>
+                    <div class="meta-value" id="examDuration">-</div>
+                </div>
+            </div>
+
+            <div class="score-display">
+                <div class="score-circle">
+                    <div class="score-content">
+                        <span class="score-value" id="scoreValue">0</span>
+                        <span class="score-percent">%</span>
+                    </div>
+                </div>
+                <div>
+                    <p class="result-status" id="resultStatus">Loading...</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="correctCount">0</div>
+                    <div class="stat-label">Correct Answers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="incorrectCount">0</div>
+                    <div class="stat-label">Incorrect Answers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalQuestions">0</div>
+                    <div class="stat-label">Total Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgTime">0s</div>
+                    <div class="stat-label">Avg Time/Question</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-review">
+            <h2>📝 Question-by-Question Review</h2>
+            <div id="questionsList">
+                <p style="color: #94a3b8; text-align: center;">Loading questions...</p>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+            <a href="insights.html" class="btn btn-secondary">View Detailed Analysis</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: window.sessionStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        let currentUser = null;
+        let examData = null;
+        let answersData = [];
+        let scheduledExamData = null;
+
+        async function init() {
+            try {
+                const { data: { session }, error: authError } = await supabase.auth.getSession();
+
+                if (authError || !session) {
+                    alert('Please login first');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = session.user;
+
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('full_name, student_id')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (profile) {
+                    document.getElementById('userName').textContent = profile.full_name || 'User';
+                    document.getElementById('userAvatar').textContent = (profile.full_name || 'U')[0].toUpperCase();
+                }
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const examId = urlParams.get('exam_id');
+
+                if (!examId) {
+                    alert('No exam ID provided');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
+                await loadExamResults(examId);
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                document.getElementById('loadingScreen').classList.add('hidden');
+                alert('Error loading results: ' + error.message);
+            }
+        }
+
+        async function loadExamResults(examId) {
+            try {
+                const { data: exam, error: examError } = await supabase
+                    .from('exams')
+                    .select('*')
+                    .eq('exam_id', examId)
+                    .single();
+
+                if (examError || !exam) {
+                    throw new Error('Failed to load exam data');
+                }
+
+                examData = exam;
+
+                // Fetch scheduled exam data to get the passing score
+                if (exam.scheduled_exam_id) {
+                    const { data: scheduledExam, error: scheduledError } = await supabase
+                        .from('scheduled_exams')
+                        .select('passing_score, exam_name')
+                        .eq('scheduled_exam_id', exam.scheduled_exam_id)
+                        .single();
+
+                    if (!scheduledError && scheduledExam) {
+                        scheduledExamData = scheduledExam;
+                        document.getElementById('examTitle').textContent = scheduledExam.exam_name || 'Your exam performance summary';
+                    }
+                }
+
+                const { data: answers, error: answersError } = await supabase
+                    .from('exam_answers')
+                    .select('*')
+                    .eq('exam_id', examId)
+                    .order('question_id', { ascending: true });
+
+                answersData = answers || [];
+
+                displayResults();
+                document.getElementById('loadingScreen').classList.add('hidden');
+
+            } catch (error) {
+                console.error('Error loading results:', error);
+                throw error;
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            };
+            return date.toLocaleString('en-US', options);
+        }
+
+        function displayResults() {
+            const totalQuestions = examData.total_questions || 30;
+            const correctAnswers = examData.correct_answers || 0;
+            const incorrectAnswers = totalQuestions - correctAnswers;
+            const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+            
+            // Get passing score from scheduled exam, fallback to 60 if not available
+            const passingScore = scheduledExamData?.passing_score || 60;
+            const passed = percentage >= passingScore;
+
+            document.getElementById('displayExamId').textContent = examData.exam_id;
+            document.getElementById('displayStudentId').textContent = examData.student_id || 'N/A';
+            
+            // Format the date properly
+            document.getElementById('examDate').textContent = formatDate(examData.created_at || examData.started_at);
+
+            const timeTakenMinutes = Math.floor((examData.time_taken || 0) / 60);
+            const timeTakenSeconds = (examData.time_taken || 0) % 60;
+            document.getElementById('examDuration').textContent = `${timeTakenMinutes}m ${timeTakenSeconds}s`;
+
+            animateValue('scoreValue', 0, percentage, 1500);
+
+            document.getElementById('resultStatus').textContent = passed ? '🎉 Passed!' : '❌ Failed';
+            document.getElementById('resultStatus').className = passed ? 'result-status passed' : 'result-status failed';
+
+            document.getElementById('correctCount').textContent = correctAnswers;
+            document.getElementById('incorrectCount').textContent = incorrectAnswers;
+            document.getElementById('totalQuestions').textContent = totalQuestions;
+
+            const avgTimePerQuestion = totalQuestions > 0 ? Math.round((examData.time_taken || 0) / totalQuestions) : 0;
+            document.getElementById('avgTime').textContent = `${avgTimePerQuestion}s`;
+
+            displayQuestions();
+        }
+
+        function animateValue(elementId, start, end, duration) {
+            const element = document.getElementById(elementId);
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.round(current);
+            }, 16);
+        }
+
+        function displayQuestions() {
+            const questionsList = document.getElementById('questionsList');
+            const questions = examData.questions || [];
+
+            if (questions.length === 0) {
+                questionsList.innerHTML = '<p style="color: #94a3b8; text-align: center;">No questions available</p>';
+                return;
+            }
+
+            questionsList.innerHTML = questions.map((q, index) => {
+                const answer = answersData.find(a => a.question_id === q.id || a.question_id === (index + 1));
+                const isCorrect = answer ? answer.is_correct : false;
+                const studentAnswer = answer ? answer.student_answer : 'Not answered';
+                const correctAnswer = q.correct_answer || answer?.correct_answer || 'N/A';
+
+                return `
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">Question ${index + 1}</span>
+                            <span class="question-status ${isCorrect ? 'status-correct' : 'status-incorrect'}">
+                                ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                            </span>
+                        </div>
+                        <div class="question-text">${q.question || q.text || 'Question text not available'}</div>
+                        <div class="answer-info">
+                            <div class="answer-row">
+                                <span class="answer-label">Your Answer:</span>
+                                <span class="answer-value ${isCorrect ? 'correct' : 'incorrect'}">${studentAnswer}</span>
+                            </div>
+                            ${!isCorrect ? `
+                                <div class="answer-row">
+                                    <span class="answer-label">Correct Answer:</span>
+                                    <span class="answer-value correct">${correctAnswer}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+
+        init();
+    </script>
+</body>
+</html>

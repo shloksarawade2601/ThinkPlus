@@ -298,7 +298,7 @@ function submitExam() {
     localStorage.setItem('lastExamResult', JSON.stringify(examResults));
     
     // Redirect to results page
-    window.location.href = '/result.html';
+    window.location.href = '/results.html';
 }
 
 // Prevent accidental page close

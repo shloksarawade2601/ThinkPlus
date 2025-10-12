@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkPlus - Teacher Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+            top: -200px;
+            left: -200px;
+        }
+
+        .orb2 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: 7s;
+        }
+
+        .orb3 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #f59e0b 0%, transparent 70%);
+            top: 50%;
+            right: -100px;
+            animation-delay: 14s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-image:
+                linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .profile-header {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(167, 139, 250, 0.15);
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(167, 139, 250, 0.25);
+            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            margin-bottom: 2rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .user-avatar-large {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.5);
+            border: 4px solid rgba(167, 139, 250, 0.3);
+        }
+
+        .user-avatar-large:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px rgba(167, 139, 250, 0.7);
+        }
+
+        .avatar-upload-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            border: 4px solid rgba(15, 23, 42, 0.8);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .avatar-upload-btn:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            transform: scale(1.1);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            color: #f1f5f9;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-email {
+            color: #94a3b8;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .profile-bio {
+            color: #cbd5e1;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            max-width: 600px;
+        }
+
+        .menu-section {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(167, 139, 250, 0.15);
+            overflow: hidden;
+            border: 1px solid rgba(167, 139, 250, 0.25);
+            animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:hover {
+            background: rgba(30, 41, 59, 0.5);
+            padding-left: 2rem;
+        }
+
+        .menu-item-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .menu-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .menu-icon.personal {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .menu-icon.security {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .menu-icon.help {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .menu-icon.about {
+            background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .menu-text h4 {
+            color: #f1f5f9;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .menu-text p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .menu-arrow {
+            color: #64748b;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover .menu-arrow {
+            color: #a78bfa;
+            transform: translateX(5px);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(167, 139, 250, 0.2);
+            border-top-color: #a78bfa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #avatarInput {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .profile-top {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .user-avatar-large {
+                width: 150px;
+                height: 150px;
+                font-size: 3.5rem;
+            }
+
+            .profile-stats {
+                justify-content: center;
+            }
+
+            .profile-bio {
+                text-align: center;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="gradient-bg"></div>
+    <div class="orbs">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <div class="container" id="mainContent">
+        <div class="loading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <input type="file" id="avatarInput" accept="image/*">
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
+        const TEACHER_EMAIL = 'shloksarawade0@gmail.com';
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: window.sessionStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        let currentUser = null;
+        let userProfile = null;
+
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return null;
+            }
+            if (session.user.email.toLowerCase() !== TEACHER_EMAIL.toLowerCase()) {
+                window.location.href = 'dashboard.html';
+                return null;
+            }
+            return session.user;
+        }
+
+        async function getUserProfile(userId) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (error) {
+                console.error('Error fetching profile:', error);
+                return null;
+            }
+            return data;
+        }
+
+        async function getTeacherStats(userId) {
+            const { data: exams } = await supabase
+                .from('scheduled_exams')
+                .select('scheduled_exam_id')
+                .eq('created_by_id', userId);
+
+            const totalExams = exams?.length || 0;
+
+            const { data: allProfiles } = await supabase
+                .from('profiles')
+                .select('id')
+                .neq('id', userId);
+
+            const totalStudents = allProfiles?.length || 0;
+
+            return {
+                examsCreated: totalExams,
+                totalStudents
+            };
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = name.trim().split(' ');
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            }
+            return parts[0].substring(0, 2).toUpperCase();
+        }
+
+        async function initNavbar(activePage = 'profile') {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                return null;
+            }
+
+            const user = session.user;
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('full_name, avatar_url')
+                .eq('id', user.id)
+                .single();
+
+            const fullName = profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0];
+            const avatarUrl = profile?.avatar_url;
+            const initials = getInitials(fullName);
+
+            const navbarHTML = `
+                <nav class="navbar">
+                    <div class="navbar-brand">
+                        <div class="navbar-logo">T+</div>
+                        <div class="navbar-text">
+                            <h1 class="navbar-title">ThinkPlus</h1>
+                            <p class="navbar-subtitle">Teacher Portal</p>
+                        </div>
+                    </div>
+                    <div class="navbar-menu">
+                        <a href="teacher-dashboard.html" class="${activePage === 'dashboard' ? 'active' : ''}">Dashboard</a>
+                        <a href="teacher-students.html" class="${activePage === 'students' ? 'active' : ''}">Students</a>
+                        <a href="teacher-insights.html" class="${activePage === 'insights' ? 'active' : ''}">Insights</a>
+                        <a href="teacher-profile.html" class="${activePage === 'profile' ? 'active' : ''}">Profile</a>
+                    </div>
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <div class="user-avatar" id="navUserAvatar">
+                                ${avatarUrl ?
+                    `<img src="${avatarUrl}" alt="${fullName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` :
+                    initials
+                }
+                            </div>
+                            <span class="user-name">${fullName}</span>
+                        </div>
+                        <button class="btn-logout" id="navLogoutBtn">Logout</button>
+                    </div>
+                </nav>
+            `;
+
+            if (!document.getElementById('navbar-styles')) {
+                const style = document.createElement('style');
+                style.id = 'navbar-styles';
+                style.textContent = `
+                    .navbar {
+                        position: relative;
+                        z-index: 100;
+                        background: rgba(15, 23, 42, 0.5);
+                        backdrop-filter: blur(20px) saturate(180%);
+                        padding: 1rem 2rem;
+                        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 1px solid rgba(167, 139, 250, 0.25);
+                        position: sticky;
+                        top: 0;
+                    }
+                    .navbar-brand {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.875rem;
+                    }
+                    .navbar-logo {
+                        width: 48px;
+                        height: 48px;
+                        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+                        border-radius: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: 900;
+                        font-size: 1.4rem;
+                        box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
+                        flex-shrink: 0;
+                        position: relative;
+                    }
+                    .navbar-logo::after {
+                        content: '';
+                        position: absolute;
+                        inset: -2px;
+                        border-radius: 12px;
+                        background: linear-gradient(135deg, #a78bfa, #ec4899);
+                        opacity: 0.3;
+                        filter: blur(10px);
+                        animation: navPulse 3s ease-in-out infinite;
+                        z-index: -1;
+                    }
+                    @keyframes navPulse {
+                        0%, 100% { opacity: 0.3; transform: scale(1); }
+                        50% { opacity: 0.6; transform: scale(1.05); }
+                    }
+                    .navbar-text {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.125rem;
+                    }
+                    .navbar-title {
+                        font-size: 1.5rem;
+                        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f59e0b 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                        font-weight: 800;
+                        letter-spacing: -0.5px;
+                        line-height: 1;
+                        margin: 0;
+                    }
+                    .navbar-subtitle {
+                        font-size: 0.75rem;
+                        color: #94a3b8;
+                        font-weight: 500;
+                        letter-spacing: 0.025em;
+                        margin: 0;
+                    }
+                    .navbar-menu {
+                        display: flex;
+                        gap: 2rem;
+                        align-items: center;
+                    }
+                    .navbar-menu a {
+                        text-decoration: none;
+                        color: #cbd5e1;
+                        font-weight: 600;
+                        transition: all 0.3s ease;
+                        position: relative;
+                        padding: 0.5rem 0;
+                    }
+                    .navbar-menu a:hover {
+                        color: #a78bfa;
+                    }
+                    .navbar-menu a.active {
+                        color: #a78bfa;
+                    }
+                    .navbar-menu a.active::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 2px;
+                        background: linear-gradient(90deg, #a78bfa, #ec4899);
+                        border-radius: 2px;
+                    }
+                    .user-menu {
+                        display: flex;
+                        align-items: center;
+                        gap: 1rem;
+                    }
+                    .user-info {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+                        padding: 0.5rem 1rem;
+                        background: rgba(30, 41, 59, 0.5);
+                        border-radius: 50px;
+                        border: 1px solid rgba(167, 139, 250, 0.2);
+                        backdrop-filter: blur(10px);
+                    }
+                    .user-avatar {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: 700;
+                        font-size: 0.95rem;
+                        box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+                        flex-shrink: 0;
+                    }
+                    .user-name {
+                        color: #e2e8f0;
+                        font-size: 0.95rem;
+                        font-weight: 600;
+                        white-space: nowrap;
+                    }
+                    .btn-logout {
+                        padding: 0.75rem 1.5rem;
+                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+                    }
+                    .btn-logout:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+                    }
+                    @media (max-width: 968px) {
+                        .navbar {
+                            flex-wrap: wrap;
+                            gap: 1rem;
+                            padding: 1rem 1.5rem;
+                        }
+                        .navbar-menu {
+                            order: 3;
+                            width: 100%;
+                            justify-content: center;
+                            gap: 1.5rem;
+                        }
+                    }
+                    @media (max-width: 640px) {
+                        .navbar-logo {
+                            width: 40px;
+                            height: 40px;
+                            font-size: 1.2rem;
+                        }
+                        .navbar-title {
+                            font-size: 1.25rem;
+                        }
+                        .navbar-subtitle {
+                            font-size: 0.7rem;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            const existingNav = document.querySelector('.navbar');
+            if (existingNav) {
+                existingNav.outerHTML = navbarHTML;
+            } else {
+                document.body.insertAdjacentHTML('afterbegin', navbarHTML);
+            }
+
+            document.getElementById('navLogoutBtn').addEventListener('click', async () => {
+                try {
+                    await supabase.auth.signOut();
+                    window.location.href = 'index.html';
+                } catch (err) {
+                    console.error('Logout error:', err);
+                    alert('Failed to logout. Please try again.');
+                }
+            });
+
+            return { user, profile };
+        }
+
+        function attachNavigationListeners() {
+            const navigationMap = {
+                'personalInfoLink': 'teacher-personalinfo.html',
+                'securityPrivacyLink': 'teacher-security.html',
+                'helpSupportLink': 'teacher-help.html',
+                'aboutThinkPlusLink': 'teacher-about.html',
+            };
+
+            for (const [id, url] of Object.entries(navigationMap)) {
+                const linkElement = document.getElementById(id);
+                if (linkElement) {
+                    linkElement.addEventListener('click', (e) => {
+                        if (linkElement.tagName === 'A') {
+                            e.preventDefault();
+                        }
+                        window.location.href = url;
+                    });
+                }
+            }
+        }
+
+        async function loadProfile() {
+            const navData = await initNavbar('profile');
+
+            if (!navData) {
+                await checkAuth();
+                return;
+            }
+
+            currentUser = navData.user;
+            let currentProfile = await getUserProfile(currentUser.id);
+            userProfile = currentProfile || navData.profile;
+
+            const stats = await getTeacherStats(currentUser.id);
+
+            const fullName = userProfile?.full_name || currentUser.user_metadata?.full_name || 'Teacher';
+            const email = currentUser.email;
+            const avatarUrl = userProfile?.avatar_url;
+            const bio = userProfile?.bio || 'No bio yet. Click "Personal Information" to add one.';
+            const initials = getInitials(fullName);
+
+            const content = `
+                <div class="profile-header">
+                    <div class="profile-top">
+                        <div class="avatar-container">
+                            <div class="user-avatar-large" id="userAvatarLarge">
+                                ${avatarUrl ?
+                    `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` :
+                    initials
+                }
+                            </div>
+                            <div class="avatar-upload-btn" id="avatarUploadBtn">📷</div>
+                        </div>
+                        <div class="profile-info">
+                            <div class="profile-name">${fullName}</div>
+                            <div class="profile-email">${email}</div>
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">${stats.examsCreated}</span>
+                                    <span class="stat-label">exams</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">${stats.totalStudents}</span>
+                                    <span class="stat-label">students</span>
+                                </div>
+                            </div>
+                            <div class="profile-bio">${bio}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-item" id="personalInfoLink">
+                        <div class="menu-item-content">
+                            <div class="menu-icon personal">👤</div>
+                            <div class="menu-text">
+                                <h4>Personal Information</h4>
+                                <p>Update your name, email, and bio</p>
+                            </div>
+                        </div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+
+                    <div class="menu-item" id="securityPrivacyLink">
+                        <div class="menu-item-content">
+                            <div class="menu-icon security">🔒</div>
+                            <div class="menu-text">
+                                <h4>Security & Privacy</h4>
+                                <p>Change password and email address</p>
+                            </div>
+                        </div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+
+                    <div class="menu-item" id="helpSupportLink">
+                        <div class="menu-item-content">
+                            <div class="menu-icon help">❓</div>
+                            <div class="menu-text">
+                                <h4>Help & Support</h4>
+                                <p>Get help and view FAQs</p>
+                            </div>
+                        </div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+
+                    <div class="menu-item" id="aboutThinkPlusLink">
+                        <div class="menu-item-content">
+                            <div class="menu-icon about">ℹ️</div>
+                            <div class="menu-text">
+                                <h4>About ThinkPlus</h4>
+                                <p>Learn more about our platform</p>
+                            </div>
+                        </div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('mainContent').innerHTML = content;
+            setupAvatarUpload();
+            attachNavigationListeners();
+        }
+
+        function setupAvatarUpload() {
+            const avatarUploadBtn = document.getElementById('avatarUploadBtn');
+            const avatarInput = document.getElementById('avatarInput');
+
+            if (!avatarUploadBtn || !avatarInput) return;
+
+            avatarUploadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                avatarInput.click();
+            });
+
+            avatarInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file');
+                    return;
+                }
+
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Image size should be less than 2MB');
+                    return;
+                }
+
+                try {
+                    const uploadBtn = document.getElementById('avatarUploadBtn');
+                    const originalContent = uploadBtn.innerHTML;
+                    uploadBtn.innerHTML = '⏳';
+                    uploadBtn.style.pointerEvents = 'none';
+
+                    const reader = new FileReader();
+                    reader.onload = async function (event) {
+                        const base64Image = event.target.result;
+
+                        try {
+                            const { error: updateError } = await supabase
+                                .from('profiles')
+                                .update({ avatar_url: base64Image })
+                                .eq('id', currentUser.id);
+
+                            if (updateError) throw updateError;
+                            location.reload();
+                        } catch (error) {
+                            console.error('Error updating avatar:', error);
+                            alert('Failed to update avatar: ' + error.message);
+                            uploadBtn.innerHTML = originalContent;
+                            uploadBtn.style.pointerEvents = 'auto';
+                        }
+                    };
+
+                    reader.onerror = function () {
+                        alert('Failed to read image file');
+                        uploadBtn.innerHTML = originalContent;
+                        uploadBtn.style.pointerEvents = 'auto';
+                    };
+
+                    reader.readAsDataURL(file);
+                } catch (error) {
+                    console.error('Error uploading avatar:', error);
+                    alert('Failed to upload avatar: ' + error.message);
+                }
+            });
+        }
+
+        loadProfile();
+    </script>
+</body>
+
+</html>

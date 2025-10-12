@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkPlus - Create Exam</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+            top: -250px;
+            left: -250px;
+        }
+
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+            top: 50%;
+            right: -200px;
+            animation-delay: 5s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-image: 
+                linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        .dashboard-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 3rem;
+        }
+
+        .page-header {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(167, 139, 250, 0.15);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(167, 139, 250, 0.25);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        .form-container {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(167, 139, 250, 0.25);
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid rgba(139, 92, 246, 0.25);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(30, 41, 59, 0.5);
+            color: #e2e8f0;
+            backdrop-filter: blur(10px);
+            font-family: inherit;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #64748b;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #a78bfa;
+            background: rgba(30, 41, 59, 0.7);
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.15),
+                        0 4px 12px rgba(167, 139, 250, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .helper-text {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(71, 85, 105, 0.5);
+            color: #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(71, 85, 105, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(167, 139, 250, 0.2);
+            border-top-color: #a78bfa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .success-message, .error-message {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            color: #6ee7b7;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #fca5a5;
+        }
+
+        .success-message.show, .error-message.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="orbs">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <div id="loadingMessage" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                Creating exam...
+            </div>
+
+            <div id="mainContent">
+                <div class="page-header">
+                    <h1>Schedule New Exam</h1>
+                    <p>Create an exam that will appear on all students' dashboards</p>
+                </div>
+
+                <div class="form-container">
+                    <div class="success-message" id="successMessage"></div>
+                    <div class="error-message" id="errorMessage"></div>
+
+                    <form id="createExamForm">
+                        <div class="form-group">
+                            <label for="examName">Exam Name *</label>
+                            <input 
+                                type="text" 
+                                id="examName" 
+                                name="examName" 
+                                placeholder="e.g., JavaScript Fundamentals Mid-Term"
+                                required
+                            >
+                            <p class="helper-text">Enter a descriptive name for the exam</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="examDescription">Description (Optional)</label>
+                            <textarea 
+                                id="examDescription" 
+                                name="examDescription" 
+                                placeholder="Brief description of exam topics and objectives..."
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="totalQuestions">Total Questions</label>
+                            <input 
+                                type="number" 
+                                id="totalQuestions" 
+                                name="totalQuestions" 
+                                value="30"
+                                readonly
+                                disabled
+                                style="opacity: 0.7; cursor: not-allowed;"
+                            >
+                            <p class="helper-text">Fixed at 30 questions with mixed difficulty</p>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="startTime">Start Time *</label>
+                                <input 
+                                    type="datetime-local" 
+                                    id="startTime" 
+                                    name="startTime" 
+                                    required
+                                >
+                                <p class="helper-text">When students can begin</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="endTime">End Time *</label>
+                                <input 
+                                    type="datetime-local" 
+                                    id="endTime" 
+                                    name="endTime" 
+                                    required
+                                >
+                                <p class="helper-text">Final submission deadline</p>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="duration">Duration (minutes) *</label>
+                                <input 
+                                    type="number" 
+                                    id="duration" 
+                                    name="duration" 
+                                    placeholder="45"
+                                    min="1"
+                                    max="300"
+                                    required
+                                >
+                                <p class="helper-text">Time limit per attempt</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="passingScore">Passing Score (%) *</label>
+                                <input 
+                                    type="number" 
+                                    id="passingScore" 
+                                    name="passingScore" 
+                                    placeholder="60"
+                                    min="1"
+                                    max="100"
+                                    value="60"
+                                    required
+                                >
+                                <p class="helper-text">Minimum percentage to pass</p>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="window.location.href='teacher-dashboard.html'">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                Schedule Exam
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
+        const TEACHER_EMAIL = 'shloksarawade0@gmail.com';
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: window.sessionStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        // Verify teacher access
+        async function verifyTeacher() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            if (session.user.email.toLowerCase() !== TEACHER_EMAIL.toLowerCase()) {
+                window.location.href = 'dashboard.html';
+                return false;
+            }
+
+            return true;
+        }
+
+        // Initialize page
+        async function initPage() {
+            const isTeacher = await verifyTeacher();
+            if (!isTeacher) return;
+
+            // Set minimum datetime to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('startTime').min = now.toISOString().slice(0, 16);
+            document.getElementById('endTime').min = now.toISOString().slice(0, 16);
+        }
+
+        // Show message
+        function showMessage(message, type = 'success') {
+            const successEl = document.getElementById('successMessage');
+            const errorEl = document.getElementById('errorMessage');
+            
+            successEl.classList.remove('show');
+            errorEl.classList.remove('show');
+            
+            if (type === 'success') {
+                successEl.textContent = message;
+                successEl.classList.add('show');
+            } else {
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+            }
+
+            // Scroll to message
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Handle form submission
+        document.getElementById('createExamForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const mainContent = document.getElementById('mainContent');
+
+            // Get form data
+            const examName = document.getElementById('examName').value.trim();
+            const description = document.getElementById('examDescription').value.trim() || null;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const duration = parseInt(document.getElementById('duration').value);
+            const totalQuestions = 30; // Fixed at 30 questions
+            const passingScore = parseInt(document.getElementById('passingScore').value);
+            const difficulty = 'mixed'; // Always set to mixed
+
+            // Validation
+            const startDateTime = new Date(startTime);
+            const endDateTime = new Date(endTime);
+            const now = new Date();
+
+            if (startDateTime >= endDateTime) {
+                showMessage('End time must be after start time', 'error');
+                return;
+            }
+
+            if (endDateTime <= now) {
+                showMessage('End time must be in the future', 'error');
+                return;
+            }
+
+            // Disable form
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Scheduling...';
+
+            try {
+                // Get current user session
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    throw new Error('Not authenticated');
+                }
+
+                // Generate unique scheduled_exam_id
+                const scheduledExamId = 'SCHEDULED_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+                // Create scheduled exam data
+                const scheduledExamData = {
+                    scheduled_exam_id: scheduledExamId,
+                    exam_name: examName,
+                    description: description,
+                    total_questions: totalQuestions,
+                    duration: duration,
+                    difficulty: difficulty,
+                    start_time: startDateTime.toISOString(),
+                    end_time: endDateTime.toISOString(),
+                    passing_score: passingScore,
+                    created_by: TEACHER_EMAIL,
+                    created_by_id: session.user.id,
+                    is_active: true
+                };
+
+                console.log('Creating scheduled exam with data:', scheduledExamData);
+
+                // Insert into scheduled_exams table (NOT exams table)
+                const { data, error } = await supabase
+                    .from('scheduled_exams')
+                    .insert([scheduledExamData])
+                    .select();
+
+                if (error) {
+                    console.error('Supabase error:', error);
+                    throw new Error(error.message);
+                }
+
+                console.log('Scheduled exam created successfully:', data);
+
+                // Show success
+                mainContent.style.display = 'none';
+                loadingMessage.style.display = 'block';
+                loadingMessage.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">✓</div>
+                        <h2 style="color: #10b981; margin-bottom: 1rem;">Exam Scheduled Successfully!</h2>
+                        <p style="margin-bottom: 0.5rem;">The exam "<strong>${examName}</strong>" has been scheduled.</p>
+                        <p style="color: #94a3b8; margin-bottom: 1.5rem;">It will appear on all student dashboards and be available from ${startDateTime.toLocaleString()} to ${endDateTime.toLocaleString()}</p>
+                        <button onclick="window.location.href='teacher-dashboard.html'" 
+                                style="padding: 1rem 2rem; background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%); 
+                                       color: white; border: none; border-radius: 12px; font-weight: 700; 
+                                       cursor: pointer; font-size: 1rem;">
+                            Back to Dashboard
+                        </button>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error creating scheduled exam:', error);
+                showMessage('Error scheduling exam: ' + error.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Schedule Exam';
+            }
+        });
+
+        // Validate end time when start time changes
+        document.getElementById('startTime').addEventListener('change', function() {
+            const startTime = this.value;
+            if (startTime) {
+                document.getElementById('endTime').min = startTime;
+            }
+        });
+
+        // Initialize
+        initPage();
+    </script>
+</body>
+</html>

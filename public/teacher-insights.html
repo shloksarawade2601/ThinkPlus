@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkPlus - Teacher Insights</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+            top: -250px;
+            left: -250px;
+        }
+
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+            top: 50%;
+            right: -200px;
+            animation-delay: 5s;
+        }
+
+        .orb3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+            bottom: -150px;
+            left: 30%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -50px) scale(1.1); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-image:
+                linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        .insights-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 3rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(167, 139, 250, 0.2);
+            border-top-color: #a78bfa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .page-header {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(167, 139, 250, 0.15);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(167, 139, 250, 0.25);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .page-header p {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .performance-card {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 1.75rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .performance-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+
+        .performance-card h3 {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .performance-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .performance-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .search-section {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .search-section h2 {
+            color: #f1f5f9;
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.875rem;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-group select option {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .btn-search {
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(167, 139, 250, 0.4);
+            font-size: 1rem;
+            height: fit-content;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(167, 139, 250, 0.6);
+        }
+
+        .btn-search:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(25px) saturate(180%);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(167, 139, 250, 0.25);
+            max-width: 900px;
+            width: 100%;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            animation: modalSlideIn 0.4s ease;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .modal-content {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.4);
+            transform: rotate(90deg);
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .report-header .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 900;
+            color: white;
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
+        }
+
+        .brand-title {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .report-header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-header .exam-name {
+            font-size: 1.3rem;
+            color: #cbd5e1;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-header .exam-date {
+            font-size: 0.95rem;
+            color: #94a3b8;
+        }
+
+        .score-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding: 2rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 20px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            gap: 2rem;
+        }
+
+        .score-ring {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(from 0deg,
+                    #a78bfa 0%,
+                    #a78bfa var(--progress, 0%),
+                    rgba(167, 139, 250, 0.15) var(--progress, 0%),
+                    rgba(167, 139, 250, 0.15) 100%);
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.4);
+        }
+
+        .score-content {
+            background: #0f172a;
+            width: 175px;
+            height: 175px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(167, 139, 250, 0.3);
+        }
+
+        .score-value {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 0.25rem;
+        }
+
+        .score-value.pass {
+            color: #10b981;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+        }
+
+        .score-value.fail {
+            color: #f472b6;
+            text-shadow: 0 0 20px rgba(244, 114, 182, 0.6);
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            text-align: center;
+        }
+
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .status-text {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-text.pass {
+            color: #10b981;
+        }
+
+        .status-text.fail {
+            color: #f472b6;
+        }
+
+        .status-subtext {
+            font-size: 0.95rem;
+            color: #94a3b8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-value.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-value.danger {
+            background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .performance-section {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .performance-section h3 {
+            font-size: 1.3rem;
+            color: #f1f5f9;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .answers-breakdown {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .answers-breakdown h3 {
+            font-size: 1.3rem;
+            color: #f1f5f9;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .answer-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+
+        .answer-item.correct {
+            border-color: #10b981;
+        }
+
+        .answer-item.incorrect {
+            border-color: #ef4444;
+        }
+
+        .answer-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .question-number {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .answer-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .answer-status.correct {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .answer-status.incorrect {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .answer-content {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .exam-performance-section {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .exam-performance-section h2 {
+            color: #f1f5f9;
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .exam-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .exam-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .exam-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateX(8px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .exam-info h4 {
+            color: #f1f5f9;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .exam-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .exam-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .exam-stat-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .exam-stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .exam-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+        }
+
+        .exam-score-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .exam-score-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        .student-performance {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            overflow-x: auto;
+        }
+
+        .student-performance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .student-performance h2 {
+            color: #f1f5f9;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+        }
+
+        .exam-filter {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .exam-filter label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .exam-filter select {
+            padding: 0.65rem 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .exam-filter select:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+        }
+
+        .exam-filter select option {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .student-table thead {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .student-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: #94a3b8;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .student-table td {
+            padding: 1rem;
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
+            color: #cbd5e1;
+        }
+
+        .student-table tr {
+            transition: all 0.3s ease;
+        }
+
+        .student-table tr:hover {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .score-cell {
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.1rem;
+        }
+
+        .status-badge-table {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .status-excellent {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .status-good {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .status-average {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .status-poor {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 20px;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            .performance-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            .score-section {
+                flex-direction: column;
+            }
+            .modal-content {
+                padding: 2rem 1.5rem;
+            }
+            .brand-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="gradient-bg"></div>
+    <div class="orbs">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <div class="insights-container">
+        <div class="container">
+            <div id="loadingMessage" class="loading">
+                <div class="spinner"></div>
+                Loading insights...
+            </div>
+
+            <div id="insightsContent" style="display: none;">
+                <div class="page-header">
+                    <h1>Teaching Insights & Analytics</h1>
+                    <p>Track exam performance, student progress, and identify improvement areas</p>
+                </div>
+
+                <div class="performance-grid">
+                    <div class="performance-card">
+                        <h3>Total Exams Created</h3>
+                        <div class="performance-value" id="totalExams">0</div>
+                        <div class="performance-trend">
+                            <span id="examsTrend">All time</span>
+                        </div>
+                    </div>
+                    <div class="performance-card">
+                        <h3>Total Students</h3>
+                        <div class="performance-value" id="totalStudents">0</div>
+                        <div class="performance-trend">
+                            <span id="studentsTrend">Registered</span>
+                        </div>
+                    </div>
+                    <div class="performance-card">
+                        <h3>Class Average</h3>
+                        <div class="performance-value" id="classAverage">-</div>
+                        <div class="performance-trend">
+                            <span id="avgTrend">Across all exams</span>
+                        </div>
+                    </div>
+                    <div class="performance-card">
+                        <h3>Submission Rate</h3>
+                        <div class="performance-value" id="submissionRate">-</div>
+                        <div class="performance-trend">
+                            <span id="submissionTrend">Completion rate</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-section">
+                    <h2>🔍 View Student Performance</h2>
+                    <form class="search-form" id="searchForm">
+                        <div class="form-group">
+                            <label for="studentSelect">Select Student</label>
+                            <select id="studentSelect" required>
+                                <option value="">Choose a student...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="examSelect">Select Exam</label>
+                            <select id="examSelect" required>
+                                <option value="">Choose an exam...</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-search">View Results</button>
+                    </form>
+                </div>
+
+                <div class="exam-performance-section">
+                    <h2>Exam-wise Performance Overview</h2>
+                    <div class="exam-list" id="examList">
+                        <div class="no-data">No exam data available yet</div>
+                    </div>
+                </div>
+
+                <div class="student-performance">
+                    <div class="student-performance-header">
+                        <h2>Top Performing Students</h2>
+                        <div class="exam-filter">
+                            <label for="topStudentsExamFilter">Filter by Exam:</label>
+                            <select id="topStudentsExamFilter">
+                                <option value="all">All Exams</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="studentTableContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
+        const TEACHER_EMAIL = 'shloksarawade0@gmail.com';
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: window.sessionStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        let allStudents = [];
+        let allExams = [];
+        let allResults = [];
+
+        window.closeModal = function() {
+            document.getElementById('resultModal').classList.remove('active');
+        };
+
+        document.getElementById('resultModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        async function initNavbar(activePage = 'insights') {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            if (session.user.email.toLowerCase() !== TEACHER_EMAIL.toLowerCase()) {
+                window.location.href = 'dashboard.html';
+                return null;
+            }
+
+            const user = session.user;
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('full_name, avatar_url')
+                .eq('id', user.id)
+                .single();
+
+            const fullName = profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0];
+            const avatarUrl = profile?.avatar_url;
+
+            function getInitials(name) {
+                if (!name) return '?';
+                const parts = name.trim().split(' ');
+                if (parts.length >= 2) {
+                    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                }
+                return parts[0].substring(0, 2).toUpperCase();
+            }
+
+            const initials = getInitials(fullName);
+
+            const navbarHTML = `
+                <nav class="navbar">
+                    <div class="navbar-brand">
+                        <div class="navbar-logo">T+</div>
+                        <div class="navbar-text">
+                            <h1 class="navbar-title">ThinkPlus</h1>
+                            <p class="navbar-subtitle">Teacher Portal</p>
+                        </div>
+                    </div>
+                    <div class="navbar-menu">
+                        <a href="teacher-dashboard.html" class="${activePage === 'dashboard' ? 'active' : ''}">Dashboard</a>
+                        <a href="teacher-students.html" class="${activePage === 'students' ? 'active' : ''}">Students</a>
+                        <a href="teacher-insights.html" class="${activePage === 'insights' ? 'active' : ''}">Insights</a>
+                        <a href="teacher-profile.html" class="${activePage === 'profile' ? 'active' : ''}">Profile</a>
+                    </div>
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                ${avatarUrl ?
+                    `<img src="${avatarUrl}" alt="${fullName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` :
+                    initials
+                }
+                            </div>
+                            <span class="user-name">${fullName}</span>
+                        </div>
+                        <button class="btn-logout" id="navLogoutBtn">Logout</button>
+                    </div>
+                </nav>
+            `;
+
+            if (!document.getElementById('navbar-styles')) {
+                const style = document.createElement('style');
+                style.id = 'navbar-styles';
+                style.textContent = `
+                    .navbar { position: relative; z-index: 100; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(20px) saturate(180%); padding: 1rem 2rem; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(167, 139, 250, 0.25); position: sticky; top: 0; }
+                    .navbar-brand { display: flex; align-items: center; gap: 0.875rem; }
+                    .navbar-logo { width: 48px; height: 48px; background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 1.4rem; box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5); flex-shrink: 0; position: relative; }
+                    .navbar-logo::after { content: ''; position: absolute; inset: -2px; border-radius: 12px; background: linear-gradient(135deg, #a78bfa, #ec4899); opacity: 0.3; filter: blur(10px); animation: navPulse 3s ease-in-out infinite; z-index: -1; }
+                    @keyframes navPulse { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.05); } }
+                    .navbar-text { display: flex; flex-direction: column; gap: 0.125rem; }
+                    .navbar-title { font-size: 1.5rem; background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 800; letter-spacing: -0.5px; line-height: 1; margin: 0; }
+                    .navbar-subtitle { font-size: 0.75rem; color: #94a3b8; font-weight: 500; letter-spacing: 0.025em; margin: 0; }
+                    .navbar-menu { display: flex; gap: 2rem; align-items: center; }
+                    .navbar-menu a { text-decoration: none; color: #cbd5e1; font-weight: 600; transition: all 0.3s ease; position: relative; padding: 0.5rem 0; }
+                    .navbar-menu a:hover { color: #a78bfa; }
+                    .navbar-menu a.active { color: #a78bfa; }
+                    .navbar-menu a.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, #a78bfa, #ec4899); border-radius: 2px; }
+                    .user-menu { display: flex; align-items: center; gap: 1rem; }
+                    .user-info { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: rgba(30, 41, 59, 0.5); border-radius: 50px; border: 1px solid rgba(167, 139, 250, 0.2); backdrop-filter: blur(10px); }
+                    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4); flex-shrink: 0; }
+                    .user-name { color: #e2e8f0; font-size: 0.95rem; font-weight: 600; white-space: nowrap; }
+                    .btn-logout { padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+                    .btn-logout:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5); }
+                    @media (max-width: 968px) { .navbar { flex-wrap: wrap; gap: 1rem; padding: 1rem 1.5rem; } .navbar-menu { order: 3; width: 100%; justify-content: center; gap: 1.5rem; } }
+                    @media (max-width: 640px) { .navbar-logo { width: 40px; height: 40px; font-size: 1.2rem; } .navbar-title { font-size: 1.25rem; } .navbar-subtitle { font-size: 0.7rem; } }
+                `;
+                document.head.appendChild(style);
+            }
+
+            const existingNav = document.querySelector('.navbar');
+            if (existingNav) {
+                existingNav.outerHTML = navbarHTML;
+            } else {
+                document.querySelector('.insights-container').insertAdjacentHTML('afterbegin', navbarHTML);
+            }
+
+            document.getElementById('navLogoutBtn').addEventListener('click', async () => {
+                try {
+                    await supabase.auth.signOut();
+                    window.location.href = 'index.html';
+                } catch (err) {
+                    console.error('Logout error:', err);
+                    alert('Failed to logout. Please try again.');
+                }
+            });
+
+            return { user, profile, fullName };
+        }
+
+        async function fetchInsightsData() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return null;
+
+            // Fetch scheduled exams created by teacher
+            const { data: exams } = await supabase
+                .from('scheduled_exams')
+                .select('*')
+                .eq('created_by_id', session.user.id)
+                .order('created_at', { ascending: false });
+
+            console.log('Scheduled exams:', exams);
+
+            // Fetch all students (profiles with student_id)
+            const { data: allProfiles } = await supabase
+                .from('profiles')
+                .select('id, full_name, student_id')
+                .not('student_id', 'is', null)
+                .neq('id', session.user.id);
+
+            console.log('All student profiles:', allProfiles);
+
+            // Fetch exam results for these exams
+            let results = [];
+            if (exams && exams.length > 0) {
+                const examIds = exams.map(e => e.scheduled_exam_id);
+                
+                const { data: examResults, error: resultsError } = await supabase
+                    .from('exam_results')
+                    .select(`
+                        *,
+                        profiles!exam_results_student_id_fkey(full_name, student_id, id)
+                    `)
+                    .in('scheduled_exam_id', examIds);
+
+                if (resultsError) {
+                    console.error('Error fetching exam results:', resultsError);
+                } else {
+                    results = examResults || [];
+                    console.log('Exam results found:', results);
+                }
+            }
+
+            allStudents = allProfiles || [];
+            allExams = exams || [];
+            allResults = results;
+
+            return { exams: exams || [], students: allProfiles || [], results };
+        }
+
+        function calculateStats(exams, students, results) {
+            const totalExams = exams.length;
+            const totalStudents = students.length;
+
+            let classAverage = '-';
+            let submissionRate = '-';
+
+            if (results.length > 0) {
+                const totalScore = results.reduce((sum, r) => sum + (r.percentage || 0), 0);
+                classAverage = Math.round(totalScore / results.length) + '%';
+
+                const expectedSubmissions = totalExams * totalStudents;
+                if (expectedSubmissions > 0) {
+                    submissionRate = Math.round((results.length / expectedSubmissions) * 100) + '%';
+                }
+            }
+
+            // Calculate exam performance
+            const examPerformance = {};
+            exams.forEach(exam => {
+                const examResults = results.filter(r => r.scheduled_exam_id === exam.scheduled_exam_id);
+                const uniqueStudents = new Set(examResults.map(r => r.student_id)).size;
+                const avgScore = examResults.length > 0 
+                    ? Math.round(examResults.reduce((sum, r) => sum + (r.percentage || 0), 0) / examResults.length)
+                    : 0;
+                const passedCount = examResults.filter(r => r.status === 'passed').length;
+
+                examPerformance[exam.scheduled_exam_id] = {
+                    name: exam.exam_name,
+                    submissions: examResults.length,
+                    students: uniqueStudents,
+                    avgScore,
+                    passingScore: exam.passing_score || 60,
+                    passedCount
+                };
+            });
+
+            // Calculate student performance
+            const studentPerformance = {};
+            results.forEach(result => {
+                const studentId = result.student_id;
+                if (!studentPerformance[studentId]) {
+                    studentPerformance[studentId] = {
+                        name: result.profiles?.full_name || 'Unknown',
+                        studentId: result.profiles?.student_id || studentId,
+                        exams: 0,
+                        totalScore: 0,
+                        avgScore: 0
+                    };
+                }
+                studentPerformance[studentId].exams++;
+                studentPerformance[studentId].totalScore += result.percentage || 0;
+            });
+
+            Object.values(studentPerformance).forEach(student => {
+                student.avgScore = Math.round(student.totalScore / student.exams);
+            });
+
+            const topStudents = Object.values(studentPerformance)
+                .sort((a, b) => b.avgScore - a.avgScore)
+                .slice(0, 10);
+
+            return {
+                totalExams,
+                totalStudents,
+                classAverage,
+                submissionRate,
+                examPerformance,
+                topStudents
+            };
+        }
+
+        function renderStats(stats) {
+            document.getElementById('totalExams').textContent = stats.totalExams;
+            document.getElementById('totalStudents').textContent = stats.totalStudents;
+            document.getElementById('classAverage').textContent = stats.classAverage;
+            document.getElementById('submissionRate').textContent = stats.submissionRate;
+        }
+
+        function renderExamPerformance(examPerformance) {
+            const examList = document.getElementById('examList');
+            
+            if (Object.keys(examPerformance).length === 0) {
+                examList.innerHTML = '<div class="no-data">No exam data available yet</div>';
+                return;
+            }
+
+            examList.innerHTML = '';
+            Object.values(examPerformance).forEach(exam => {
+                const passRate = exam.submissions > 0 
+                    ? Math.round((exam.passedCount / exam.submissions) * 100)
+                    : 0;
+
+                const examItem = document.createElement('div');
+                examItem.className = 'exam-item';
+                examItem.innerHTML = `
+                    <div class="exam-info">
+                        <h4>${exam.name}</h4>
+                        <div class="exam-stats">
+                            <div class="exam-stat">
+                                <span class="exam-stat-label">Submissions</span>
+                                <span class="exam-stat-value">${exam.submissions}</span>
+                            </div>
+                            <div class="exam-stat">
+                                <span class="exam-stat-label">Students</span>
+                                <span class="exam-stat-value">${exam.students}</span>
+                            </div>
+                            <div class="exam-stat">
+                                <span class="exam-stat-label">Pass Rate</span>
+                                <span class="exam-stat-value">${passRate}%</span>
+                            </div>
+                            <div class="exam-stat">
+                                <span class="exam-stat-label">Passed</span>
+                                <span class="exam-stat-value">${exam.passedCount}/${exam.submissions}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="exam-score">
+                        <div class="exam-score-value">${exam.avgScore}%</div>
+                        <div class="exam-score-label">Avg Score</div>
+                    </div>
+                `;
+                examList.appendChild(examItem);
+            });
+        }
+
+        function getPerformanceStatus(score) {
+            if (score >= 90) return { class: 'status-excellent', text: 'Excellent' };
+            if (score >= 75) return { class: 'status-good', text: 'Good' };
+            if (score >= 60) return { class: 'status-average', text: 'Average' };
+            return { class: 'status-poor', text: 'Needs Help' };
+        }
+
+        function renderTopStudents(students) {
+            const container = document.getElementById('studentTableContainer');
+            
+            if (students.length === 0) {
+                container.innerHTML = '<div class="no-data">No student performance data available yet</div>';
+                return;
+            }
+
+            let tableHTML = `
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Student Name</th>
+                            <th>Student ID</th>
+                            <th>Exams Taken</th>
+                            <th>Avg Score</th>
+                            <th>Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            students.forEach((student, index) => {
+                const status = getPerformanceStatus(student.avgScore);
+                tableHTML += `
+                    <tr>
+                        <td><strong>#${index + 1}</strong></td>
+                        <td>${student.name}</td>
+                        <td>${student.studentId}</td>
+                        <td>${student.exams}</td>
+                        <td class="score-cell">${student.avgScore}%</td>
+                        <td>
+                            <span class="status-badge-table ${status.class}">${status.text}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = tableHTML;
+        }
+
+        function populateTopStudentsFilter() {
+            const filterSelect = document.getElementById('topStudentsExamFilter');
+            filterSelect.innerHTML = '<option value="all">All Exams</option>';
+            
+            allExams.forEach(exam => {
+                const option = document.createElement('option');
+                option.value = exam.scheduled_exam_id;
+                option.textContent = exam.exam_name;
+                filterSelect.appendChild(option);
+            });
+
+            filterSelect.addEventListener('change', (e) => {
+                const selectedExamId = e.target.value;
+                filterAndRenderTopStudents(selectedExamId);
+            });
+        }
+
+        function filterAndRenderTopStudents(examId) {
+            let filteredResults = allResults;
+            
+            if (examId !== 'all') {
+                filteredResults = allResults.filter(r => r.scheduled_exam_id === examId);
+            }
+
+            const studentPerformance = {};
+            filteredResults.forEach(result => {
+                const studentId = result.student_id;
+                if (!studentPerformance[studentId]) {
+                    studentPerformance[studentId] = {
+                        name: result.profiles?.full_name || 'Unknown',
+                        studentId: result.profiles?.student_id || studentId,
+                        exams: 0,
+                        totalScore: 0,
+                        avgScore: 0
+                    };
+                }
+                studentPerformance[studentId].exams++;
+                studentPerformance[studentId].totalScore += result.percentage || 0;
+            });
+
+            Object.values(studentPerformance).forEach(student => {
+                student.avgScore = Math.round(student.totalScore / student.exams);
+            });
+
+            const topStudents = Object.values(studentPerformance)
+                .sort((a, b) => b.avgScore - a.avgScore)
+                .slice(0, 10);
+
+            renderTopStudents(topStudents);
+        }
+
+        function populateDropdowns() {
+            const studentSelect = document.getElementById('studentSelect');
+            const examSelect = document.getElementById('examSelect');
+
+            studentSelect.innerHTML = '<option value="">Choose a student...</option>';
+            
+            console.log('Populating students dropdown. Total students:', allStudents.length);
+            
+            if (allStudents.length === 0) {
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "No students found";
+                option.disabled = true;
+                studentSelect.appendChild(option);
+            } else {
+                allStudents.forEach(student => {
+                    if (student.student_id) {
+                        const option = document.createElement('option');
+                        option.value = student.student_id;
+                        option.textContent = `${student.full_name || 'Unknown'} (${student.student_id})`;
+                        studentSelect.appendChild(option);
+                    }
+                });
+            }
+
+            examSelect.innerHTML = '<option value="">Choose an exam...</option>';
+            
+            console.log('Populating exams dropdown. Total exams:', allExams.length);
+            
+            if (allExams.length === 0) {
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "No exams found";
+                option.disabled = true;
+                examSelect.appendChild(option);
+            } else {
+                allExams.forEach(exam => {
+                    const option = document.createElement('option');
+                    option.value = exam.scheduled_exam_id;
+                    option.textContent = exam.exam_name;
+                    examSelect.appendChild(option);
+                });
+            }
+        }
+
+        async function searchStudentPerformance(studentId, scheduledExamId) {
+            console.log('Searching for student_id:', studentId, 'scheduled_exam_id:', scheduledExamId);
+
+            // Fetch from exam_results table
+            const { data: resultData, error: resultError } = await supabase
+                .from('exam_results')
+                .select(`
+                    *,
+                    profiles!exam_results_student_id_fkey(full_name, student_id, id)
+                `)
+                .eq('student_id', studentId)
+                .eq('scheduled_exam_id', scheduledExamId)
+                .order('submitted_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (resultError) {
+                console.error('Exam result error:', resultError);
+                return { error: 'No completed exam found for this student and exam combination.' };
+            }
+
+            if (!resultData) {
+                return { error: 'No completed exam found for this student and exam combination.' };
+            }
+
+            console.log('Found exam result:', resultData);
+
+            // Get scheduled exam details
+            const scheduledExam = allExams.find(e => e.scheduled_exam_id === scheduledExamId);
+
+            if (!scheduledExam) {
+                return { error: 'Scheduled exam details not found.' };
+            }
+
+            // Fetch answers using exam_id from exam_results
+            const { data: answers, error: answersError } = await supabase
+                .from('exam_answers')
+                .select('*')
+                .eq('exam_id', resultData.exam_id)
+                .order('question_id', { ascending: true });
+
+            if (answersError) {
+                console.error('Error fetching answers:', answersError);
+            }
+
+            console.log('Found answers:', answers);
+
+            return { result: resultData, scheduledExam, answers: answers || [] };
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}m ${secs}s`;
+        }
+
+        function renderModal(data) {
+            if (data.error) {
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="no-data" style="margin: 2rem 0;">
+                        ${data.error}
+                    </div>
+                `;
+                document.getElementById('resultModal').classList.add('active');
+                return;
+            }
+
+            const { result, scheduledExam, answers } = data;
+            const scorePercent = result.percentage || 0;
+            const passed = result.status === 'passed';
+
+            const totalQuestions = result.total_questions || 30;
+            const correctAnswers = result.correct_answers || 0;
+            const incorrectAnswers = result.incorrect_answers || 0;
+            const unanswered = result.unanswered || 0;
+            const attempted = correctAnswers + incorrectAnswers;
+            const accuracyRate = attempted > 0 ? Math.round((correctAnswers / attempted) * 100) : 0;
+
+            let modalHTML = `
+                <div class="report-header">
+                    <div class="brand-container">
+                        <div class="logo">T+</div>
+                        <div class="brand-title">ThinkPlus</div>
+                    </div>
+                    <h1>Student Performance Report</h1>
+                    <div class="exam-name">${scheduledExam.exam_name}</div>
+                    <div class="exam-date">Student: ${result.profiles.full_name} (${result.profiles.student_id})</div>
+                    <div class="exam-date" style="margin-top: 0.25rem;">
+                        Completed: ${new Date(result.submitted_at).toLocaleDateString('en-IN', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </div>
+                </div>
+
+                <div class="score-section">
+                    <div class="score-ring" style="--progress: ${(scorePercent / 100) * 360}deg">
+                        <div class="score-content">
+                            <div class="score-value ${passed ? 'pass' : 'fail'}">${scorePercent}%</div>
+                            <div class="score-label">Score</div>
+                        </div>
+                    </div>
+                    <div class="status-badge">
+                        <span class="status-icon">${passed ? '🎉' : '📝'}</span>
+                        <div class="status-text ${passed ? 'pass' : 'fail'}">${passed ? 'PASSED' : 'NEEDS IMPROVEMENT'}</div>
+                        <div class="status-subtext">${passed ? 'Excellent work!' : 'Keep practicing'}</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Questions</div>
+                        <div class="stat-value">${totalQuestions}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Correct</div>
+                        <div class="stat-value success">${correctAnswers}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Incorrect</div>
+                        <div class="stat-value danger">${incorrectAnswers}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Unanswered</div>
+                        <div class="stat-value">${unanswered}</div>
+                    </div>
+                </div>
+
+                <div class="performance-section">
+                    <h3>Performance Details</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Time Taken</span>
+                        <span class="detail-value">${formatTime(result.time_taken)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Accuracy Rate</span>
+                        <span class="detail-value">${accuracyRate}%</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Questions Attempted</span>
+                        <span class="detail-value">${attempted} of ${totalQuestions}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Passing Score</span>
+                        <span class="detail-value">${scheduledExam.passing_score || 60}%</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Final Score</span>
+                        <span class="detail-value">${result.score} / ${totalQuestions}</span>
+                    </div>
+                </div>
+            `;
+
+            if (answers.length > 0) {
+                modalHTML += `
+                    <div class="answers-breakdown">
+                        <h3>📋 Answer Breakdown</h3>
+                `;
+
+                answers.forEach(answer => {
+                    const isCorrect = answer.is_correct;
+                    modalHTML += `
+                        <div class="answer-item ${isCorrect ? 'correct' : 'incorrect'}">
+                            <div class="answer-item-header">
+                                <span class="question-number">Question ${answer.question_id}</span>
+                                <span class="answer-status ${isCorrect ? 'correct' : 'incorrect'}">
+                                    ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                                </span>
+                            </div>
+                            <div class="answer-content">
+                                <div style="margin-bottom: 0.5rem;">
+                                    ${answer.topic ? `<strong>Topic:</strong> ${answer.topic}` : ''}
+                                    ${answer.topic && answer.difficulty ? ' | ' : ''}
+                                    ${answer.difficulty ? `<strong>Difficulty:</strong> ${answer.difficulty}` : ''}
+                                </div>
+                                <div><strong>Student's Answer:</strong> ${answer.student_answer}</div>
+                                ${!isCorrect ? `<div style="color: #10b981; margin-top: 0.5rem;"><strong>Correct Answer:</strong> ${answer.correct_answer}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                modalHTML += `</div>`;
+            }
+
+            document.getElementById('modalBody').innerHTML = modalHTML;
+            document.getElementById('resultModal').classList.add('active');
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('studentSelect').value;
+            const examId = document.getElementById('examSelect').value;
+            
+            if (!studentId || !examId) {
+                alert('Please select both student and exam');
+                return;
+            }
+
+            const btn = document.querySelector('.btn-search');
+            btn.disabled = true;
+            btn.textContent = 'Loading...';
+
+            try {
+                const data = await searchStudentPerformance(studentId, examId);
+                renderModal(data);
+            } catch (err) {
+                console.error('Search error:', err);
+                renderModal({ error: 'Error searching for results. Please try again.' });
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'View Results';
+            }
+        });
+
+        async function initInsights() {
+            try {
+                const navData = await initNavbar('insights');
+                if (!navData) return;
+
+                const data = await fetchInsightsData();
+                if (!data) return;
+
+                const stats = calculateStats(data.exams, data.students, data.results);
+
+                renderStats(stats);
+                renderExamPerformance(stats.examPerformance);
+                renderTopStudents(stats.topStudents);
+                
+                populateDropdowns();
+                populateTopStudentsFilter();
+
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('insightsContent').style.display = 'block';
+
+            } catch (err) {
+                console.error('Insights init error:', err);
+                document.getElementById('loadingMessage').innerHTML = `
+                    <div style="color: #ef4444;">
+                        Error loading insights: ${err.message}<br>
+                        <small>Redirecting to login...</small>
+                    </div>
+                `;
+                setTimeout(() => window.location.href = 'index.html', 2000);
+            }
+        }
+
+        initInsights();
+    </script>
+</body>
+
+</html>

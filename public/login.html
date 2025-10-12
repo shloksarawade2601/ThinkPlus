@@ -545,6 +545,11 @@
         const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
         
+        // Teacher email configuration
+        const TEACHER_EMAIL = 'shloksarawade0@gmail.com';
+        const TEACHER_DASHBOARD = 'teacher-dashboard.html';
+        const STUDENT_DASHBOARD = 'dashboard.html';
+        
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: {
                 storage: window.sessionStorage,
@@ -554,10 +559,20 @@
             }
         });
 
+        // Helper function to check if email is teacher
+        function isTeacher(email) {
+            return email.toLowerCase() === TEACHER_EMAIL.toLowerCase();
+        }
+
         // Check if user is already logged in
         const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-            window.location.href = 'dashboard.html';
+        if (session && session.user.email) {
+            const userEmail = session.user.email;
+            if (isTeacher(userEmail)) {
+                window.location.href = TEACHER_DASHBOARD;
+            } else {
+                window.location.href = STUDENT_DASHBOARD;
+            }
         }
 
         // Toggle password visibility
@@ -625,9 +640,15 @@
                     loginBtn.disabled = false;
                     loginBtn.textContent = 'Login';
                 } else {
-                    showPopup('Success!', 'Login successful! Redirecting to dashboard...', 'success');
+                    // Check if user is teacher and redirect accordingly
+                    const isTeacherAccount = isTeacher(email);
+                    const dashboardType = isTeacherAccount ? 'Teacher' : 'Student';
+                    const redirectUrl = isTeacherAccount ? TEACHER_DASHBOARD : STUDENT_DASHBOARD;
+                    
+                    showPopup('Success!', `Login successful! Redirecting to ${dashboardType} dashboard...`, 'success');
+                    
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = redirectUrl;
                     }, 2000);
                 }
             } catch (err) {

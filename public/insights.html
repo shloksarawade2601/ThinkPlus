@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThinkPlus - Insights</title>
+    <title>ThinkPlus - Performance Insights</title>
     <style>
         * {
             margin: 0;
@@ -32,8 +33,15 @@
         }
 
         @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .orbs {
@@ -82,12 +90,16 @@
         }
 
         @keyframes float {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translate(0, 0) scale(1);
             }
+
             33% {
                 transform: translate(50px, -50px) scale(1.1);
             }
+
             66% {
                 transform: translate(-30px, 30px) scale(0.9);
             }
@@ -100,7 +112,7 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
@@ -113,7 +125,6 @@
             min-height: 100vh;
         }
 
-        /* Navbar CSS (Defined inside JS, but shown here for context/completeness) */
         .navbar {
             position: relative;
             z-index: 100;
@@ -128,13 +139,178 @@
             position: sticky;
             top: 0;
         }
-        /* ... rest of your navbar styles ... */
 
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+        }
+
+        .navbar-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 900;
+            font-size: 1.4rem;
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .navbar-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .navbar-title {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1;
+            margin: 0;
+        }
+
+        .navbar-subtitle {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+            margin: 0;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .navbar-menu a {
+            text-decoration: none;
+            color: #cbd5e1;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .navbar-menu a:hover {
+            color: #a78bfa;
+        }
+
+        .navbar-menu a.active {
+            color: #a78bfa;
+        }
+
+        .navbar-menu a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #a78bfa, #ec4899);
+            border-radius: 2px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 50px;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+            flex-shrink: 0;
+        }
+
+        .user-avatar svg {
+            width: 60%;
+            height: 60%;
+        }
+
+        .user-name {
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .btn-logout {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+        }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem 3rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(167, 139, 250, 0.2);
+            border-top-color: #a78bfa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .page-header {
@@ -153,6 +329,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -233,77 +410,8 @@
             color: #ef4444;
         }
 
-        .chart-section {
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(20px) saturate(180%);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            margin-bottom: 2.5rem;
-            border: 1px solid rgba(167, 139, 250, 0.2);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .chart-header h2 {
-            color: #f1f5f9;
-            font-size: 1.75rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .chart-filters {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 0.5rem 1rem;
-            background: rgba(30, 41, 59, 0.5);
+        .trend-neutral {
             color: #94a3b8;
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn:hover {
-            background: rgba(30, 41, 59, 0.8);
-            border-color: rgba(139, 92, 246, 0.4);
-            color: #cbd5e1;
-        }
-
-        .filter-btn.active {
-            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
-        }
-
-        .chart-placeholder {
-            height: 300px;
-            background: rgba(30, 41, 59, 0.5);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #94a3b8;
-            font-size: 1.125rem;
-            border: 1px solid rgba(139, 92, 246, 0.1);
-            backdrop-filter: blur(10px);
         }
 
         .subject-performance {
@@ -361,6 +469,14 @@
             color: #f1f5f9;
             margin-bottom: 0.5rem;
             font-size: 1.05rem;
+        }
+
+        .subject-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
         }
 
         .progress-bar-container {
@@ -474,6 +590,31 @@
             font-size: 1.1rem;
         }
 
+        .no-data {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 20px;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        @media (max-width: 968px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 1rem;
+                padding: 1rem 1.5rem;
+            }
+
+            .navbar-menu {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                gap: 1.5rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1.5rem;
@@ -486,10 +627,11 @@
             .performance-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+        }
 
-            .chart-header {
-                flex-direction: column;
-                align-items: flex-start;
+        @media (max-width: 640px) {
+            .user-name {
+                display: none;
             }
         }
 
@@ -500,6 +642,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="gradient-bg"></div>
     <div class="orbs">
@@ -510,166 +653,241 @@
     <div class="grid-overlay"></div>
 
     <div class="insights-container">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <div class="navbar-logo">T+</div>
+                <div class="navbar-text">
+                    <h1 class="navbar-title">ThinkPlus</h1>
+                    <p class="navbar-subtitle">Exam Portal</p>
+                </div>
+            </div>
+            <div class="navbar-menu">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="insights.html" class="active">Insights</a>
+                <a href="profile.html">Profile</a>
+            </div>
+            <div class="user-menu">
+                <div class="user-info">
+                    <div class="user-avatar" id="navUserAvatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </div>
+                    <span class="user-name" id="navUserName">Loading...</span>
+                </div>
+                <button class="btn-logout" id="navLogoutBtn">Logout</button>
+            </div>
+        </nav>
+
         <div class="container">
-            <div class="page-header">
-                <h1>Performance Insights</h1>
-                <p>Track your exam performance and identify areas for improvement</p>
+            <div id="loadingMessage" class="loading">
+                <div class="spinner"></div>
+                Loading your performance insights...
             </div>
 
-            <div class="performance-grid">
-                <div class="performance-card">
-                    <h3>Overall Performance</h3>
-                    <div class="performance-value">85%</div>
-                    <div class="performance-trend trend-up">
-                        <span>↑ 5%</span>
-                        <span>vs last month</span>
-                    </div>
+            <div id="insightsContent" style="display: none;">
+                <div class="page-header">
+                    <h1>Performance Insights</h1>
+                    <p>Track your exam performance and identify areas for improvement</p>
                 </div>
-                <div class="performance-card">
-                    <h3>Average Score</h3>
-                    <div class="performance-value">82</div>
-                    <div class="performance-trend trend-up">
-                        <span>↑ 3 points</span>
-                        <span>improvement</span>
-                    </div>
-                </div>
-                <div class="performance-card">
-                    <h3>Pass Rate</h3>
-                    <div class="performance-value">92%</div>
-                    <div class="performance-trend trend-up">
-                        <span>↑ 8%</span>
-                        <span>this week</span>
-                    </div>
-                </div>
-                <div class="performance-card">
-                    <h3>Time Spent</h3>
-                    <div class="performance-value">12.5h</div>
-                    <div class="performance-trend trend-down">
-                        <span>↓ 2h</span>
-                        <span>vs last week</span>
-                    </div>
-                </div>
-            </div>
 
-            <div class="chart-section">
-                <div class="chart-header">
-                    <h2>Score Trends</h2>
-                    <div class="chart-filters">
-                        <button class="filter-btn">7 Days</button>
-                        <button class="filter-btn active">30 Days</button>
-                        <button class="filter-btn">90 Days</button>
-                        <button class="filter-btn">All Time</button>
+                <div class="performance-grid">
+                    <div class="performance-card">
+                        <h3>Overall Performance</h3>
+                        <div class="performance-value" id="overallPerformance">-</div>
+                        <div class="performance-trend trend-neutral" id="overallTrend">
+                            <span>No data yet</span>
+                        </div>
+                    </div>
+                    <div class="performance-card">
+                        <h3>Average Score</h3>
+                        <div class="performance-value" id="averageScore">-</div>
+                        <div class="performance-trend trend-neutral" id="avgTrend">
+                            <span>Complete exams</span>
+                        </div>
+                    </div>
+                    <div class="performance-card">
+                        <h3>Pass Rate</h3>
+                        <div class="performance-value" id="passRate">-</div>
+                        <div class="performance-trend trend-neutral" id="passTrend">
+                            <span>Start practicing</span>
+                        </div>
+                    </div>
+                    <div class="performance-card">
+                        <h3>Total Questions</h3>
+                        <div class="performance-value" id="totalQuestions">0</div>
+                        <div class="performance-trend trend-neutral" id="questionsTrend">
+                            <span>Attempted</span>
+                        </div>
                     </div>
                 </div>
-                <div class="chart-placeholder">
-                    📊 Chart visualization will be displayed here
-                </div>
-            </div>
 
-            <div class="subject-performance">
-                <h2>Performance by Subject</h2>
-                <div class="subject-list">
-                    <div class="subject-item">
-                        <div class="subject-info">
-                            <div class="subject-name">JavaScript Fundamentals</div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: 92%"></div>
-                            </div>
-                        </div>
-                        <div class="subject-score">92%</div>
-                    </div>
-                    <div class="subject-item">
-                        <div class="subject-info">
-                            <div class="subject-name">React Advanced Concepts</div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: 85%"></div>
-                            </div>
-                        </div>
-                        <div class="subject-score">85%</div>
-                    </div>
-                    <div class="subject-item">
-                        <div class="subject-info">
-                            <div class="subject-name">Data Structures & Algorithms</div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: 78%"></div>
-                            </div>
-                        </div>
-                        <div class="subject-score">78%</div>
-                    </div>
-                    <div class="subject-item">
-                        <div class="subject-info">
-                            <div class="subject-name">Node.js Backend Development</div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: 88%"></div>
-                            </div>
-                        </div>
-                        <div class="subject-score">88%</div>
-                    </div>
-                    <div class="subject-item">
-                        <div class="subject-info">
-                            <div class="subject-name">Database Management</div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: 81%"></div>
-                            </div>
-                        </div>
-                        <div class="subject-score">81%</div>
+                <div class="subject-performance">
+                    <h2>Performance by Topic/Unit</h2>
+                    <div class="subject-list" id="topicList">
+                        <div class="no-data">Complete some exams to see detailed unit-wise performance</div>
                     </div>
                 </div>
-            </div>
 
-            <div class="recent-exams">
-                <h2>Recent Exam Results</h2>
-                <table class="exam-table">
-                    <thead>
-                        <tr>
-                            <th>Exam Name</th>
-                            <th>Date</th>
-                            <th>Score</th>
-                            <th>Time Taken</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>JavaScript Fundamentals</td>
-                            <td>Oct 5, 2025</td>
-                            <td class="score-cell">92%</td>
-                            <td>28 min</td>
-                            <td><span class="exam-status status-passed">Passed</span></td>
-                        </tr>
-                        <tr>
-                            <td>React Advanced Concepts</td>
-                            <td>Oct 3, 2025</td>
-                            <td class="score-cell">85%</td>
-                            <td>42 min</td>
-                            <td><span class="exam-status status-passed">Passed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Data Structures & Algorithms</td>
-                            <td>Oct 1, 2025</td>
-                            <td class="score-cell">78%</td>
-                            <td>55 min</td>
-                            <td><span class="exam-status status-passed">Passed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Node.js Backend Development</td>
-                            <td>Sep 28, 2025</td>
-                            <td class="score-cell">88%</td>
-                            <td>38 min</td>
-                            <td><span class="exam-status status-passed">Passed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Database Management</td>
-                            <td>Sep 25, 2025</td>
-                            <td class="score-cell">65%</td>
-                            <td>45 min</td>
-                            <td><span class="exam-status status-failed">Failed</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="subject-performance">
+                    <h2>AI-Powered Suggestions for Improvement</h2>
+                    <div id="suggestionsContainer">
+                        <div class="no-data">
+                            <p style="margin-bottom: 1.5rem;">Get personalized recommendations based on your
+                                performance!</p>
+                            <button class="btn-get-suggestions" id="getSuggestionsBtn" onclick="getSuggestions()">
+                                <span id="suggestionsBtnText">✨ Get AI Suggestions</span>
+                                <span id="suggestionsSpinner" style="display: none;">
+                                    <div class="btn-spinner"></div>
+                                    Analyzing...
+                                </span>
+                            </button>
+                        </div>
+                        <div id="suggestionsContent" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <div class="recent-exams">
+                    <h2>Recent Exam Results</h2>
+                    <div id="recentExamsTable"></div>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .btn-get-suggestions {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-get-suggestions:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn-get-suggestions:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        .suggestions-content {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .suggestions-content h3 {
+            color: #a78bfa;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .suggestions-content p {
+            color: #cbd5e1;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .suggestions-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .suggestions-content li {
+            color: #e2e8f0;
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .suggestions-content li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #a78bfa;
+            font-weight: bold;
+        }
+
+        .suggestion-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .suggestion-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .refresh-suggestions {
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-suggestions:hover {
+            background: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .success-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+    </style>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -686,255 +904,11 @@
             }
         });
 
-        // =========================================================
-        // FIX 1: SYNCHRONOUS FUNCTION TO RENDER STATIC NAVBAR INSTANTLY
-        // =========================================================
-        function renderNavbarStructure(activePage = 'insights') {
-            
-            // 1. Define the STATIC HTML structure for the navbar here
-            const navbarHTML = `
-                <nav class="navbar">
-                    <div class="navbar-brand">
-                        <div class="navbar-logo">T+</div>
-                        <div class="navbar-text">
-                            <h1 class="navbar-title">ThinkPlus</h1>
-                            <p class="navbar-subtitle">Exam Portal</p>
-                        </div>
-                    </div>
-                    <div class="navbar-menu">
-                        <a href="dashboard.html" class="nav-link ${activePage === 'dashboard' ? 'active' : ''}" id="nav-dashboard">Dashboard</a>
-                        <a href="insights.html" class="nav-link ${activePage === 'insights' ? 'active' : ''}" id="nav-insights">Insights</a>
-                        <a href="profile.html" class="nav-link ${activePage === 'profile' ? 'active' : ''}" id="nav-profile">Profile</a>
-                    </div>
-                    <div class="user-menu">
-                        <div class="user-info">
-                            <div class="user-avatar" id="navUserAvatar">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            </div>
-                            <span class="user-name" id="navUserName">Loading...</span>
-                        </div>
-                        <button class="btn-logout" id="navLogoutBtn">Logout</button>
-                    </div>
-                </nav>
-            `;
-
-            // 2. Add styles if not present (only run once)
-            if (!document.getElementById('navbar-styles')) {
-                const style = document.createElement('style');
-                style.id = 'navbar-styles';
-                style.textContent = `
-                    .navbar {
-                        position: relative;
-                        z-index: 100;
-                        background: rgba(15, 23, 42, 0.5);
-                        backdrop-filter: blur(20px) saturate(180%);
-                        padding: 1rem 2rem;
-                        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        border-bottom: 1px solid rgba(167, 139, 250, 0.25);
-                        position: sticky;
-                        top: 0;
-                    }
-                    .navbar-brand {
-                        display: flex;
-                        align-items: center;
-                        gap: 0.875rem;
-                    }
-                    .navbar-logo {
-                        width: 48px;
-                        height: 48px;
-                        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
-                        border-radius: 12px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-weight: 900;
-                        font-size: 1.4rem;
-                        box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
-                        flex-shrink: 0;
-                        position: relative;
-                    }
-                    .navbar-logo::after {
-                        content: '';
-                        position: absolute;
-                        inset: -2px;
-                        border-radius: 12px;
-                        background: linear-gradient(135deg, #a78bfa, #ec4899);
-                        opacity: 0.3;
-                        filter: blur(10px);
-                        animation: navPulse 3s ease-in-out infinite;
-                        z-index: -1;
-                    }
-                    @keyframes navPulse {
-                        0%, 100% { opacity: 0.3; transform: scale(1); }
-                        50% { opacity: 0.6; transform: scale(1.05); }
-                    }
-                    .navbar-text {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 0.125rem;
-                    }
-                    .navbar-title {
-                        font-size: 1.5rem;
-                        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f59e0b 100%);
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                        background-clip: text;
-                        font-weight: 800;
-                        letter-spacing: -0.5px;
-                        line-height: 1;
-                        margin: 0;
-                    }
-                    .navbar-subtitle {
-                        font-size: 0.75rem;
-                        color: #94a3b8;
-                        font-weight: 500;
-                        letter-spacing: 0.025em;
-                        margin: 0;
-                    }
-                    .navbar-menu {
-                        display: flex;
-                        gap: 2rem;
-                        align-items: center;
-                    }
-                    .navbar-menu a {
-                        text-decoration: none;
-                        color: #cbd5e1;
-                        font-weight: 600;
-                        transition: all 0.3s ease;
-                        position: relative;
-                        padding: 0.5rem 0;
-                    }
-                    .navbar-menu a:hover {
-                        color: #a78bfa;
-                    }
-                    .navbar-menu a.active {
-                        color: #a78bfa;
-                    }
-                    .navbar-menu a.active::after {
-                        content: '';
-                        position: absolute;
-                        bottom: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 2px;
-                        background: linear-gradient(90deg, #a78bfa, #ec4899);
-                        border-radius: 2px;
-                    }
-                    .user-menu {
-                        display: flex;
-                        align-items: center;
-                        gap: 1rem;
-                    }
-                    .user-info {
-                        display: flex;
-                        align-items: center;
-                        gap: 0.75rem;
-                        padding: 0.5rem 1rem;
-                        background: rgba(30, 41, 59, 0.5);
-                        border-radius: 50px;
-                        border: 1px solid rgba(167, 139, 250, 0.2);
-                        backdrop-filter: blur(10px);
-                    }
-                    .user-avatar {
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 50%;
-                        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-weight: 700;
-                        font-size: 0.95rem;
-                        box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
-                        flex-shrink: 0;
-                    }
-                    .user-avatar svg {
-                        width: 60%;
-                        height: 60%;
-                    }
-                    .user-name {
-                        color: #e2e8f0;
-                        font-size: 0.95rem;
-                        font-weight: 600;
-                        white-space: nowrap;
-                    }
-                    .btn-logout {
-                        padding: 0.75rem 1.5rem;
-                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                        color: white;
-                        border: none;
-                        border-radius: 12px;
-                        cursor: pointer;
-                        font-weight: 600;
-                        font-size: 0.9rem;
-                        transition: all 0.3s ease;
-                        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-                    }
-                    .btn-logout:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
-                    }
-                    @media (max-width: 968px) {
-                        .navbar {
-                            flex-wrap: wrap;
-                            gap: 1rem;
-                            padding: 1rem 1.5rem;
-                        }
-                        .navbar-menu {
-                            order: 3;
-                            width: 100%;
-                            justify-content: center;
-                            gap: 1.5rem;
-                        }
-                    }
-                    @media (max-width: 640px) {
-                        .navbar-logo {
-                            width: 40px;
-                            height: 40px;
-                            font-size: 1.2rem;
-                        }
-                        .navbar-title {
-                            font-size: 1.25rem;
-                        }
-                        .navbar-subtitle {
-                            font-size: 0.7rem;
-                        }
-                        .user-name {
-                            display: none;
-                        }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-
-            // 3. Insert the static HTML immediately
-            const insightsContainer = document.querySelector('.insights-container');
-            const existingNav = document.querySelector('.navbar');
-
-            // If the nav doesn't exist, insert it at the beginning of the container.
-            if (!existingNav) {
-                insightsContainer.insertAdjacentHTML('afterbegin', navbarHTML);
-            }
-        }
-
-
-        // =========================================================
-        // FIX 2: ASYNCHRONOUS FUNCTION TO FETCH USER DATA
-        // =========================================================
-        async function initNavbarData() {
+        async function initNavbar() {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                window.location.href = 'index.html';
-                return null;
-            }
+            if (!session) return;
 
             const user = session.user;
-            
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('full_name, avatar_url')
@@ -943,7 +917,7 @@
 
             const fullName = profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0];
             const avatarUrl = profile?.avatar_url;
-            
+
             function getInitials(name) {
                 if (!name) return '?';
                 const parts = name.trim().split(' ');
@@ -957,22 +931,18 @@
             const userAvatarElement = document.getElementById('navUserAvatar');
             const userNameElement = document.getElementById('navUserName');
 
-            // Update user name
             if (userNameElement) {
                 userNameElement.textContent = fullName;
             }
 
-            // Update avatar
             if (userAvatarElement) {
                 if (avatarUrl) {
                     userAvatarElement.innerHTML = `<img src="${avatarUrl}" alt="${fullName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
                 } else {
                     userAvatarElement.textContent = initials;
-                    userAvatarElement.style.background = 'linear-gradient(135deg, #a78bfa 0%, #ec4899 100%)';
                 }
             }
 
-            // Add logout listener only once
             document.getElementById('navLogoutBtn').addEventListener('click', async () => {
                 try {
                     await supabase.auth.signOut();
@@ -982,29 +952,457 @@
                     alert('Failed to logout. Please try again.');
                 }
             });
-
-            return { user, profile, fullName };
         }
 
-        // =========================================================
-        // MAIN ENTRY POINT
-        // =========================================================
+        async function fetchInsightsData() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('student_id')
+                .eq('id', session.user.id)
+                .single();
+
+            const studentId = profile?.student_id;
+            if (!studentId) {
+                throw new Error('Student ID not found');
+            }
+
+            // Fetch completed exams
+            const { data: exams, error: examsError } = await supabase
+                .from('exams')
+                .select('*')
+                .eq('student_id', studentId)
+                .eq('status', 'completed')
+                .order('completed_at', { ascending: false });
+
+            if (examsError) throw examsError;
+
+            // Fetch scheduled exams metadata
+            const { data: scheduledExams, error: scheduledError } = await supabase
+                .from('scheduled_exams')
+                .select('scheduled_exam_id, exam_name, passing_score');
+
+            if (scheduledError) throw scheduledError;
+
+            // Fetch individual answers with topic/unit data
+            const examIds = exams.map(e => e.exam_id);
+            let examAnswers = [];
+
+            if (examIds.length > 0) {
+                const { data: answers, error: answersError } = await supabase
+                    .from('exam_answers')
+                    .select('*')
+                    .in('exam_id', examIds);
+
+                if (answersError) throw answersError;
+                examAnswers = answers || [];
+            }
+
+            const scheduledExamsMap = {};
+            scheduledExams.forEach(exam => {
+                scheduledExamsMap[exam.scheduled_exam_id] = exam;
+            });
+
+            return { exams, scheduledExamsMap, examAnswers };
+        }
+
+        function calculateStats(exams, scheduledExamsMap, examAnswers) {
+            if (!exams || exams.length === 0) {
+                return {
+                    totalExams: 0,
+                    totalQuestions: 0,
+                    averageScore: 0,
+                    passRate: 0,
+                    overallPerformance: 0,
+                    examsByName: {},
+                    topicPerformance: {}
+                };
+            }
+
+            const totalExams = exams.length;
+            const totalScore = exams.reduce((sum, exam) => sum + (exam.score || 0), 0);
+            const averageScore = totalScore / totalExams;
+
+            let passedCount = 0;
+            exams.forEach(exam => {
+                const scheduledExam = scheduledExamsMap[exam.scheduled_exam_id];
+                const passingScore = scheduledExam?.passing_score || 60;
+                if ((exam.score || 0) >= passingScore) {
+                    passedCount++;
+                }
+            });
+
+            const passRate = (passedCount / totalExams) * 100;
+
+            // Calculate exam-wise performance
+            const examsByName = {};
+            exams.forEach(exam => {
+                const scheduledExam = scheduledExamsMap[exam.scheduled_exam_id];
+                const examName = scheduledExam?.exam_name || 'Unknown Exam';
+
+                if (!examsByName[examName]) {
+                    examsByName[examName] = {
+                        attempts: 0,
+                        totalScore: 0,
+                        passed: 0,
+                        failed: 0,
+                        totalTime: 0,
+                        lastAttempt: null
+                    };
+                }
+
+                examsByName[examName].attempts++;
+                examsByName[examName].totalScore += exam.score || 0;
+                examsByName[examName].totalTime += exam.time_taken || 0;
+
+                const passingScore = scheduledExam?.passing_score || 60;
+                if ((exam.score || 0) >= passingScore) {
+                    examsByName[examName].passed++;
+                } else {
+                    examsByName[examName].failed++;
+                }
+
+                if (!examsByName[examName].lastAttempt || new Date(exam.completed_at) > new Date(examsByName[examName].lastAttempt)) {
+                    examsByName[examName].lastAttempt = exam.completed_at;
+                }
+            });
+
+            // Calculate topic/unit-wise performance from exam_answers
+            const topicPerformance = {};
+            examAnswers.forEach(answer => {
+                const topic = answer.topic || 'Unknown Topic';
+
+                if (!topicPerformance[topic]) {
+                    topicPerformance[topic] = {
+                        total: 0,
+                        correct: 0,
+                        incorrect: 0
+                    };
+                }
+
+                topicPerformance[topic].total++;
+                if (answer.is_correct) {
+                    topicPerformance[topic].correct++;
+                } else {
+                    topicPerformance[topic].incorrect++;
+                }
+            });
+
+            return {
+                totalExams,
+                totalQuestions: examAnswers.length,
+                averageScore: Math.round(averageScore),
+                passRate: Math.round(passRate),
+                overallPerformance: Math.round(averageScore),
+                examsByName,
+                topicPerformance,
+                passedCount
+            };
+        }
+
+        function calculateTrend(exams) {
+            if (exams.length < 2) return { text: 'Not enough data', class: 'trend-neutral' };
+
+            const recent = exams.slice(0, Math.ceil(exams.length / 2));
+            const older = exams.slice(Math.ceil(exams.length / 2));
+
+            const recentAvg = recent.reduce((sum, e) => sum + (e.score || 0), 0) / recent.length;
+            const olderAvg = older.reduce((sum, e) => sum + (e.score || 0), 0) / older.length;
+
+            const diff = recentAvg - olderAvg;
+
+            if (Math.abs(diff) < 2) {
+                return { text: 'Stable performance', class: 'trend-neutral' };
+            } else if (diff > 0) {
+                return { text: `↑ ${Math.round(diff)}% improvement`, class: 'trend-up' };
+            } else {
+                return { text: `↓ ${Math.abs(Math.round(diff))}% decline`, class: 'trend-down' };
+            }
+        }
+
+        function renderStats(stats, exams) {
+            document.getElementById('overallPerformance').textContent = stats.totalExams > 0 ? `${stats.overallPerformance}%` : '-';
+            document.getElementById('averageScore').textContent = stats.totalExams > 0 ? `${stats.averageScore}%` : '-';
+            document.getElementById('passRate').textContent = stats.totalExams > 0 ? `${stats.passRate}%` : '-';
+            document.getElementById('totalQuestions').textContent = stats.totalQuestions;
+
+            if (stats.totalExams > 0) {
+                const trend = calculateTrend(exams);
+                document.getElementById('overallTrend').innerHTML = `<span>${trend.text}</span>`;
+                document.getElementById('overallTrend').className = `performance-trend ${trend.class}`;
+
+                document.getElementById('avgTrend').innerHTML = `<span>${stats.passedCount} passed / ${stats.totalExams - stats.passedCount} failed</span>`;
+                document.getElementById('avgTrend').className = 'performance-trend trend-neutral';
+
+                const passClass = stats.passRate >= 70 ? 'trend-up' : stats.passRate >= 50 ? 'trend-neutral' : 'trend-down';
+                document.getElementById('passTrend').innerHTML = `<span>${stats.passedCount} out of ${stats.totalExams}</span>`;
+                document.getElementById('passTrend').className = `performance-trend ${passClass}`;
+
+                document.getElementById('questionsTrend').innerHTML = `<span>${stats.totalExams} exams</span>`;
+                document.getElementById('questionsTrend').className = 'performance-trend trend-neutral';
+            }
+        }
+
+        function renderTopicPerformance(topicPerformance) {
+            const topicList = document.getElementById('topicList');
+
+            if (Object.keys(topicPerformance).length === 0) {
+                topicList.innerHTML = '<div class="no-data">Complete some exams to see detailed unit-wise performance</div>';
+                return;
+            }
+
+            const sortedTopics = Object.entries(topicPerformance)
+                .map(([topic, data]) => ({
+                    topic,
+                    accuracy: (data.correct / data.total) * 100,
+                    ...data
+                }))
+                .sort((a, b) => b.accuracy - a.accuracy);
+
+            topicList.innerHTML = '';
+            sortedTopics.forEach(topic => {
+                const accuracy = Math.round(topic.accuracy);
+
+                const topicItem = document.createElement('div');
+                topicItem.className = 'subject-item';
+                topicItem.innerHTML = `
+                    <div class="subject-info">
+                        <div class="subject-name">${topic.topic}</div>
+                        <div class="subject-meta">
+                            <span>${topic.total} questions</span>
+                            <span>•</span>
+                            <span>${topic.correct} correct</span>
+                            <span>•</span>
+                            <span>${topic.incorrect} incorrect</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: ${accuracy}%"></div>
+                        </div>
+                    </div>
+                    <div class="subject-score">${accuracy}%</div>
+                `;
+                topicList.appendChild(topicItem);
+            });
+        }
+
+        function renderRecentExams(exams, scheduledExamsMap) {
+            const tableContainer = document.getElementById('recentExamsTable');
+
+            if (exams.length === 0) {
+                tableContainer.innerHTML = '<div class="no-data">No exam results yet. Start taking exams to see your performance!</div>';
+                return;
+            }
+
+            const recentExams = exams.slice(0, 10);
+
+            let tableHTML = `
+                <table class="exam-table">
+                    <thead>
+                        <tr>
+                            <th>Exam Name</th>
+                            <th>Date</th>
+                            <th>Score</th>
+                            <th>Time Taken</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            recentExams.forEach(exam => {
+                const scheduledExam = scheduledExamsMap[exam.scheduled_exam_id];
+                const examName = scheduledExam?.exam_name || 'Unknown Exam';
+                const passingScore = scheduledExam?.passing_score || 60;
+                const completedDate = new Date(exam.completed_at);
+                const timeTaken = Math.round((exam.time_taken || 0) / 60);
+                const passed = (exam.score || 0) >= passingScore;
+
+                tableHTML += `
+                    <tr>
+                        <td>${examName}</td>
+                        <td>${completedDate.toLocaleDateString('en-IN', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                })}</td>
+                        <td class="score-cell">${exam.score || 0}%</td>
+                        <td>${timeTaken} min</td>
+                        <td>
+                            <span class="exam-status ${passed ? 'status-passed' : 'status-failed'}">
+                                ${passed ? 'Passed' : 'Failed'}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            tableContainer.innerHTML = tableHTML;
+        }
+
         async function initInsights() {
             try {
-                // 1. Render the static HTML for the navbar immediately (SYNCHRONOUS)
-                renderNavbarStructure('insights');
+                await initNavbar();
 
-                // 2. Fetch the user data and update the name/avatar (ASYNCHRONOUS)
-                await initNavbarData();
+                const data = await fetchInsightsData();
+                if (!data) return;
+
+                const { exams, scheduledExamsMap, examAnswers } = data;
+                const stats = calculateStats(exams, scheduledExamsMap, examAnswers);
+
+                // Store data globally for suggestions
+                window.insightsData = { exams, scheduledExamsMap, examAnswers, stats };
+
+                renderStats(stats, exams);
+                renderTopicPerformance(stats.topicPerformance);
+                renderRecentExams(exams, scheduledExamsMap);
+
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('insightsContent').style.display = 'block';
 
             } catch (err) {
                 console.error('Insights init error:', err);
-                // On any error during session check/data fetch, redirect.
-                window.location.href = 'index.html';
+                document.getElementById('loadingMessage').innerHTML = `
+                    <div style="color: #ef4444;">
+                        Error loading insights: ${err.message}<br>
+                        <small>Redirecting to login...</small>
+                    </div>
+                `;
+                setTimeout(() => window.location.href = 'index.html', 2000);
             }
+        }
+
+        // Function to prepare data for AI suggestions
+        function prepareDataForAI() {
+            const { exams, stats } = window.insightsData;
+
+            // Get weak topics (below 70% accuracy)
+            const weakTopics = Object.entries(stats.topicPerformance)
+                .map(([topic, data]) => ({
+                    topic,
+                    accuracy: Math.round((data.correct / data.total) * 100),
+                    total: data.total,
+                    correct: data.correct
+                }))
+                .filter(t => t.accuracy < 70)
+                .sort((a, b) => a.accuracy - b.accuracy);
+
+            // Get strong topics (above 80% accuracy)
+            const strongTopics = Object.entries(stats.topicPerformance)
+                .map(([topic, data]) => ({
+                    topic,
+                    accuracy: Math.round((data.correct / data.total) * 100)
+                }))
+                .filter(t => t.accuracy >= 80)
+                .sort((a, b) => b.accuracy - a.accuracy);
+
+            // Recent performance trend
+            const recentExams = exams.slice(0, 3);
+            const recentAvg = recentExams.reduce((sum, e) => sum + (e.score || 0), 0) / recentExams.length;
+
+            return {
+                overall_score: stats.averageScore,
+                pass_rate: stats.passRate,
+                total_exams: stats.totalExams,
+                total_questions: stats.totalQuestions,
+                recent_performance: Math.round(recentAvg),
+                weak_topics: weakTopics.slice(0, 5),
+                strong_topics: strongTopics.slice(0, 3),
+                topic_count: Object.keys(stats.topicPerformance).length
+            };
+        }
+
+        // Function to get AI suggestions via Make.com webhook
+        window.getSuggestions = async function () {
+            const btn = document.getElementById('getSuggestionsBtn');
+            const btnText = document.getElementById('suggestionsBtnText');
+            const spinner = document.getElementById('suggestionsSpinner');
+            const container = document.getElementById('suggestionsContainer');
+
+            try {
+                // Disable button and show loading
+                btn.disabled = true;
+                btnText.style.display = 'none';
+                spinner.style.display = 'inline-flex';
+
+                // Prepare performance data
+                const performanceData = prepareDataForAI();
+
+                console.log('Sending data to Make.com:', performanceData);
+
+                // TODO: Replace with your Make.com webhook URL
+                const WEBHOOK_URL = 'YOUR_MAKE_COM_WEBHOOK_URL_HERE';
+
+                // Send data to Make.com webhook
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(performanceData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Webhook error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('Received suggestions:', result);
+
+                // Display suggestions
+                displaySuggestions(result.suggestions || result.message || result);
+
+            } catch (error) {
+                console.error('Error getting suggestions:', error);
+
+                // Show error message
+                container.innerHTML = `
+                    <div class="error-message">
+                        <p><strong>⚠️ Unable to generate suggestions</strong></p>
+                        <p>Please check your webhook configuration or try again later.</p>
+                        <button class="refresh-suggestions" onclick="getSuggestions()">
+                            🔄 Try Again
+                        </button>
+                    </div>
+                `;
+            } finally {
+                // Re-enable button
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        };
+
+        // Function to display AI-generated suggestions
+        function displaySuggestions(suggestionsText) {
+            const container = document.getElementById('suggestionsContainer');
+
+            container.innerHTML = `
+                <div class="suggestions-content">
+                    <div class="success-badge">✨ AI-Generated Suggestions</div>
+                    <div class="suggestion-section">
+                        <div style="white-space: pre-wrap; color: #e2e8f0; line-height: 1.8;">
+                            ${suggestionsText}
+                        </div>
+                    </div>
+                    <button class="refresh-suggestions" onclick="getSuggestions()">
+                        🔄 Refresh Suggestions
+                    </button>
+                </div>
+            `;
         }
 
         initInsights();
     </script>
 </body>
+
 </html>

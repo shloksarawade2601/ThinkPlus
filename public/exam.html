@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThinkPlus - Exam</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -13,13 +15,11 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-            background: #0a0e27; /* Base dark color */
+            background: #0a0e27;
             min-height: 100vh;
             color: #e2e8f0;
             overflow-x: hidden;
         }
-
-        /* --- THEME BACKGROUND STYLES --- */
 
         .gradient-bg {
             position: fixed;
@@ -34,8 +34,15 @@
         }
 
         @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .orbs {
@@ -84,12 +91,16 @@
         }
 
         @keyframes float {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translate(0, 0) scale(1);
             }
+
             33% {
                 transform: translate(50px, -50px) scale(1.1);
             }
+
             66% {
                 transform: translate(-30px, 30px) scale(0.9);
             }
@@ -102,27 +113,127 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
             pointer-events: none;
         }
 
-        /* --- EXAM COMPONENTS STYLES (UPDATED) --- */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .loading-screen.hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(167, 139, 250, 0.3);
+            border-top-color: #a78bfa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            color: #a78bfa;
+        }
+
+        .warning-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .warning-overlay.active {
+            display: flex;
+        }
+
+        .warning-content {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(239, 68, 68, 0.5);
+        }
+
+        .warning-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .warning-content h2 {
+            color: #fca5a5;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .warning-content p {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .warning-content .btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .warning-content .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(239, 68, 68, 0.6);
+        }
 
         .exam-header {
-            background: rgba(15, 23, 42, 0.5); /* Semi-transparent background */
-            backdrop-filter: blur(20px) saturate(180%); /* Increased blur for theme */
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
             padding: 1rem 2rem;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Darker shadow */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid rgba(167, 139, 250, 0.25); /* Theme border color */
+            border-bottom: 1px solid rgba(167, 139, 250, 0.25);
         }
 
         .exam-title {
@@ -133,7 +244,6 @@
 
         .exam-title h1 {
             font-size: 1.5rem;
-            /* Using theme gradient */
             background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f472b6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -142,7 +252,7 @@
         }
 
         .exam-title span {
-            color: #475569; /* Slightly darker separator */
+            color: #475569;
         }
 
         .exam-title h2 {
@@ -161,7 +271,6 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
-            /* Retaining red for time warning, but using theme's box style */
             background: rgba(239, 68, 68, 0.2);
             border-radius: 0.5rem;
             border: 1px solid rgba(239, 68, 68, 0.3);
@@ -179,9 +288,31 @@
             color: #fca5a5;
         }
 
+        .timer.warning {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.3);
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        .timer.warning .timer-icon,
+        .timer.warning .timer-text {
+            color: #fbbf24;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
         .btn-submit {
             padding: 0.75rem 2rem;
-            /* Green gradient for final submission action */
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             border: none;
@@ -198,10 +329,9 @@
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
         }
 
-        /* Main Content */
         .exam-container {
             position: relative;
-            z-index: 2; /* Ensures content is above the background */
+            z-index: 2;
             display: flex;
             max-width: 1400px;
             margin: 2rem auto;
@@ -209,16 +339,17 @@
             gap: 2rem;
         }
 
-        /* Question Section & Nav Panel (Themed Cards) */
-        .question-section, .nav-panel, .modal-content {
-            background: rgba(15, 23, 42, 0.7); /* Darker semi-transparent */
+        .question-section,
+        .nav-panel,
+        .modal-content {
+            background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(20px) saturate(180%);
             padding: 2rem;
             border-radius: 1rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(167, 139, 250, 0.15); /* Theme shadow/border */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(167, 139, 250, 0.15);
             border: 1px solid rgba(167, 139, 250, 0.2);
         }
-        
+
         .question-section {
             flex: 1;
         }
@@ -235,7 +366,6 @@
         .question-number {
             font-size: 1.25rem;
             font-weight: 600;
-            /* Theme gradient for primary text */
             background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -306,7 +436,6 @@
             flex: 1;
         }
 
-        /* Action Buttons */
         .action-buttons {
             display: flex;
             gap: 1rem;
@@ -328,9 +457,14 @@
             font-size: 1rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
-        
-        .btn:hover {
-             transform: translateY(-2px);
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .btn-clear {
@@ -341,7 +475,7 @@
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
         }
 
-        .btn-clear:hover {
+        .btn-clear:hover:not(:disabled) {
             background: rgba(245, 158, 11, 0.3);
         }
 
@@ -353,32 +487,27 @@
             box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
         }
 
-        .btn-mark-review:hover {
+        .btn-mark-review:hover:not(:disabled) {
             background: rgba(139, 92, 246, 0.3);
         }
 
         .btn-save-next {
-            /* Theme primary action gradient (Purple) - default */
             background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
             color: white;
             box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
         }
 
-        .btn-save-next:hover {
+        .btn-save-next:hover:not(:disabled) {
             box-shadow: 0 6px 20px rgba(167, 139, 250, 0.6);
         }
-        
-        /* Style for Final Button Action */
+
         .btn-save-next.btn-final-action {
-            /* Use the green gradient like the main submit button */
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
         }
 
-        .btn-save-next.btn-final-action:hover {
+        .btn-save-next.btn-final-action:hover:not(:disabled) {
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
-            transform: translateY(-2px);
         }
 
         .btn-previous {
@@ -389,11 +518,10 @@
             box-shadow: none;
         }
 
-        .btn-previous:hover {
+        .btn-previous:hover:not(:disabled) {
             background: rgba(71, 85, 105, 0.7);
         }
 
-        /* Navigation Panel */
         .nav-panel {
             width: 350px;
             height: fit-content;
@@ -405,7 +533,6 @@
             color: #f1f5f9;
             margin-bottom: 1rem;
             font-size: 1.25rem;
-            /* Theme gradient for panel title */
             background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -439,27 +566,34 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Status Colors (Matching Theme) */
-        .legend-box.answered, .question-box.answered, .btn-confirm {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* Green */
+        .legend-box.answered,
+        .question-box.answered,
+        .btn-confirm {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            border: 2px solid #10b981;
         }
 
-        .legend-box.not-answered, .question-box.not-answered {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); /* Red */
+        .legend-box.not-answered,
+        .question-box.not-answered {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            border: 2px solid #ef4444;
         }
 
-        .legend-box.marked, .question-box.marked {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); /* Purple */
+        .legend-box.marked,
+        .question-box.marked {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             color: white;
             box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            border: 2px solid #8b5cf6;
         }
 
-        .legend-box.not-visited, .question-box.not-visited {
-            background: rgba(71, 85, 105, 0.5); /* Gray */
+        .legend-box.not-visited,
+        .question-box.not-visited {
+            background: rgba(71, 85, 105, 0.5);
             color: #cbd5e1;
             border: 1px solid rgba(100, 116, 139, 0.3);
             box-shadow: none;
@@ -493,12 +627,11 @@
         }
 
         .question-box.current {
-            border: 3px solid #f472b6; /* Highlight border */
+            border: 3px solid #f472b6;
             box-shadow: 0 0 20px rgba(244, 114, 182, 0.5);
             transform: scale(1.05);
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -507,16 +640,14 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px); 
+            backdrop-filter: blur(10px);
             z-index: 1000;
-            /* Center the modal content using flex */
-            display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .modal:not(.active) {
-            display: none; /* Only hide when not active, otherwise use flex */
+        .modal.active {
+            display: flex;
         }
 
         .modal-content {
@@ -528,11 +659,9 @@
             width: 90%;
             border: 1px solid rgba(139, 92, 246, 0.3);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
-            /* Center text content */
             text-align: center;
         }
-        
-        /* Ensure modal summary is left-aligned while modal is centered */
+
         #modalSummary {
             text-align: left;
             background: rgba(30, 41, 59, 0.5);
@@ -540,18 +669,17 @@
             border-radius: 0.5rem;
             border: 1px solid rgba(139, 92, 246, 0.2);
             backdrop-filter: blur(5px);
-            margin-bottom: 1.5rem; /* Added margin for separation */
+            margin-bottom: 1.5rem;
         }
 
         .modal-content h3 {
             color: #f1f5f9;
-            margin-bottom: 0.5rem; /* Reduced margin */
-            /* Theme gradient */
+            margin-bottom: 0.5rem;
             background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-size: 1.8rem; /* Increased size */
+            font-size: 1.8rem;
         }
 
         .modal-content p {
@@ -563,7 +691,7 @@
         #modalSummary p {
             color: #e2e8f0;
             margin: 0;
-            line-height: 1.8; /* Increased line-height for readability */
+            line-height: 1.8;
             font-size: 0.95rem;
         }
 
@@ -571,14 +699,13 @@
             color: #a78bfa;
             font-weight: 700;
             display: inline-block;
-            width: 150px; /* Aligned summary key */
+            width: 150px;
         }
-        
-        /* Buttons should be centered nicely */
+
         .modal-buttons {
             display: flex;
             gap: 1rem;
-            justify-content: center; /* Center the buttons */
+            justify-content: center;
         }
 
         .btn-cancel {
@@ -593,7 +720,6 @@
             transform: translateY(-2px);
         }
 
-        /* .btn-confirm uses .legend-box.answered styling (Green gradient) */
         .btn-confirm {
             padding: 0.75rem 2rem;
             border: none;
@@ -603,12 +729,59 @@
             transition: all 0.3s ease;
             font-size: 1rem;
         }
-        
+
         .btn-confirm:hover {
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .exam-container {
+                flex-direction: column;
+            }
+
+            .nav-panel {
+                width: 100%;
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .exam-header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .timer-container {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .question-section {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-group {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+            }
+
+            .question-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="gradient-bg"></div>
     <div class="orbs">
@@ -617,16 +790,32 @@
         <div class="orb orb3"></div>
     </div>
     <div class="grid-overlay"></div>
+
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading your exam...</div>
+    </div>
+
+    <div class="warning-overlay" id="warningOverlay">
+        <div class="warning-content">
+            <div class="warning-icon">⚠️</div>
+            <h2>Warning!</h2>
+            <p id="warningMessage">You switched tabs during the exam. This is your first warning. If you switch tabs
+                again, your exam will be automatically submitted.</p>
+            <button class="btn" onclick="closeWarning()">I Understand - Continue Exam</button>
+        </div>
+    </div>
+
     <div class="exam-header">
         <div class="exam-title">
             <h1>ThinkPlus</h1>
             <span>|</span>
-            <h2 id="examTitle">JavaScript Fundamentals</h2>
+            <h2 id="examTitle">MCQ Exam</h2>
         </div>
         <div class="timer-container">
-            <div class="timer">
+            <div class="timer" id="timerElement">
                 <span class="timer-icon">⏱️</span>
-                <span class="timer-text" id="timer">30:00</span>
+                <span class="timer-text" id="timer">45:00</span>
             </div>
             <button class="btn-submit" onclick="showSubmitModal()">Submit Exam</button>
         </div>
@@ -635,25 +824,24 @@
     <div class="exam-container">
         <div class="question-section">
             <div class="question-header">
-                <span class="question-number" id="questionNumber">Question 1 of 5</span>
-                <span class="question-marks" id="questionMarks">Marks: 1</span>
+                <span class="question-number" id="questionNumber">Question 1 of 30</span>
+                <span class="question-marks" id="questionMarks">Topic: Loading...</span>
             </div>
 
             <div class="question-text" id="questionText">
-                What is the correct syntax for referring to an external script called "app.js"?
+                Loading question...
             </div>
 
-            <div class="options-container" id="optionsContainer">
-                </div>
+            <div class="options-container" id="optionsContainer"></div>
 
             <div class="action-buttons">
                 <div class="btn-group">
-                    <button class="btn btn-previous" onclick="previousQuestion()">Previous</button>
+                    <button class="btn btn-previous" id="prevBtn" onclick="previousQuestion()">Previous</button>
                     <button class="btn btn-clear" onclick="clearResponse()">Clear Response</button>
                 </div>
                 <div class="btn-group">
                     <button class="btn btn-mark-review" onclick="markForReview()">Mark for Review</button>
-                    <button class="btn btn-save-next" onclick="saveAndNext()">Save & Next</button>
+                    <button class="btn btn-save-next" id="saveNextBtn" onclick="saveAndNext()">Save & Next</button>
                 </div>
             </div>
         </div>
@@ -679,8 +867,7 @@
                 </div>
             </div>
 
-            <div class="question-grid" id="questionGrid">
-                </div>
+            <div class="question-grid" id="questionGrid"></div>
         </div>
     </div>
 
@@ -697,84 +884,164 @@
     </div>
 
     <script>
-        // Sample exam data 
-        const examData = {
-            title: "JavaScript Fundamentals",
-            duration: 30, // in minutes
-            questions: [
-                {
-                    id: 1,
-                    text: "What is the correct syntax for referring to an external script called 'app.js'?",
-                    options: [
-                        '&lt;script src="app.js"&gt;', // A (Correct)
-                        '&lt;script href="app.js"&gt;',
-                        '&lt;script name="app.js"&gt;',
-                        '&lt;script link="app.js"&gt;'
-                    ],
-                    marks: 1
-                },
-                {
-                    id: 2,
-                    text: "Which company developed JavaScript?",
-                    options: ["Microsoft", "Netscape", "Oracle", "IBM"], // B (Correct)
-                    marks: 1
-                },
-                {
-                    id: 3,
-                    text: "What is the correct way to write a JavaScript array?",
-                    options: [
-                        'var colors = "red", "green", "blue"',
-                        'var colors = (1:"red", 2:"green", 3:"blue")',
-                        'var colors = ["red", "green", "blue"]', // C (Correct)
-                        'var colors = 1 = ("red"), 2 = ("green"), 3 = ("blue")'
-                    ],
-                    marks: 1
-                },
-                {
-                    id: 4,
-                    text: "How do you create a function in JavaScript?",
-                    options: [
-                        "function myFunction()", // A (Correct)
-                        "function:myFunction()",
-                        "function = myFunction()",
-                        "create myFunction()"
-                    ],
-                    marks: 1
-                },
-                {
-                    id: 5,
-                    text: "How do you call a function named 'myFunction'?",
-                    options: [
-                        "call myFunction()",
-                        "myFunction()", // B (Correct)
-                        "call function myFunction()",
-                        "execute myFunction()"
-                    ],
-                    marks: 1
-                }
-            ]
-        };
+        const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
 
-        // Correct answer keys for local scoring validation (A, B, C, A, B)
-        const correctAnswers = ['A', 'B', 'C', 'A', 'B'];
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+            auth: {
+                storage: window.sessionStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
 
+        let examData = null;
+        let currentExamId = null;
         let currentQuestion = 0;
-        let timeRemaining = examData.duration * 60;
+        let timeRemaining = 45 * 60;
         let timerInterval;
-        let examState = examData.questions.map(() => ({
-            visited: false,
-            answered: false,
-            marked: false,
-            selectedAnswer: null
-        }));
+        let examState = [];
+        let tabSwitchCount = 0;
+        let isExamActive = false;
 
-        function initExam() {
-            generateQuestionGrid();
-            loadQuestion(0);
-            startTimer();
-            examState[0].visited = true;
-            document.getElementById('examTitle').textContent = examData.title;
-            updateQuestionGrid();
+        // Anti-cheat: Tab switch detection
+        document.addEventListener('visibilitychange', function () {
+            if (!isExamActive) return;
+
+            if (document.hidden) {
+                tabSwitchCount++;
+                console.log('Tab switch detected. Count:', tabSwitchCount);
+
+                if (tabSwitchCount === 1) {
+                    // First warning
+                    showWarning('You switched tabs during the exam. This is your first warning. If you switch tabs again, your exam will be automatically submitted.');
+                } else if (tabSwitchCount >= 2) {
+                    // Auto-submit on second offense
+                    showWarning('You switched tabs again. Your exam is being automatically submitted for violating exam rules.');
+                    setTimeout(() => {
+                        submitExam(true); // true = forced submission
+                    }, 3000);
+                }
+            }
+        });
+
+        // Prevent right-click and copy
+        document.addEventListener('contextmenu', (e) => {
+            if (isExamActive) e.preventDefault();
+        });
+
+        document.addEventListener('copy', (e) => {
+            if (isExamActive) e.preventDefault();
+        });
+
+        function showWarning(message) {
+            document.getElementById('warningMessage').textContent = message;
+            document.getElementById('warningOverlay').classList.add('active');
+        }
+
+        function closeWarning() {
+            document.getElementById('warningOverlay').classList.remove('active');
+        }
+
+        async function initExam() {
+            try {
+                console.log('🔄 Initializing exam...');
+
+                const urlParams = new URLSearchParams(window.location.search);
+                currentExamId = urlParams.get('exam_id');
+
+                console.log('Exam ID from URL:', currentExamId);
+
+                if (!currentExamId) {
+                    console.error('❌ No exam ID in URL');
+                    alert('No exam ID found. Redirecting to start page.');
+                    window.location.href = 'start_exam.html';
+                    return;
+                }
+
+                console.log('📡 Fetching exam from database...');
+                const { data, error } = await supabase
+                    .from('exams')
+                    .select('*')
+                    .eq('exam_id', currentExamId)
+                    .single();
+
+                console.log('Database response:', data);
+                console.log('Database error:', error);
+
+                if (error) {
+                    console.error('❌ Supabase error:', error);
+                    throw error;
+                }
+
+                if (!data) {
+                    console.error('❌ No exam data found');
+                    throw new Error('Exam not found');
+                }
+
+                if (data.status === 'completed') {
+                    console.log('⚠️ Exam already completed');
+                    alert('This exam has already been submitted.');
+                    window.location.href = 'report_card.html?exam_id=' + currentExamId;
+                    return;
+                }
+
+                // Fetch scheduled exam to get duration
+                const { data: scheduledExam, error: scheduledError } = await supabase
+                    .from('scheduled_exams')
+                    .select('duration, exam_name')
+                    .eq('scheduled_exam_id', data.scheduled_exam_id)
+                    .single();
+
+                if (scheduledError) {
+                    console.error('❌ Error fetching scheduled exam:', scheduledError);
+                    throw scheduledError;
+                }
+
+                console.log('✅ Scheduled exam data loaded:', scheduledExam);
+                console.log('Duration from scheduled exam:', scheduledExam.duration, 'minutes');
+
+                examData = {
+                    title: scheduledExam.exam_name || "ThinkPlus MCQ Exam",
+                    duration: scheduledExam.duration, // Use duration from scheduled_exams
+                    questions: data.questions
+                };
+
+                if (!examData.questions || examData.questions.length === 0) {
+                    throw new Error('No questions found in exam');
+                }
+
+                examState = examData.questions.map(() => ({
+                    visited: false,
+                    answered: false,
+                    marked: false,
+                    selectedAnswer: null
+                }));
+
+                timeRemaining = examData.duration * 60; // Convert minutes to seconds
+
+                console.log('✅ Exam initialized successfully');
+                console.log('Total questions:', examData.questions.length);
+                console.log('Duration:', examData.duration, 'minutes');
+                console.log('Time remaining:', timeRemaining, 'seconds');
+
+                document.getElementById('loadingScreen').classList.add('hidden');
+
+                generateQuestionGrid();
+                loadQuestion(0);
+                startTimer();
+                examState[0].visited = true;
+                document.getElementById('examTitle').textContent = examData.title;
+                updateQuestionGrid();
+
+                isExamActive = true; // Enable anti-cheat
+
+            } catch (error) {
+                console.error('❌ Error loading exam:', error);
+                alert('Error loading exam: ' + error.message);
+                window.location.href = 'start_exam.html';
+            }
         }
 
         function generateQuestionGrid() {
@@ -792,34 +1059,33 @@
         function loadQuestion(index) {
             const question = examData.questions[index];
             document.getElementById('questionNumber').textContent = `Question ${index + 1} of ${examData.questions.length}`;
-            document.getElementById('questionMarks').textContent = `Marks: ${question.marks}`;
-            document.getElementById('questionText').innerHTML = question.text; 
+            document.getElementById('questionMarks').textContent = `${question.topic} - ${question.difficulty}`;
+            document.getElementById('questionText').innerHTML = question.question;
 
             const container = document.getElementById('optionsContainer');
             container.innerHTML = '';
             question.options.forEach((option, i) => {
                 const label = document.createElement('label');
                 label.className = 'option';
-                const optionLetter = String.fromCharCode(65 + i);
-                
+
                 const input = document.createElement('input');
                 input.type = 'radio';
                 input.name = 'answer';
-                input.value = optionLetter;
-                
-                if (examState[index].selectedAnswer === optionLetter) {
+                input.value = option;
+
+                if (examState[index].selectedAnswer === option) {
                     input.checked = true;
                     label.classList.add('selected');
                 }
-                
+
                 const span = document.createElement('span');
                 span.className = 'option-label';
                 span.innerHTML = option;
-                
+
                 label.appendChild(input);
                 label.appendChild(span);
                 container.appendChild(label);
-                
+
                 label.addEventListener('click', (event) => {
                     if (event.target !== input) {
                         input.checked = true;
@@ -827,7 +1093,7 @@
                     document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
                     label.classList.add('selected');
                 });
-                
+
                 input.addEventListener('change', () => {
                     document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
                     label.classList.add('selected');
@@ -836,9 +1102,8 @@
 
             currentQuestion = index;
             examState[index].visited = true;
-            
-            // Logic to change button text and style on last question
-            const saveNextBtn = document.querySelector('.btn-save-next');
+
+            const saveNextBtn = document.getElementById('saveNextBtn');
             if (index === examData.questions.length - 1) {
                 saveNextBtn.textContent = 'Save & Finish';
                 saveNextBtn.classList.add('btn-final-action');
@@ -846,10 +1111,9 @@
                 saveNextBtn.textContent = 'Save & Next';
                 saveNextBtn.classList.remove('btn-final-action');
             }
-            
-            // Disable 'Previous' button on the first question
-            document.querySelector('.btn-previous').disabled = (index === 0);
-            
+
+            document.getElementById('prevBtn').disabled = (index === 0);
+
             updateQuestionGrid();
         }
 
@@ -863,13 +1127,53 @@
             if (selected) {
                 examState[currentQuestion].selectedAnswer = selected.value;
                 examState[currentQuestion].answered = true;
-            } else {
-                // If an answer was cleared, update state
-                if (examState[currentQuestion].selectedAnswer !== null) {
-                    examState[currentQuestion].answered = false;
-                }
-                examState[currentQuestion].selectedAnswer = null;
+                examState[currentQuestion].marked = false;
             }
+        }
+
+        function updateQuestionGrid() {
+            const boxes = document.querySelectorAll('.question-box');
+            boxes.forEach((box, index) => {
+                box.classList.remove('answered', 'not-answered', 'marked', 'not-visited', 'current');
+
+                if (index === currentQuestion) {
+                    box.classList.add('current');
+                }
+
+                const state = examState[index];
+                box.textContent = index + 1;
+
+                if (state.marked) {
+                    box.classList.add('marked');
+                } else if (state.answered) {
+                    box.classList.add('answered');
+                } else if (state.visited) {
+                    box.classList.add('not-answered');
+                } else {
+                    box.classList.add('not-visited');
+                }
+            });
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                const timerDisplay = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                document.getElementById('timer').textContent = timerDisplay;
+
+                if (timeRemaining <= 300 && timeRemaining > 0) {
+                    document.getElementById('timerElement').classList.add('warning');
+                }
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    alert('Time is up! Your exam will be submitted automatically.');
+                    submitExam(true); // Auto-submit when time runs out
+                }
+            }, 1000);
         }
 
         function previousQuestion() {
@@ -882,153 +1186,237 @@
         function saveAndNext() {
             saveCurrentAnswer();
             updateQuestionGrid();
+
             if (currentQuestion < examData.questions.length - 1) {
                 loadQuestion(currentQuestion + 1);
             } else {
-                // If on the last question, show the submit modal
                 showSubmitModal();
             }
         }
 
         function clearResponse() {
-            document.querySelectorAll('input[name="answer"]').forEach(input => {
-                input.checked = false;
-            });
-            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-            examState[currentQuestion].selectedAnswer = null;
-            examState[currentQuestion].answered = false;
-            
-            // Only clear 'marked' status if it was not answered.
-            if (!examState[currentQuestion].answered) {
-                examState[currentQuestion].marked = false;
+            const selected = document.querySelector('input[name="answer"]:checked');
+            if (selected) {
+                selected.checked = false;
+                document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+                examState[currentQuestion].selectedAnswer = null;
+                examState[currentQuestion].answered = false;
+                updateQuestionGrid();
             }
-            updateQuestionGrid();
         }
 
         function markForReview() {
             saveCurrentAnswer();
             examState[currentQuestion].marked = true;
             updateQuestionGrid();
+
             if (currentQuestion < examData.questions.length - 1) {
                 loadQuestion(currentQuestion + 1);
-            } else {
-                updateQuestionGrid(); 
             }
         }
 
-        function updateQuestionGrid() {
-            const boxes = document.querySelectorAll('.question-box');
-            boxes.forEach((box, index) => {
-                box.className = 'question-box';
-                
-                if (index === currentQuestion) {
-                    box.classList.add('current');
-                }
-                
-                // Determine status based on examState
-                if (examState[index].marked) {
-                    box.classList.add('marked');
-                } else if (examState[index].answered) {
-                    box.classList.add('answered');
-                } else if (examState[index].visited) {
-                    box.classList.add('not-answered');
-                } else {
-                    box.classList.add('not-visited');
-                }
-            });
-        }
-
-        function startTimer() {
-            timerInterval = setInterval(() => {
-                timeRemaining--;
-                updateTimerDisplay();
-                
-                if (timeRemaining <= 0) {
-                    clearInterval(timerInterval);
-                    // Automatically submit the exam when time runs out
-                    alert("Time's up! Submitting exam automatically.");
-                    submitExam();
-                }
-            }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeRemaining / 60);
-            const seconds = timeRemaining % 60;
-            document.getElementById('timer').textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
         function showSubmitModal() {
-            // Ensure the current answer is saved before showing the summary
             saveCurrentAnswer();
-            
-            const answered = examState.filter(s => s.answered).length;
-            const notAnswered = examState.filter(s => s.visited && !s.answered).length;
-            const marked = examState.filter(s => s.marked).length;
-            const notVisited = examData.questions.length - examState.filter(s => s.visited).length;
 
-            document.getElementById('modalSummary').innerHTML = `
-                <p>
-                    <strong>Total Questions:</strong> ${examData.questions.length}<br>
-                    <strong>Answered:</strong> <span style="color: #10b981;">${answered}</span><br>
-                    <strong>Not Answered:</strong> <span style="color: #ef4444;">${notAnswered}</span><br>
-                    <strong>Marked for Review:</strong> <span style="color: #8b5cf6;">${marked}</span><br>
-                    <strong>Not Visited:</strong> ${notVisited}
-                </p>
+            const answered = examState.filter(s => s.answered).length;
+            const notAnswered = examState.filter(s => !s.answered && s.visited).length;
+            const marked = examState.filter(s => s.marked).length;
+            const notVisited = examState.filter(s => !s.visited).length;
+
+            const summaryHTML = `
+                <p><strong>Answered:</strong> ${answered}</p>
+                <p><strong>Not Answered:</strong> ${notAnswered}</p>
+                <p><strong>Marked for Review:</strong> ${marked}</p>
+                <p><strong>Not Visited:</strong> ${notVisited}</p>
             `;
-            
-            // Check if the modal is currently hidden by CSS (display: none)
-            const modal = document.getElementById('submitModal');
-            modal.style.display = 'flex'; 
-            modal.classList.add('active');
+
+            document.getElementById('modalSummary').innerHTML = summaryHTML;
+            document.getElementById('submitModal').classList.add('active');
         }
 
         function closeSubmitModal() {
-            const modal = document.getElementById('submitModal');
-            modal.classList.remove('active');
-            // Explicitly set display to none to ensure full hide
-            modal.style.display = 'none'; 
+            document.getElementById('submitModal').classList.remove('active');
         }
 
-        function submitExam() {
-            clearInterval(timerInterval);
-            
-            // Final save before submission
-            saveCurrentAnswer();
+        async function submitExam(isForced = false) {
+            try {
+                isExamActive = false; // Disable anti-cheat
+                clearInterval(timerInterval);
+                closeSubmitModal();
 
-            // 1. Calculate Results
-            let score = 0;
-            const totalQuestions = examData.questions.length;
-            
-            examState.forEach((state, index) => {
-                // Check if the user answered and if the answer matches the correct key
-                if (state.answered && state.selectedAnswer === correctAnswers[index]) {
-                    score++;
+                document.getElementById('loadingScreen').classList.remove('hidden');
+                document.querySelector('.loading-text').textContent = isForced ? 'Auto-submitting your exam...' : 'Submitting your exam...';
+
+                console.log('📊 Calculating results...');
+
+                // Get current user
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    throw new Error('User session not found');
                 }
-            });
-            
-            const timeSpentSeconds = (examData.duration * 60) - timeRemaining;
-            const scorePercentage = Math.round((score / totalQuestions) * 100);
 
-            // 2. Prepare Data for Report Card (URL Parameters)
-            const params = new URLSearchParams();
-            params.append('title', examData.title);
-            params.append('total', totalQuestions);
-            params.append('score', score);
-            params.append('percent', scorePercentage);
-            params.append('time', timeSpentSeconds);
+                // Get student profile
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('student_id, full_name')
+                    .eq('id', session.user.id)
+                    .single();
 
-            // Pass the selected answers for calculating attempted/incorrect counts on the report card
-            // We only pass the selected answers (null if not answered)
-            params.append('state', JSON.stringify(examState.map(s => s.selectedAnswer)));
+                if (!profile || !profile.student_id) {
+                    throw new Error('Student ID not found');
+                }
 
-            // 3. Redirect to the Report Card
-            // This is the line that performs the navigation:
-            window.location.href = `report_card.html?${params.toString()}`;
+                // Calculate results
+                let correctAnswers = 0;
+                let answeredCount = 0;
+                const responses = examData.questions.map((q, index) => {
+                    const userAnswer = examState[index].selectedAnswer;
+                    const isCorrect = userAnswer === q.answer;
+                    if (isCorrect) correctAnswers++;
+                    if (userAnswer) answeredCount++;
+
+                    return {
+                        question_id: q.id,
+                        question: q.question,
+                        user_answer: userAnswer || 'Not Answered',
+                        correct_answer: q.answer,
+                        is_correct: isCorrect,
+                        topic: q.topic,
+                        difficulty: q.difficulty
+                    };
+                });
+
+                const totalQuestions = examData.questions.length;
+                const incorrectAnswers = answeredCount - correctAnswers;
+                const unanswered = totalQuestions - answeredCount;
+                const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+                const timeTaken = (examData.duration * 60) - timeRemaining;
+
+                // Get scheduled exam details
+                const { data: currentExamData } = await supabase
+                    .from('exams')
+                    .select('scheduled_exam_id')
+                    .eq('exam_id', currentExamId)
+                    .single();
+
+                const { data: scheduledExam } = await supabase
+                    .from('scheduled_exams')
+                    .select('passing_score, exam_name')
+                    .eq('scheduled_exam_id', currentExamData.scheduled_exam_id)
+                    .single();
+
+                const passingScore = scheduledExam?.passing_score || 60;
+                const examName = scheduledExam?.exam_name || 'ThinkPlus Exam';
+                const status = percentage >= passingScore ? 'passed' : 'failed';
+
+                console.log('✅ Score calculated:', percentage + '%');
+                console.log('✅ Status:', status);
+                console.log('✅ Correct answers:', correctAnswers + '/' + totalQuestions);
+
+                // 1. Save individual answers
+                console.log('💾 Saving individual answers...');
+                const answersToInsert = responses.map(r => ({
+                    exam_id: currentExamId,
+                    question_id: r.question_id,
+                    student_answer: r.user_answer,
+                    correct_answer: r.correct_answer,
+                    is_correct: r.is_correct,
+                    topic: r.topic,
+                    difficulty: r.difficulty
+                }));
+
+                const { error: answersError } = await supabase
+                    .from('exam_answers')
+                    .insert(answersToInsert);
+
+                if (answersError) {
+                    console.error('❌ Error saving answers:', answersError);
+                    throw new Error('Failed to save exam answers: ' + answersError.message);
+                }
+                console.log('✅ Individual answers saved!');
+
+                // 2. Update exam status
+                console.log('💾 Updating exam status...');
+                const { error: updateError } = await supabase
+                    .from('exams')
+                    .update({
+                        status: 'completed',
+                        score: percentage,
+                        correct_answers: correctAnswers,
+                        time_taken: timeTaken,
+                        completed_at: new Date().toISOString()
+                    })
+                    .eq('exam_id', currentExamId);
+
+                if (updateError) {
+                    console.error('❌ Update error:', updateError);
+                    throw new Error('Failed to update exam: ' + updateError.message);
+                }
+                console.log('✅ Exam status updated!');
+
+                // 3. Save to exam_results table (NEW!)
+                console.log('💾 Saving to exam_results table...');
+                const resultId = 'RESULT_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+                const resultData = {
+                    result_id: resultId,
+                    exam_id: currentExamId,
+                    scheduled_exam_id: currentExamData.scheduled_exam_id,
+                    student_id: profile.student_id,
+                    user_id: session.user.id,
+                    exam_name: examName,
+                    score: percentage,
+                    percentage: percentage,
+                    total_questions: totalQuestions,
+                    correct_answers: correctAnswers,
+                    incorrect_answers: incorrectAnswers,
+                    unanswered: unanswered,
+                    time_taken: timeTaken,
+                    passing_score: passingScore,
+                    status: status,
+                    submitted_at: new Date().toISOString()
+                };
+
+                console.log('Result data to insert:', resultData);
+
+                const { data: insertedResult, error: resultError } = await supabase
+                    .from('exam_results')
+                    .insert(resultData)
+                    .select()
+                    .single();
+
+                if (resultError) {
+                    console.error('❌ Error saving to exam_results:', resultError);
+                    throw new Error('Failed to save exam result: ' + resultError.message);
+                }
+
+                console.log('✅ Result saved to exam_results table!');
+                console.log('✅ Result ID:', resultId);
+                console.log('✅ Inserted result:', insertedResult);
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                console.log('🚀 Redirecting to results page...');
+                window.location.href = `results.html?exam_id=${currentExamId}`;
+
+            } catch (error) {
+                console.error('❌ Error submitting exam:', error);
+                document.getElementById('loadingScreen').classList.add('hidden');
+                alert('Error submitting exam: ' + error.message + '\n\nPlease try again or contact support.');
+                isExamActive = true; // Re-enable anti-cheat if submission failed
+            }
         }
-        
-        initExam();
+
+        window.addEventListener('beforeunload', (e) => {
+            if (examData && timerInterval && isExamActive) {
+                e.preventDefault();
+                e.returnValue = 'Your exam is in progress. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', initExam);
     </script>
 </body>
+
 </html>

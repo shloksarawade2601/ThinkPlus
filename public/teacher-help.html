@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkPlus - Help & Support</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* --- BASE THEME STYLES (Matching Dashboard/Profile) --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1437 25%, #2d1b4e 50%, #1a1437 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+            top: -200px;
+            left: -200px;
+        }
+
+        .orb2 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: 7s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-image:
+                linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* --- Layout & Content Styles --- */
+        body {
+            padding-top: 0;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 2;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 2rem auto;
+            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-content h1 {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .help-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        /* --- Glassmorphic Card Style (Common) --- */
+        .card {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(167, 139, 250, 0.15);
+            border: 1px solid rgba(167, 139, 250, 0.25);
+            height: 100%;
+        }
+
+        .card h2 {
+            border-bottom: 2px solid rgba(167, 139, 250, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            color: #f1f5f9;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* --- Support Form Card Styles --- */
+        .support-card {
+            grid-column: 1 / 2;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #e2e8f0;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .support-form input[type="text"],
+        .support-form textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            background: rgba(30, 41, 59, 0.7);
+            color: #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .support-form textarea {
+            resize: vertical;
+        }
+
+        .support-form input[type="text"]:focus,
+        .support-form textarea:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
+            background: rgba(30, 41, 59, 1);
+        }
+
+        .support-form ::placeholder {
+            color: #94a3b8;
+        }
+
+        /* --- FAQ Card Styles --- */
+        .faq-card {
+            grid-column: 2 / 3;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid rgba(167, 139, 250, 0.15);
+            padding: 15px 0;
+            cursor: pointer;
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #f1f5f9;
+            transition: color 0.2s;
+        }
+
+        .faq-question:hover {
+            color: #a78bfa;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            color: #94a3b8;
+            padding-top: 0;
+            line-height: 1.5;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding-top: 10px;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            line-height: 1;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .toggle-icon {
+            transform: rotate(45deg);
+        }
+
+        /* --- Your Queries Section --- */
+        .queries-section {
+            grid-column: 1 / -1;
+        }
+
+        .queries-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .queries-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .queries-list::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 10px;
+        }
+
+        .queries-list::-webkit-scrollbar-thumb {
+            background: rgba(167, 139, 250, 0.5);
+            border-radius: 10px;
+        }
+
+        .queries-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(167, 139, 250, 0.7);
+        }
+
+        .query-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .query-item:hover {
+            border-color: rgba(167, 139, 250, 0.4);
+            background: rgba(30, 41, 59, 0.7);
+        }
+
+        .query-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+            gap: 15px;
+        }
+
+        .query-subject {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            flex: 1;
+        }
+
+        .query-status {
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .status-answered {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-closed {
+            background: rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .query-message {
+            color: #94a3b8;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .query-reply {
+            background: rgba(167, 139, 250, 0.1);
+            border-left: 3px solid #a78bfa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .query-reply.new-reply {
+            animation: slideIn 0.5s ease-out, pulse 2s ease-in-out 3;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(167, 139, 250, 0);
+            }
+        }
+
+        .query-reply-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #a78bfa;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .query-reply-text {
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .query-date {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 10px;
+        }
+
+        .empty-queries {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-queries-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-queries-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .empty-queries-subtext {
+            font-size: 0.95rem;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            color: #a78bfa;
+        }
+
+        .spinner {
+            border: 3px solid rgba(167, 139, 250, 0.3);
+            border-top: 3px solid #a78bfa;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- Buttons (Themed Gradient) --- */
+        .action-button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+            margin-top: 1rem;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.6);
+        }
+
+        .action-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* --- POPUP STYLES (Custom Modal) --- */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .popup-modal {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7);
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            text-align: center;
+        }
+
+        .popup-overlay.active .popup-modal {
+            transform: scale(1);
+        }
+
+        .popup-modal h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .popup-modal p {
+            color: #a0aec0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .popup-modal button {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            color: white;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+        }
+
+        .popup-modal button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.6);
+        }
+
+        /* Status Colors */
+        .popup-modal.success h3 {
+            color: #48bb78;
+        }
+
+        .popup-modal.error h3 {
+            color: #f56565;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 850px) {
+            .help-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .support-card,
+            .faq-card {
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="gradient-bg"></div>
+    <div class="orbs">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <div id="navbarContainer"></div>
+
+    <div class="main-content">
+        <h1>Help & Support</h1>
+        <p class="subtitle">Find quick answers or send us a direct message for assistance.</p>
+
+        <div class="help-grid">
+            <div class="card support-card">
+                <h2>Send Us a Message</h2>
+                <form id="supportForm" class="support-form">
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" name="subject" required
+                            placeholder="Briefly summarize your issue">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="6" required
+                            placeholder="Describe your issue in detail..."></textarea>
+                    </div>
+
+                    <button type="submit" id="sendMessageBtn" class="action-button">Send Message</button>
+                </form>
+            </div>
+
+            <div class="card faq-card">
+                <h2>Frequently Asked Questions</h2>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            How do I create a new exam?
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Navigate to your Dashboard and click the 'Create New Exam' button. Fill in the exam details including name, duration, number of questions, and schedule. The exam will be immediately available to students.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            How can I view student performance?
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Go to the 'Insights' section to view detailed analytics on student performance, including average scores, completion rates, and individual student progress across all your exams.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            Can I edit an exam after it's been created?
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>You can edit exam details like name and description. However, once students have started taking the exam, certain fields like question count and duration cannot be modified to maintain fairness.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            How do I reset my password?
+                            <span class="toggle-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>You can reset your password from the 'Security & Privacy' section of your profile settings. Click the 'Change Password' button and follow the on-screen instructions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Your Queries Section -->
+        <div class="card queries-section">
+            <h2>Your Queries</h2>
+            <div id="queriesContainer" class="queries-list">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Loading your queries...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Popup Modal Structure -->
+    <div id="popupOverlay" class="popup-overlay">
+        <div id="popupModal" class="popup-modal">
+            <h3 id="popupTitle"></h3>
+            <p id="popupMessage"></p>
+            <button id="popupCloseBtn">OK</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- SUPABASE INITIALIZATION ---
+        const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
+        const TEACHER_EMAIL = 'shloksarawade0@gmail.com';
+        
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: window.sessionStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        // Store current user data
+        let currentUser = null;
+        let currentUserProfile = null;
+        let previousQueries = new Map();
+
+        // --- POPUP LOGIC ---
+        const popupOverlay = document.getElementById('popupOverlay');
+        const popupModal = document.getElementById('popupModal');
+        const popupTitle = document.getElementById('popupTitle');
+        const popupMessage = document.getElementById('popupMessage');
+        const popupCloseBtn = document.getElementById('popupCloseBtn');
+
+        function showPopup(title, message, type = 'info') {
+            popupTitle.textContent = title;
+            popupMessage.textContent = message;
+            popupModal.className = 'popup-modal ' + type;
+            popupOverlay.classList.add('active');
+        }
+
+        function closePopup() {
+            popupOverlay.classList.remove('active');
+        }
+
+        popupCloseBtn.addEventListener('click', closePopup);
+        popupOverlay.addEventListener('click', (e) => {
+            if (e.target === popupOverlay) {
+                closePopup();
+            }
+        });
+
+        // --- GET CURRENT USER DATA ---
+        async function getCurrentUserData() {
+            try {
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+
+                if (sessionError || !session?.user) {
+                    return null;
+                }
+
+                const user = session.user;
+
+                if (user.email.toLowerCase() !== TEACHER_EMAIL.toLowerCase()) {
+                    window.location.href = 'dashboard.html';
+                    return null;
+                }
+
+                currentUser = user;
+
+                const { data: profile, error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .select('full_name')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profile) {
+                    currentUserProfile = profile;
+                }
+
+                return {
+                    email: user.email,
+                    username: profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Teacher',
+                    userId: user.id
+                };
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                return null;
+            }
+        }
+
+        // --- FAQ TOGGLE LOGIC ---
+        function initFaqToggles() {
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.faq-item.active').forEach(activeItem => {
+                        if (activeItem !== item) {
+                            activeItem.classList.remove('active');
+                        }
+                    });
+                    item.classList.toggle('active');
+                });
+            });
+        }
+
+        // --- LOAD USER QUERIES WITH REAL-TIME REPLY DETECTION ---
+        async function loadUserQueries(showNotification = false) {
+            const queriesContainer = document.getElementById('queriesContainer');
+
+            try {
+                const userData = await getCurrentUserData();
+
+                if (!userData) {
+                    queriesContainer.innerHTML = `
+                        <div class="empty-queries">
+                            <div class="empty-queries-icon">🔒</div>
+                            <div class="empty-queries-text">Please log in to view your queries</div>
+                            <div class="empty-queries-subtext">Sign in to access your support history</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const { data: queries, error } = await supabaseClient
+                    .from('support_queries')
+                    .select('*')
+                    .eq('user_id', userData.userId)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error fetching queries:', error);
+                    queriesContainer.innerHTML = `
+                        <div class="empty-queries">
+                            <div class="empty-queries-icon">⚠️</div>
+                            <div class="empty-queries-text">Error loading queries</div>
+                            <div class="empty-queries-subtext">Please try refreshing the page</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!queries || queries.length === 0) {
+                    queriesContainer.innerHTML = `
+                        <div class="empty-queries">
+                            <div class="empty-queries-icon">📭</div>
+                            <div class="empty-queries-text">No queries yet</div>
+                            <div class="empty-queries-subtext">Your support tickets will appear here once you submit them</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (showNotification && previousQueries.size > 0) {
+                    queries.forEach(query => {
+                        const prevQuery = previousQueries.get(query.id);
+                        if (prevQuery) {
+                            const hadReply = prevQuery.reply && prevQuery.reply.trim() !== '';
+                            const hasReply = query.reply && query.reply.trim() !== '';
+
+                            if (!hadReply && hasReply) {
+                                showPopup(
+                                    '💬 New Reply Received!',
+                                    `Your query "${query.subject}" has been answered by our support team.`,
+                                    'success'
+                                );
+                            }
+                        }
+                    });
+                }
+
+                previousQueries.clear();
+                queries.forEach(query => {
+                    previousQueries.set(query.id, {
+                        reply: query.reply,
+                        status: query.status
+                    });
+                });
+
+                queriesContainer.innerHTML = queries.map(query => {
+                    const createdDate = new Date(query.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    let actualStatus = query.status;
+                    const hasReply = query.reply && query.reply.trim() !== '';
+
+                    if (hasReply && query.status === 'pending') {
+                        actualStatus = 'answered';
+                        updateQueryStatus(query.id, 'answered');
+                    }
+
+                    const statusClass = actualStatus === 'answered' ? 'status-answered' :
+                        actualStatus === 'closed' ? 'status-closed' : 'status-pending';
+
+                    const statusText = actualStatus === 'answered' ? 'Answered' :
+                        actualStatus === 'closed' ? 'Closed' : 'Pending';
+
+                    return `
+                        <div class="query-item" data-query-id="${query.id}">
+                            <div class="query-header">
+                                <div class="query-subject">${escapeHtml(query.subject)}</div>
+                                <div class="query-status ${statusClass}">${statusText}</div>
+                            </div>
+                            <div class="query-message">${escapeHtml(query.message)}</div>
+                            ${hasReply ? `
+                                <div class="query-reply new-reply">
+                                    <div class="query-reply-label">💬 Support Reply</div>
+                                    <div class="query-reply-text">${escapeHtml(query.reply)}</div>
+                                </div>
+                            ` : ''}
+                            <div class="query-date">Submitted on ${createdDate}</div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading queries:', error);
+                queriesContainer.innerHTML = `
+                    <div class="empty-queries">
+                        <div class="empty-queries-icon">⚠️</div>
+                        <div class="empty-queries-text">Error loading queries</div>
+                        <div class="empty-queries-subtext">Please try refreshing the page</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Update query status in database
+        async function updateQueryStatus(queryId, newStatus) {
+            try {
+                const { error } = await supabaseClient
+                    .from('support_queries')
+                    .update({
+                        status: newStatus,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', queryId);
+
+                if (error) {
+                    console.error('Error updating query status:', error);
+                }
+            } catch (error) {
+                console.error('Error in updateQueryStatus:', error);
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // --- WEBHOOK INTEGRATION LOGIC (Make.com) ---
+        const MAKE_WEBHOOK_URL = 'https://hook.eu2.make.com/i7of8wxn7h573syfrnbncgmgdyp1pqrs';
+
+        const supportForm = document.getElementById("supportForm");
+        const sendMessageBtn = document.getElementById("sendMessageBtn");
+
+        supportForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!supportForm.checkValidity()) {
+                supportForm.reportValidity();
+                return;
+            }
+
+            const subject = document.getElementById('subject').value.trim();
+            const message = document.getElementById('message').value.trim();
+
+            if (!subject || !message) {
+                showPopup('Missing Information', 'Please fill in both subject and message fields.', 'error');
+                return;
+            }
+
+            const originalText = sendMessageBtn.textContent;
+            sendMessageBtn.textContent = 'Sending...';
+            sendMessageBtn.disabled = true;
+
+            const userData = await getCurrentUserData();
+
+            if (!userData) {
+                showPopup('Authentication Required', 'Please log in to submit a support request.', 'error');
+                sendMessageBtn.textContent = originalText;
+                sendMessageBtn.disabled = false;
+                return;
+            }
+
+            try {
+                const { data: insertedQuery, error: dbError } = await supabaseClient
+                    .from('support_queries')
+                    .insert([
+                        {
+                            user_id: userData.userId,
+                            user_email: userData.email,
+                            user_name: userData.username,
+                            subject: subject,
+                            message: message,
+                            status: 'pending',
+                            created_at: new Date().toISOString()
+                        }
+                    ])
+                    .select()
+                    .single();
+
+                if (dbError) {
+                    console.error('Database error:', dbError);
+                    throw new Error('Failed to save query to database');
+                }
+
+                console.log('✅ Query saved to database with ID:', insertedQuery.id);
+
+                const formData = new FormData();
+                formData.append('id', insertedQuery.id);
+                formData.append('query_id', insertedQuery.id);
+                formData.append('subject', subject);
+                formData.append('message', message);
+                formData.append('user_email', userData.email);
+                formData.append('user_name', userData.username);
+                formData.append('user_id', userData.userId);
+                formData.append('status', 'pending');
+                formData.append('created_at', insertedQuery.created_at);
+                formData.append('sent_at', new Date().toISOString());
+                formData.append('source', 'ThinkPlus Web Support Form');
+
+                try {
+                    await fetch(MAKE_WEBHOOK_URL, {
+                        method: 'POST',
+                        body: formData,
+                        mode: 'no-cors'
+                    });
+                } catch (webhookError) {
+                    console.log('Webhook notification sent (no-cors mode)');
+                }
+
+                showPopup('✅ Message Sent!', 'Your support request has been received. Our team will review your message and respond within 24 hours.', 'success');
+                supportForm.reset();
+
+                await loadUserQueries(false);
+
+            } catch (error) {
+                console.error('Error submitting query:', error);
+                showPopup('Error', 'Failed to submit your query. Please try again or contact support directly.', 'error');
+            } finally {
+                sendMessageBtn.textContent = originalText;
+                sendMessageBtn.disabled = false;
+            }
+        });
+
+        // --- REAL-TIME UPDATES FOR QUERIES ---
+        function setupRealtimeUpdates(userId) {
+            console.log('Setting up realtime updates for user:', userId);
+
+            const subscription = supabaseClient
+                .channel('support_queries_changes')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',
+                        schema: 'public',
+                        table: 'support_queries',
+                        filter: `user_id=eq.${userId}`
+                    },
+                    (payload) => {
+                        console.log('📡 Realtime update received:', payload);
+                        loadUserQueries(true);
+                    }
+                )
+                .subscribe((status) => {
+                    console.log('Realtime subscription status:', status);
+                });
+
+            return subscription;
+        }
+
+        // --- Initialization ---
+        let realtimeSubscription = null;
+
+        async function initNavbar(activePage = 'help') {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                return null;
+            }
+
+            const user = session.user;
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('full_name, avatar_url')
+                .eq('id', user.id)
+                .single();
+
+            const fullName = profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0];
+            const avatarUrl = profile?.avatar_url;
+
+            function getInitials(name) {
+                if (!name) return '?';
+                const parts = name.trim().split(' ');
+                if (parts.length >= 2) {
+                    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                }
+                return parts[0].substring(0, 2).toUpperCase();
+            }
+
+            const initials = getInitials(fullName);
+
+            const navbarHTML = `
+                <nav class="navbar">
+                    <div class="navbar-brand">
+                        <div class="navbar-logo">T+</div>
+                        <div class="navbar-text">
+                            <h1 class="navbar-title">ThinkPlus</h1>
+                            <p class="navbar-subtitle">Teacher Portal</p>
+                        </div>
+                    </div>
+                    <div class="navbar-menu">
+                        <a href="teacher-dashboard.html" class="${activePage === 'dashboard' ? 'active' : ''}">Dashboard</a>
+                        <a href="teacher-students.html" class="${activePage === 'students' ? 'active' : ''}">Students</a>
+                        <a href="teacher-insights.html" class="${activePage === 'insights' ? 'active' : ''}">Insights</a>
+                        <a href="teacher-profile.html" class="${activePage === 'profile' ? 'active' : ''}">Profile</a>
+                    </div>
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                ${avatarUrl ? `<img src="${avatarUrl}" alt="${fullName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : initials}
+                            </div>
+                            <span class="user-name">${fullName}</span>
+                        </div>
+                        <button class="btn-logout" id="navLogoutBtn">Logout</button>
+                    </div>
+                </nav>
+            `;
+
+            if (!document.getElementById('navbar-styles')) {
+                const style = document.createElement('style');
+                style.id = 'navbar-styles';
+                style.textContent = `
+                    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(20px) saturate(180%); padding: 1rem 2rem; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(167, 139, 250, 0.25); width: 100%; }
+                    body { padding-top: 80px; }
+                    .navbar-brand { display: flex; align-items: center; gap: 0.875rem; }
+                    .navbar-logo { width: 48px; height: 48px; background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 1.4rem; box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5); flex-shrink: 0; position: relative; }
+                    .navbar-logo::after { content: ''; position: absolute; inset: -2px; border-radius: 12px; background: linear-gradient(135deg, #a78bfa, #ec4899); opacity: 0.3; filter: blur(10px); animation: navPulse 3s ease-in-out infinite; z-index: -1; }
+                    @keyframes navPulse { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.05); } }
+                    .navbar-text { display: flex; flex-direction: column; gap: 0.125rem; }
+                    .navbar-title { font-size: 1.5rem; background: linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 800; letter-spacing: -0.5px; line-height: 1; margin: 0; }
+                    .navbar-subtitle { font-size: 0.75rem; color: #94a3b8; font-weight: 500; letter-spacing: 0.025em; margin: 0; }
+                    .navbar-menu { display: flex; gap: 2rem; align-items: center; }
+                    .navbar-menu a { text-decoration: none; color: #cbd5e1; font-weight: 600; transition: all 0.3s ease; position: relative; padding: 0.5rem 0; }
+                    .navbar-menu a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: linear-gradient(90deg, #a78bfa, #ec4899); border-radius: 2px; transition: width 0.3s ease; }
+                    .navbar-menu a:hover { color: #a78bfa; }
+                    .navbar-menu a:hover::after { width: 100%; }
+                    .navbar-menu a.active { color: #a78bfa; }
+                    .navbar-menu a.active::after { width: 100%; }
+                    .user-menu { display: flex; align-items: center; gap: 1rem; }
+                    .user-info { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: rgba(30, 41, 59, 0.5); border-radius: 50px; border: 1px solid rgba(167, 139, 250, 0.2); backdrop-filter: blur(10px); }
+                    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4); flex-shrink: 0; }
+                    .user-name { color: #e2e8f0; font-size: 0.95rem; font-weight: 600; white-space: nowrap; }
+                    .btn-logout { padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+                    .btn-logout:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5); }
+                    @media (max-width: 968px) { .navbar { flex-wrap: wrap; gap: 1rem; padding: 1rem 1.5rem; } .navbar-menu { order: 3; width: 100%; justify-content: center; gap: 1.5rem; } }
+                    @media (max-width: 640px) { .navbar-logo { width: 40px; height: 40px; font-size: 1.2rem; } .navbar-title { font-size: 1.25rem; } .navbar-subtitle { font-size: 0.7rem; } }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.getElementById('navbarContainer').innerHTML = navbarHTML;
+
+            document.getElementById('navLogoutBtn').addEventListener('click', async () => {
+                try {
+                    await supabaseClient.auth.signOut();
+                    window.location.href = 'index.html';
+                } catch (err) {
+                    console.error('Logout error:', err);
+                    alert('Failed to logout. Please try again.');
+                }
+            });
+
+            return { user, profile };
+        }
+
+        async function initPage() {
+            console.log('🚀 Initializing Help & Support page...');
+
+            const navData = await initNavbar('help');
+            if (!navData) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            initFaqToggles();
+
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const userData = await getCurrentUserData();
+
+            if (userData) {
+                console.log('✅ User authenticated:', userData.email);
+                realtimeSubscription = setupRealtimeUpdates(userData.userId);
+            } else {
+                console.log('❌ No authenticated user found');
+            }
+
+            await loadUserQueries(false);
+        }
+
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log('🔐 Auth state changed:', event, session?.user?.email);
+
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                if (session?.user) {
+                    if (!realtimeSubscription) {
+                        realtimeSubscription = setupRealtimeUpdates(session.user.id);
+                    }
+                }
+                loadUserQueries(false);
+            } else if (event === 'SIGNED_OUT') {
+                if (realtimeSubscription) {
+                    realtimeSubscription.unsubscribe();
+                    realtimeSubscription = null;
+                }
+                loadUserQueries(false);
+            }
+        });
+
+        initPage();
+
+        window.addEventListener('beforeunload', () => {
+            if (realtimeSubscription) {
+                console.log('🧹 Cleaning up realtime subscription...');
+                realtimeSubscription.unsubscribe();
+            }
+        });
+    </script>
+</body>
+
+</html>

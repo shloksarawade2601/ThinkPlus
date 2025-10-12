@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThinkPlus - Start Exam</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -13,14 +14,12 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-            background: #0a0e27; /* Base dark color */
+            background: #0a0e27;
             min-height: 100vh;
             color: #e2e8f0;
             overflow-x: hidden;
         }
         
-        /* --- THEME BACKGROUND STYLES --- */
-
         .gradient-bg {
             position: fixed;
             top: 0;
@@ -109,8 +108,6 @@
             pointer-events: none;
         }
 
-        /* --- LAYOUT AND CARD STYLES (MATCHING THEME) --- */
-
         .page-wrapper {
             position: relative;
             z-index: 2;
@@ -124,7 +121,6 @@
         .exam-setup-card {
             max-width: 700px;
             width: 95%;
-            /* Themed translucent card style */
             background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(20px) saturate(180%);
             padding: 2.5rem;
@@ -145,7 +141,6 @@
             }
         }
 
-        /* Header Styles */
         .card-header {
             text-align: center;
             margin-bottom: 2rem;
@@ -155,7 +150,6 @@
 
         .card-header h1 {
             font-size: 2.5rem;
-            /* Primary gradient for titles */
             background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -169,7 +163,6 @@
             color: #94a3b8;
         }
 
-        /* Difficulty Badge */
         .exam-badge {
             display: inline-block;
             padding: 0.4rem 1.25rem;
@@ -184,7 +177,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* Themed badge colors */
         .easy {
             background: rgba(16, 185, 129, 0.2);
             color: #6ee7b7;
@@ -201,7 +193,6 @@
             border-color: rgba(239, 68, 68, 0.5);
         }
 
-        /* Details Grid */
         .details-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -210,7 +201,6 @@
         }
 
         .detail-item {
-            /* Secondary translucent card style */
             background: rgba(30, 41, 59, 0.5);
             backdrop-filter: blur(10px);
             padding: 1.5rem;
@@ -231,7 +221,6 @@
         .detail-item strong {
             font-size: 1.8rem;
             font-weight: 800;
-            /* Primary gradient for values */
             background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -239,7 +228,6 @@
             display: block;
         }
 
-        /* Rules Section */
         .exam-rules {
             margin-bottom: 2rem;
             padding-bottom: 2rem;
@@ -254,7 +242,7 @@
         }
 
         .exam-rules ul {
-            list-style-type: '⚡'; /* Custom bullet */
+            list-style-type: '⚡';
             padding-left: 1.5rem;
             color: #cbd5e1;
             display: flex;
@@ -268,7 +256,6 @@
             padding-left: 0.5rem;
         }
 
-        /* Checkbox and Button */
         .start-action {
             display: flex;
             flex-direction: column;
@@ -288,14 +275,20 @@
         .agreement input[type="checkbox"] {
             width: 18px;
             height: 18px;
-            accent-color: #a78bfa; /* Theme accent color for checkbox */
+            accent-color: #a78bfa;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .agreement label {
+            cursor: pointer;
+            user-select: none;
         }
 
         .btn-start {
             width: 100%;
             max-width: 300px;
             padding: 1rem 2rem;
-            /* Main action gradient */
             background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
             color: white;
             border: none;
@@ -313,13 +306,17 @@
         }
 
         .btn-start:disabled {
-            background: #475569;
-            cursor: not-allowed;
+            background: #475569 !important;
+            cursor: not-allowed !important;
             opacity: 0.6;
-            box-shadow: none;
+            box-shadow: none !important;
+            pointer-events: none;
+        }
+        
+        .btn-start.enabled {
+            pointer-events: auto;
         }
 
-        /* Footer Time */
         .current-time {
             text-align: center;
             font-size: 1rem;
@@ -330,8 +327,41 @@
         .current-time strong {
             color: #a78bfa;
         }
+
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(167, 139, 250, 0.3);
+            border-top-color: #a78bfa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        .loading-spinner.active {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #fca5a5;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+            padding: 1rem;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .error-message.active {
+            display: block;
+        }
         
-        /* Responsive adjustments */
         @media (max-width: 768px) {
             .exam-setup-card {
                 padding: 1.5rem;
@@ -360,51 +390,49 @@
         <div class="exam-setup-card">
             
             <div class="card-header">
-                <p id="currentDateTime">Oct 8, 2025 | 10:00:00 AM</p>
-                <h1 id="examTitle">Welcome to the JavaScript Fundamentals Exam</h1>
-                <span id="difficultyBadge" class="exam-badge easy">Easy Level</span>
+                <p id="currentDateTime">Loading...</p>
+                <h1 id="examTitle">Loading Exam...</h1>
+                <span id="difficultyBadge" class="exam-badge medium">Medium</span>
             </div>
 
             <div class="details-grid">
                 <div class="detail-item">
                     <p>Duration</p>
-                    <strong id="duration">30</strong>
+                    <strong id="duration">--</strong>
                     <p style="margin-top: 0; color: #cbd5e1; font-weight: 500; font-size: 0.9rem;">Minutes</p>
                 </div>
                 <div class="detail-item">
                     <p>Total Questions</p>
-                    <strong id="totalQuestions">20</strong>
+                    <strong id="totalQuestions">--</strong>
                     <p style="margin-top: 0; color: #cbd5e1; font-weight: 500; font-size: 0.9rem;">Questions</p>
                 </div>
                 <div class="detail-item">
                     <p>Total Marks</p>
-                    <strong id="totalMarks">20</strong>
+                    <strong id="totalMarks">--</strong>
                     <p style="margin-top: 0; color: #cbd5e1; font-weight: 500; font-size: 0.9rem;">Marks</p>
                 </div>
                 <div class="detail-item">
                     <p>Passing Score</p>
-                    <strong id="passingScore">70%</strong>
+                    <strong id="passingScore">--</strong>
                     <p style="margin-top: 0; color: #cbd5e1; font-weight: 500; font-size: 0.9rem;">Minimum</p>
                 </div>
             </div>
 
             <div class="exam-rules">
                 <h2>Exam Instructions</h2>
-                <ul>
-                    <li>The exam duration is **30 minutes**. The timer will start immediately upon clicking "Start Exam".</li>
-                    <li>There are **20 multiple-choice questions** in total, each carrying 1 mark.</li>
-                    <li>You must score at least **70%** to pass this assessment.</li>
-                    <li>You can navigate freely between questions using the navigation panel.</li>
-                    <li>Ensure you have a stable internet connection. Closing the browser will submit your exam.</li>
+                <ul id="examInstructions">
+                    <li>Loading instructions...</li>
                 </ul>
             </div>
 
             <div class="start-action">
-                <label class="agreement">
+                <label class="agreement" for="agreementCheckbox">
                     <input type="checkbox" id="agreementCheckbox">
-                    I have read and understood all the instructions above.
+                    <span>I have read and understood all the instructions above.</span>
                 </label>
                 <button class="btn-start" id="startExamButton" disabled>Start Exam</button>
+                <div class="loading-spinner" id="loadingSpinner"></div>
+                <p class="error-message" id="errorMessage"></p>
             </div>
             
             <p class="current-time">Current System Time: <strong id="timeFooter"></strong></p>
@@ -413,82 +441,290 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        const API_URL = 'https://exam-generator-api-069x.onrender.com/generate-questions';
+        const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
+        
+        let supabase = null;
+        let scheduledExamData = null;
+
+        // Initialize Supabase
+        function initSupabase() {
+            if (supabase) return supabase;
+            
+            try {
+                if (!window.supabase) {
+                    throw new Error('Supabase library not loaded');
+                }
+                
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+                    auth: {
+                        storage: window.sessionStorage,
+                        autoRefreshToken: true,
+                        persistSession: true,
+                        detectSessionInUrl: true
+                    }
+                });
+                console.log('✅ Supabase initialized successfully');
+                return supabase;
+            } catch (error) {
+                console.error('❌ Supabase initialization error:', error);
+                throw error;
+            }
+        }
+
+        // Get URL parameter
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
             const checkbox = document.getElementById('agreementCheckbox');
             const startButton = document.getElementById('startExamButton');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const errorMessage = document.getElementById('errorMessage');
 
-            // Helper function to update current time display
-            function updateDateTime() {
-                const now = new Date();
-                const options = { 
-                    year: 'numeric', month: 'short', day: 'numeric', 
-                    hour: '2-digit', minute: '2-digit', second: '2-digit', 
-                    hour12: true 
-                };
-                const formattedTime = now.toLocaleTimeString('en-US', options);
+            // Initialize Supabase
+            const supabaseClient = initSupabase();
+
+            // Get scheduled_exam_id from URL
+            const scheduledExamId = getUrlParameter('scheduled_exam_id');
+            
+            if (!scheduledExamId) {
+                errorMessage.textContent = 'No exam ID provided. Redirecting...';
+                errorMessage.classList.add('active');
+                setTimeout(() => window.location.href = 'dashboard.html', 2000);
+                return;
+            }
+
+            // Fetch scheduled exam details
+            try {
+                console.log('📋 Fetching exam details for:', scheduledExamId);
                 
-                document.getElementById('currentDateTime').textContent = formattedTime.split(' | ')[0];
-                document.getElementById('timeFooter').textContent = formattedTime.split(', ')[1];
-            }
+                const { data, error } = await supabaseClient
+                    .from('scheduled_exams')
+                    .select('*')
+                    .eq('scheduled_exam_id', scheduledExamId)
+                    .single();
 
-            // Helper to get exam data from URL (passed from dashboard)
-            function getExamDataFromURL() {
-                const urlParams = new URLSearchParams(window.location.search);
-                // Return defaults if parameters are missing, to ensure exam.html doesn't break
-                return {
-                    examId: urlParams.get('examId') || 'js-fund',
-                    examTitle: urlParams.get('examTitle') || 'JavaScript Fundamentals Exam',
-                    difficulty: urlParams.get('difficulty') || 'easy',
-                    duration: urlParams.get('duration') || '30',
-                    questions: urlParams.get('questions') || '20',
-                    passingScore: urlParams.get('passingScore') || '70'
-                };
-            }
-
-            // Enable/Disable Start Button
-            checkbox.addEventListener('change', () => {
-                startButton.disabled = !checkbox.checked;
-            });
-
-            // *** UPDATED START BUTTON LOGIC ***
-            startButton.addEventListener('click', () => {
-                if (checkbox.checked) {
-                    const examData = getExamDataFromURL();
-                    const params = new URLSearchParams();
-                    // Pass the data received from the dashboard directly to exam.html
-                    for (const key in examData) {
-                        params.append(key, examData[key]);
-                    }
-                    // Navigate to exam.html with the parameters
-                    window.location.href = `exam.html?${params.toString()}`;
+                if (error) {
+                    throw new Error('Exam not found: ' + error.message);
                 }
-            });
 
-            // Load exam details from URL parameters
-            function loadExamDetails() {
-                const examData = getExamDataFromURL();
+                scheduledExamData = data;
+                console.log('✅ Exam details loaded:', scheduledExamData);
 
-                // Update page with exam data
-                document.getElementById('examTitle').textContent = examData.examTitle;
+                // Populate exam details
+                document.getElementById('examTitle').textContent = scheduledExamData.exam_name;
+                document.getElementById('duration').textContent = scheduledExamData.duration;
+                document.getElementById('totalQuestions').textContent = scheduledExamData.total_questions;
+                document.getElementById('totalMarks').textContent = scheduledExamData.total_questions;
+                document.getElementById('passingScore').textContent = scheduledExamData.passing_score + '%';
                 
                 // Set difficulty badge
                 const badge = document.getElementById('difficultyBadge');
-                const difficultyText = examData.difficulty.charAt(0).toUpperCase() + examData.difficulty.slice(1);
-                badge.textContent = difficultyText + ' Level';
-                badge.className = `exam-badge ${examData.difficulty}`;
-                
-                // Update exam details
-                document.getElementById('duration').textContent = examData.duration;
-                document.getElementById('totalQuestions').textContent = examData.questions;
-                document.getElementById('passingScore').textContent = examData.passingScore + '%';
-                document.getElementById('totalMarks').textContent = examData.questions;
+                badge.textContent = scheduledExamData.difficulty.charAt(0).toUpperCase() + scheduledExamData.difficulty.slice(1);
+                badge.className = 'exam-badge ' + scheduledExamData.difficulty;
+
+                // Update instructions
+                const instructionsList = document.getElementById('examInstructions');
+                instructionsList.innerHTML = `
+                    <li>The exam duration is <strong>${scheduledExamData.duration} minutes</strong>. The timer will start immediately upon clicking "Start Exam".</li>
+                    <li>There are <strong>${scheduledExamData.total_questions} multiple-choice questions</strong> covering various difficulty levels.</li>
+                    <li>You must score at least <strong>${scheduledExamData.passing_score}%</strong> to pass this assessment.</li>
+                    <li>You can navigate freely between questions using the navigation panel.</li>
+                    <li>Ensure you have a stable internet connection throughout the exam.</li>
+                `;
+
+            } catch (error) {
+                console.error('❌ Error loading exam:', error);
+                errorMessage.textContent = 'Error: ' + error.message;
+                errorMessage.classList.add('active');
+                setTimeout(() => window.location.href = 'dashboard.html', 3000);
+                return;
             }
+
+            function updateDateTime() {
+                const now = new Date();
+                const formattedDate = now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                const formattedTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                
+                document.getElementById('currentDateTime').textContent = `${formattedDate} | ${formattedTime}`;
+                document.getElementById('timeFooter').textContent = formattedTime;
+            }
+
+            // Enable/Disable Start Button
+            checkbox.addEventListener('change', function() {
+                console.log('Checkbox changed:', this.checked);
+                if (this.checked) {
+                    startButton.disabled = false;
+                    startButton.classList.add('enabled');
+                    startButton.style.pointerEvents = 'auto';
+                } else {
+                    startButton.disabled = true;
+                    startButton.classList.remove('enabled');
+                    startButton.style.pointerEvents = 'none';
+                }
+            });
+
+            checkbox.addEventListener('click', function() {
+                setTimeout(() => {
+                    if (this.checked) {
+                        startButton.disabled = false;
+                        startButton.classList.add('enabled');
+                        startButton.style.pointerEvents = 'auto';
+                    } else {
+                        startButton.disabled = true;
+                        startButton.classList.remove('enabled');
+                        startButton.style.pointerEvents = 'none';
+                    }
+                }, 10);
+            });
+            
+            checkbox.addEventListener('input', function() {
+                startButton.disabled = !this.checked;
+                if (this.checked) {
+                    startButton.classList.add('enabled');
+                } else {
+                    startButton.classList.remove('enabled');
+                }
+            });
+
+            // START EXAM - Generate Questions & Create Student Exam Attempt
+            startButton.addEventListener('click', async () => {
+                if (!checkbox.checked) return;
+
+                startButton.disabled = true;
+                startButton.textContent = 'Generating Questions...';
+                loadingSpinner.classList.add('active');
+                errorMessage.classList.remove('active');
+
+                try {
+                    // 1. Get user session
+                    console.log('👤 Getting user session...');
+                    const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                    
+                    if (sessionError || !session) {
+                        throw new Error('NO_AUTH|Please log in to continue.');
+                    }
+                    
+                    const user = session.user;
+                    console.log('✅ User authenticated:', user.id);
+
+                    // 2. Get student profile
+                    console.log('📋 Fetching student profile...');
+                    const { data: profile, error: profileError } = await supabaseClient
+                        .from('profiles')
+                        .select('student_id')
+                        .eq('id', user.id)
+                        .single();
+
+                    if (profileError) {
+                        if (profileError.code === 'PGRST116') {
+                            // Create default profile if doesn't exist
+                            const defaultStudentId = 'STU-' + Date.now();
+                            const { error: insertError } = await supabaseClient
+                                .from('profiles')
+                                .insert({
+                                    id: user.id,
+                                    student_id: defaultStudentId,
+                                    email: user.email
+                                });
+                            
+                            if (insertError) {
+                                throw new Error('Failed to create student profile: ' + insertError.message);
+                            }
+                            
+                            profile.student_id = defaultStudentId;
+                        } else {
+                            throw new Error('Error fetching student profile: ' + profileError.message);
+                        }
+                    }
+
+                    if (!profile || !profile.student_id) {
+                        throw new Error('Student profile missing student_id');
+                    }
+
+                    const studentId = profile.student_id;
+                    console.log('✅ Student ID:', studentId);
+
+                    // 3. Call API to generate questions
+                    console.log('🔡 Calling API to generate questions...');
+                    const response = await fetch(API_URL);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+                    }
+                    
+                    const apiData = await response.json();
+                    console.log('✅ API Response received:', apiData);
+
+                    if (!apiData.success || !apiData.questions || apiData.questions.length === 0) {
+                        throw new Error('Invalid response from API - no questions generated');
+                    }
+
+                    // 4. Create individual exam attempt record
+                    const examId = 'EXAM_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    console.log('💾 Creating exam attempt:', examId);
+                    
+                    const examAttemptData = {
+                        exam_id: examId,
+                        scheduled_exam_id: scheduledExamData.scheduled_exam_id, // Link to scheduled exam
+                        student_id: studentId,
+                        user_id: user.id,
+                        questions: apiData.questions,
+                        status: 'in_progress',
+                        total_questions: scheduledExamData.total_questions,
+                        started_at: new Date().toISOString()
+                    };
+
+                    const { error: insertError } = await supabaseClient
+                        .from('exams')
+                        .insert([examAttemptData]);
+
+                    if (insertError) {
+                        console.error('Insert error:', insertError);
+                        throw new Error('Error creating exam attempt: ' + insertError.message);
+                    }
+
+                    console.log('✅ Exam attempt created successfully!');
+                    console.log('🚀 Redirecting to exam page...');
+
+                    // 5. Navigate to exam page
+                    window.location.href = `exam.html?exam_id=${examId}`;
+
+                } catch (error) {
+                    console.error('❌ Error starting exam:', error);
+                    
+                    let errorMsg = error.message;
+                    let shouldRedirect = false;
+                    
+                    if (errorMsg.includes('NO_AUTH|')) {
+                        errorMsg = errorMsg.replace('NO_AUTH|', '');
+                        shouldRedirect = true;
+                    }
+                    
+                    errorMessage.textContent = 'Error: ' + errorMsg;
+                    errorMessage.classList.add('active');
+                    startButton.disabled = false;
+                    startButton.textContent = 'Start Exam';
+                    
+                    if (shouldRedirect) {
+                        console.log('🔄 Redirecting to dashboard in 2 seconds...');
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 2000);
+                    }
+                } finally {
+                    loadingSpinner.classList.remove('active');
+                }
+            });
 
             // Initialize
             updateDateTime();
-            loadExamDetails();
-            
-            // Update time every second
             setInterval(updateDateTime, 1000);
         });
     </script>
