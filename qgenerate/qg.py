@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)  # Allow requests from your website
 
 # --- CONFIGURATION ---
-CSV_FILE_PATH = 'C:\generated_math_questions.csv'  # Update this path to your CSV file location
+CSV_FILE_PATH = 'questions.csv'  # Update this path to your CSV file location
 TOTAL_QUESTIONS = 30
 DIFFICULTY_ALLOCATION = {"Easy": 6, "Medium": 9, "Hard": 9, "Expert": 6}
 
