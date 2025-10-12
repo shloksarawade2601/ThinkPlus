@@ -33,15 +33,8 @@
         }
 
         @keyframes gradientShift {
-
-            0%,
-            100% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .orbs {
@@ -90,19 +83,9 @@
         }
 
         @keyframes float {
-
-            0%,
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
-
-            33% {
-                transform: translate(50px, -50px) scale(1.1);
-            }
-
-            66% {
-                transform: translate(-30px, 30px) scale(0.9);
-            }
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -50px) scale(1.1); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
         }
 
         .grid-overlay {
@@ -159,7 +142,6 @@
             font-size: 1.4rem;
             box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
             flex-shrink: 0;
-            position: relative;
         }
 
         .navbar-text {
@@ -308,9 +290,7 @@
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
         .page-header {
@@ -329,7 +309,6 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -402,17 +381,9 @@
             font-weight: 600;
         }
 
-        .trend-up {
-            color: #10b981;
-        }
-
-        .trend-down {
-            color: #ef4444;
-        }
-
-        .trend-neutral {
-            color: #94a3b8;
-        }
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
+        .trend-neutral { color: #94a3b8; }
 
         .subject-performance {
             background: rgba(15, 23, 42, 0.5);
@@ -600,13 +571,287 @@
             border: 1px solid rgba(167, 139, 250, 0.2);
         }
 
+        .btn-get-suggestions {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-get-suggestions:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn-get-suggestions:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        .suggestions-content {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .success-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .analysis-timestamp {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .analysis-section {
+            margin-bottom: 2rem;
+        }
+
+        .analysis-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .analysis-section h3 {
+            color: #a78bfa;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .analysis-section p,
+        .analysis-section ul {
+            color: #e2e8f0;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .analysis-section ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 0.5rem;
+        }
+
+        .analysis-section li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .analysis-section li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #a78bfa;
+            font-weight: bold;
+        }
+
+        .analysis-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .refresh-suggestions {
+            padding: 0.75rem 1.5rem;
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-suggestions:hover {
+            background: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .view-history-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .view-history-btn:hover {
+            background: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .history-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .history-modal-content {
+            position: relative;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+        }
+
+        .history-modal-header {
+            position: sticky;
+            top: 0;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .history-modal-header h2 {
+            color: #f1f5f9;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .close-modal:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .history-list {
+            padding: 2rem;
+        }
+
+        .history-item {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateX(8px);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-item-date {
+            color: #a78bfa;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .history-item-preview {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
         @media (max-width: 968px) {
             .navbar {
                 flex-wrap: wrap;
                 gap: 1rem;
                 padding: 1rem 1.5rem;
             }
-
             .navbar-menu {
                 order: 3;
                 width: 100%;
@@ -619,13 +864,15 @@
             .container {
                 padding: 1.5rem;
             }
-
             .page-header h1 {
                 font-size: 1.5rem;
             }
-
             .performance-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .history-modal-content {
+                margin: 1rem;
+                max-height: calc(100vh - 2rem);
             }
         }
 
@@ -735,8 +982,7 @@
                     <h2>AI-Powered Suggestions for Improvement</h2>
                     <div id="suggestionsContainer">
                         <div class="no-data">
-                            <p style="margin-bottom: 1.5rem;">Get personalized recommendations based on your
-                                performance!</p>
+                            <p style="margin-bottom: 1.5rem;">Get personalized recommendations based on your performance!</p>
                             <button class="btn-get-suggestions" id="getSuggestionsBtn" onclick="getSuggestions()">
                                 <span id="suggestionsBtnText">✨ Get AI Suggestions</span>
                                 <span id="suggestionsSpinner" style="display: none;">
@@ -757,143 +1003,28 @@
         </div>
     </div>
 
-    <style>
-        .btn-get-suggestions {
-            padding: 1rem 2.5rem;
-            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-get-suggestions:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.6);
-        }
-
-        .btn-get-suggestions:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
-
-        .suggestions-content {
-            background: rgba(30, 41, 59, 0.5);
-            padding: 2rem;
-            border-radius: 16px;
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            backdrop-filter: blur(10px);
-            animation: fadeInUp 0.6s ease;
-        }
-
-        .suggestions-content h3 {
-            color: #a78bfa;
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .suggestions-content p {
-            color: #cbd5e1;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-        }
-
-        .suggestions-content ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .suggestions-content li {
-            color: #e2e8f0;
-            padding: 0.75rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-            line-height: 1.6;
-        }
-
-        .suggestions-content li:before {
-            content: '→';
-            position: absolute;
-            left: 0;
-            color: #a78bfa;
-            font-weight: bold;
-        }
-
-        .suggestion-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .suggestion-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .refresh-suggestions {
-            margin-top: 1.5rem;
-            padding: 0.75rem 1.5rem;
-            background: rgba(139, 92, 246, 0.2);
-            color: #c4b5fd;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .refresh-suggestions:hover {
-            background: rgba(139, 92, 246, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .success-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 0.4rem 1rem;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-    </style>
+    <!-- History Modal -->
+    <div id="historyModal" class="history-modal">
+        <div class="history-modal-content">
+            <div class="history-modal-header">
+                <h2>📜 Analysis History</h2>
+                <button class="close-modal" onclick="closeHistoryModal()">✕</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading history...
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
         const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
+        const MAKE_WEBHOOK_URL = 'https://hook.eu2.make.com/d6cnfmbllv5cftf2knbmkvjbbgzu88oa';
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: {
@@ -903,6 +1034,17 @@
                 detectSessionInUrl: true
             }
         });
+
+        // Global state
+        window.insightsData = null;
+        window.currentAnalysis = null;
+
+        // Generate unique analysis ID
+        function generateAnalysisId() {
+            const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            const random = Math.random().toString(36).substring(2, 10).toUpperCase();
+            return `ANALYSIS_${date}_${random}`;
+        }
 
         async function initNavbar() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -963,16 +1105,18 @@
 
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('student_id')
+                .select('student_id, full_name')
                 .eq('id', session.user.id)
                 .single();
 
             const studentId = profile?.student_id;
+            const studentName = profile?.full_name || session.user.email.split('@')[0];
+            const userId = session.user.id;
+            
             if (!studentId) {
                 throw new Error('Student ID not found');
             }
 
-            // Fetch completed exams
             const { data: exams, error: examsError } = await supabase
                 .from('exams')
                 .select('*')
@@ -982,14 +1126,12 @@
 
             if (examsError) throw examsError;
 
-            // Fetch scheduled exams metadata
             const { data: scheduledExams, error: scheduledError } = await supabase
                 .from('scheduled_exams')
                 .select('scheduled_exam_id, exam_name, passing_score');
 
             if (scheduledError) throw scheduledError;
 
-            // Fetch individual answers with topic/unit data
             const examIds = exams.map(e => e.exam_id);
             let examAnswers = [];
 
@@ -1008,7 +1150,7 @@
                 scheduledExamsMap[exam.scheduled_exam_id] = exam;
             });
 
-            return { exams, scheduledExamsMap, examAnswers };
+            return { exams, scheduledExamsMap, examAnswers, studentName, studentId, userId };
         }
 
         function calculateStats(exams, scheduledExamsMap, examAnswers) {
@@ -1020,7 +1162,8 @@
                     passRate: 0,
                     overallPerformance: 0,
                     examsByName: {},
-                    topicPerformance: {}
+                    topicPerformance: {},
+                    passedCount: 0
                 };
             }
 
@@ -1039,7 +1182,6 @@
 
             const passRate = (passedCount / totalExams) * 100;
 
-            // Calculate exam-wise performance
             const examsByName = {};
             exams.forEach(exam => {
                 const scheduledExam = scheduledExamsMap[exam.scheduled_exam_id];
@@ -1052,13 +1194,15 @@
                         passed: 0,
                         failed: 0,
                         totalTime: 0,
-                        lastAttempt: null
+                        lastAttempt: null,
+                        scores: []
                     };
                 }
 
                 examsByName[examName].attempts++;
                 examsByName[examName].totalScore += exam.score || 0;
                 examsByName[examName].totalTime += exam.time_taken || 0;
+                examsByName[examName].scores.push(exam.score || 0);
 
                 const passingScore = scheduledExam?.passing_score || 60;
                 if ((exam.score || 0) >= passingScore) {
@@ -1072,7 +1216,6 @@
                 }
             });
 
-            // Calculate topic/unit-wise performance from exam_answers
             const topicPerformance = {};
             examAnswers.forEach(answer => {
                 const topic = answer.topic || 'Unknown Topic';
@@ -1249,6 +1392,465 @@
             tableContainer.innerHTML = tableHTML;
         }
 
+        async function checkExistingAnalysis() {
+            const { studentId } = window.insightsData;
+
+            try {
+                const { data, error } = await supabase
+                    .from('ai_analysis')
+                    .select('*')
+                    .eq('student_id', studentId)
+                    .order('generated_at', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') {
+                    console.error('Error fetching existing analysis:', error);
+                    return;
+                }
+
+                if (data) {
+                    window.currentAnalysis = data;
+                    displayAnalysis(data);
+                }
+            } catch (err) {
+                console.error('Error in checkExistingAnalysis:', err);
+            }
+        }
+
+        function prepareComprehensiveDataForAI() {
+            const { exams, stats, scheduledExamsMap, examAnswers, studentName, studentId } = window.insightsData;
+
+            const overallSummary = {
+                student_name: studentName,
+                student_id: studentId,
+                total_exams_completed: stats.totalExams,
+                total_questions_attempted: stats.totalQuestions,
+                overall_average_score: stats.averageScore,
+                pass_rate: stats.passRate,
+                exams_passed: stats.passedCount,
+                exams_failed: stats.totalExams - stats.passedCount
+            };
+
+            const recentExams = exams.slice(0, Math.min(5, exams.length));
+            const olderExams = exams.slice(5);
+            
+            const recentAvg = recentExams.length > 0 
+                ? recentExams.reduce((sum, e) => sum + (e.score || 0), 0) / recentExams.length 
+                : 0;
+            const olderAvg = olderExams.length > 0 
+                ? olderExams.reduce((sum, e) => sum + (e.score || 0), 0) / olderExams.length 
+                : recentAvg;
+
+            const performanceTrend = {
+                recent_performance_avg: Math.round(recentAvg),
+                older_performance_avg: Math.round(olderAvg),
+                trend_direction: recentAvg > olderAvg ? 'improving' : recentAvg < olderAvg ? 'declining' : 'stable',
+                trend_percentage: Math.round(recentAvg - olderAvg)
+            };
+
+            const topicAnalysis = Object.entries(stats.topicPerformance)
+                .map(([topic, data]) => ({
+                    topic_name: topic,
+                    total_questions: data.total,
+                    correct_answers: data.correct,
+                    incorrect_answers: data.incorrect,
+                    accuracy_percentage: Math.round((data.correct / data.total) * 100),
+                    performance_category: ((data.correct / data.total) * 100) >= 80 ? 'strong' : 
+                                        ((data.correct / data.total) * 100) >= 60 ? 'moderate' : 'weak'
+                }))
+                .sort((a, b) => a.accuracy_percentage - b.accuracy_percentage);
+
+            const examAnalysis = Object.entries(stats.examsByName)
+                .map(([examName, data]) => ({
+                    exam_name: examName,
+                    total_attempts: data.attempts,
+                    average_score: Math.round(data.totalScore / data.attempts),
+                    highest_score: Math.max(...data.scores),
+                    lowest_score: Math.min(...data.scores),
+                    passed_attempts: data.passed,
+                    failed_attempts: data.failed,
+                    average_time_minutes: Math.round((data.totalTime / data.attempts) / 60),
+                    last_attempt_date: data.lastAttempt
+                }))
+                .sort((a, b) => a.average_score - b.average_score);
+
+            const weakAreas = topicAnalysis
+                .filter(t => t.accuracy_percentage < 70)
+                .slice(0, 5);
+
+            const strongAreas = topicAnalysis
+                .filter(t => t.accuracy_percentage >= 80)
+                .slice(0, 5);
+
+            const recentExamDetails = exams.slice(0, 5).map(exam => {
+                const scheduledExam = scheduledExamsMap[exam.scheduled_exam_id];
+                return {
+                    exam_name: scheduledExam?.exam_name || 'Unknown',
+                    score: exam.score,
+                    passing_score: scheduledExam?.passing_score || 60,
+                    status: exam.score >= (scheduledExam?.passing_score || 60) ? 'passed' : 'failed',
+                    time_taken_minutes: Math.round((exam.time_taken || 0) / 60),
+                    completed_date: exam.completed_at
+                };
+            });
+
+            const avgTimePerQuestion = stats.totalQuestions > 0 
+                ? Math.round(exams.reduce((sum, e) => sum + (e.time_taken || 0), 0) / stats.totalQuestions)
+                : 0;
+
+            const timeManagement = {
+                average_time_per_question_seconds: avgTimePerQuestion,
+                total_study_time_minutes: Math.round(exams.reduce((sum, e) => sum + (e.time_taken || 0), 0) / 60)
+            };
+
+            const scores = exams.map(e => e.score || 0);
+            const scoreVariance = scores.length > 0 
+                ? Math.round(Math.sqrt(scores.reduce((sum, score) => sum + Math.pow(score - stats.averageScore, 2), 0) / scores.length))
+                : 0;
+
+            const consistencyAnalysis = {
+                score_variance: scoreVariance,
+                consistency_rating: scoreVariance < 10 ? 'highly_consistent' : 
+                                  scoreVariance < 20 ? 'moderately_consistent' : 'inconsistent',
+                highest_score: Math.max(...scores),
+                lowest_score: Math.min(...scores)
+            };
+
+            const studyContext = {
+                needs_improvement: weakAreas.length > 0,
+                has_strong_foundation: strongAreas.length > 0,
+                is_improving: performanceTrend.trend_direction === 'improving',
+                exam_readiness: stats.passRate >= 70 ? 'ready' : stats.passRate >= 50 ? 'needs_practice' : 'needs_significant_improvement'
+            };
+
+            return {
+                timestamp: new Date().toISOString(),
+                overall_summary: overallSummary,
+                performance_trend: performanceTrend,
+                topic_analysis: topicAnalysis,
+                weak_areas: weakAreas,
+                strong_areas: strongAreas,
+                exam_analysis: examAnalysis,
+                recent_exams: recentExamDetails,
+                time_management: timeManagement,
+                consistency_analysis: consistencyAnalysis,
+                study_context: studyContext,
+                request_type: 'comprehensive_student_analysis'
+            };
+        }
+
+        async function saveAnalysisToDatabase(analysisData, comprehensiveData) {
+            const { studentId, userId } = window.insightsData;
+            const analysisId = generateAnalysisId();
+
+            try {
+                const { data, error } = await supabase
+                    .from('ai_analysis')
+                    .insert([{
+                        analysis_id: analysisId,
+                        student_id: studentId,
+                        user_id: userId,
+                        ai_response: analysisData.ai_response || analysisData.suggestions || JSON.stringify(analysisData),
+                        overall_assessment: analysisData.overall_assessment || null,
+                        strengths: analysisData.strengths || null,
+                        areas_for_improvement: analysisData.areas_for_improvement || null,
+                        study_plan: analysisData.study_plan || null,
+                        motivational_message: analysisData.motivational_message || null,
+                        overall_score: comprehensiveData.overall_summary.overall_average_score,
+                        pass_rate: comprehensiveData.overall_summary.pass_rate,
+                        total_exams: comprehensiveData.overall_summary.total_exams_completed,
+                        total_questions: comprehensiveData.overall_summary.total_questions_attempted,
+                        performance_trend: comprehensiveData.performance_trend.trend_direction,
+                        weak_topics: JSON.stringify(comprehensiveData.weak_areas),
+                        strong_topics: JSON.stringify(comprehensiveData.strong_areas),
+                        data_snapshot: JSON.stringify(comprehensiveData)
+                    }])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                console.log('✅ Analysis saved to database:', data);
+                window.currentAnalysis = data;
+                return data;
+
+            } catch (error) {
+                console.error('❌ Error saving analysis:', error);
+                throw error;
+            }
+        }
+
+        window.getSuggestions = async function() {
+            const btn = document.getElementById('getSuggestionsBtn');
+            const btnText = document.getElementById('suggestionsBtnText');
+            const spinner = document.getElementById('suggestionsSpinner');
+            const container = document.getElementById('suggestionsContainer');
+
+            try {
+                btn.disabled = true;
+                btnText.style.display = 'none';
+                spinner.style.display = 'inline-flex';
+
+                const comprehensiveData = prepareComprehensiveDataForAI();
+
+                console.log('📊 Sending comprehensive data to Make.com:', comprehensiveData);
+
+                const response = await fetch(MAKE_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(comprehensiveData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Webhook responded with status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('✅ Received AI suggestions:', result);
+
+                const savedAnalysis = await saveAnalysisToDatabase(result, comprehensiveData);
+
+                displayAnalysis(savedAnalysis);
+
+            } catch (error) {
+                console.error('❌ Error getting suggestions:', error);
+
+                container.innerHTML = `
+                    <div class="error-message">
+                        <p><strong>⚠️ Unable to generate suggestions</strong></p>
+                        <p>${error.message}</p>
+                        <p style="margin-top: 1rem; font-size: 0.9rem;">Please ensure your Make.com scenario is active and configured correctly.</p>
+                        <button class="refresh-suggestions" onclick="getSuggestions()">
+                            🔄 Try Again
+                        </button>
+                    </div>
+                `;
+            } finally {
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        };
+
+        function displayAnalysis(analysis) {
+            const container = document.getElementById('suggestionsContainer');
+
+            let aiResponse = analysis.ai_response;
+            
+            let structuredResponse = null;
+            try {
+                if (typeof aiResponse === 'string' && (aiResponse.startsWith('{') || aiResponse.startsWith('['))) {
+                    structuredResponse = JSON.parse(aiResponse);
+                }
+            } catch (e) {
+                // Not JSON, treat as plain text
+            }
+
+            const generatedDate = new Date(analysis.generated_at);
+            const formattedDate = generatedDate.toLocaleDateString('en-IN', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            let contentHTML = '';
+
+            if (structuredResponse && typeof structuredResponse === 'object') {
+                if (analysis.overall_assessment) {
+                    contentHTML += `
+                        <div class="analysis-section">
+                            <h3>📊 Overall Assessment</h3>
+                            <p>${analysis.overall_assessment}</p>
+                        </div>
+                    `;
+                }
+
+                if (analysis.strengths) {
+                    contentHTML += `
+                        <div class="analysis-section">
+                            <h3>💪 Your Strengths</h3>
+                            <p>${analysis.strengths}</p>
+                        </div>
+                    `;
+                }
+
+                if (analysis.areas_for_improvement) {
+                    contentHTML += `
+                        <div class="analysis-section">
+                            <h3>⚠️ Areas for Improvement</h3>
+                            <p>${analysis.areas_for_improvement}</p>
+                        </div>
+                    `;
+                }
+
+                if (analysis.study_plan) {
+                    contentHTML += `
+                        <div class="analysis-section">
+                            <h3>📚 Personalized Study Plan</h3>
+                            <p>${analysis.study_plan}</p>
+                        </div>
+                    `;
+                }
+
+                if (analysis.motivational_message) {
+                    contentHTML += `
+                        <div class="analysis-section">
+                            <h3>✨ Keep Going!</h3>
+                            <p>${analysis.motivational_message}</p>
+                        </div>
+                    `;
+                }
+            } else {
+                contentHTML = `
+                    <div class="analysis-section">
+                        <div style="white-space: pre-wrap; color: #e2e8f0; line-height: 1.8;">
+                            ${aiResponse}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="suggestions-content">
+                    <div class="analysis-header">
+                        <div class="success-badge">✨ AI-Generated Performance Report</div>
+                        <div class="analysis-timestamp">Generated: ${formattedDate}</div>
+                    </div>
+                    ${contentHTML}
+                    <div class="analysis-actions">
+                        <button class="refresh-suggestions" onclick="getSuggestions()">
+                            🔄 Generate New Analysis
+                        </button>
+                        <button class="view-history-btn" onclick="viewAnalysisHistory()">
+                            📜 View History
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            if (!analysis.is_read) {
+                markAnalysisAsRead(analysis.id);
+            }
+        }
+
+        async function markAnalysisAsRead(analysisId) {
+            try {
+                await supabase
+                    .from('ai_analysis')
+                    .update({ is_read: true })
+                    .eq('id', analysisId);
+            } catch (err) {
+                console.error('Error marking analysis as read:', err);
+            }
+        }
+
+        window.viewAnalysisHistory = async function() {
+            const modal = document.getElementById('historyModal');
+            const historyList = document.getElementById('historyList');
+
+            modal.style.display = 'block';
+            historyList.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading history...
+                </div>
+            `;
+
+            try {
+                const { studentId } = window.insightsData;
+
+                const { data, error } = await supabase
+                    .from('ai_analysis')
+                    .select('*')
+                    .eq('student_id', studentId)
+                    .order('generated_at', { ascending: false })
+                    .limit(20);
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    historyList.innerHTML = `
+                        <div class="no-data">
+                            No previous analyses found. Generate your first AI analysis!
+                        </div>
+                    `;
+                    return;
+                }
+
+                let historyHTML = '';
+                data.forEach(analysis => {
+                    const date = new Date(analysis.generated_at);
+                    const formattedDate = date.toLocaleDateString('en-IN', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    let preview = analysis.ai_response;
+                    if (preview.length > 150) {
+                        preview = preview.substring(0, 150) + '...';
+                    }
+
+                    historyHTML += `
+                        <div class="history-item" onclick="loadHistoricalAnalysis('${analysis.id}')">
+                            <div class="history-item-header">
+                                <span class="history-item-date">${formattedDate}</span>
+                                ${!analysis.is_read ? '<span class="success-badge" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">New</span>' : ''}
+                            </div>
+                            <div class="history-item-preview">${preview}</div>
+                        </div>
+                    `;
+                });
+
+                historyList.innerHTML = historyHTML;
+
+            } catch (err) {
+                console.error('Error loading history:', err);
+                historyList.innerHTML = `
+                    <div class="error-message">
+                        Error loading analysis history. Please try again.
+                    </div>
+                `;
+            }
+        };
+
+        window.loadHistoricalAnalysis = async function(analysisId) {
+            try {
+                const { data, error } = await supabase
+                    .from('ai_analysis')
+                    .select('*')
+                    .eq('id', analysisId)
+                    .single();
+
+                if (error) throw error;
+
+                displayAnalysis(data);
+                closeHistoryModal();
+
+            } catch (err) {
+                console.error('Error loading historical analysis:', err);
+                alert('Error loading analysis. Please try again.');
+            }
+        };
+
+        window.closeHistoryModal = function() {
+            document.getElementById('historyModal').style.display = 'none';
+        };
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('historyModal');
+            if (event.target === modal) {
+                closeHistoryModal();
+            }
+        };
+
         async function initInsights() {
             try {
                 await initNavbar();
@@ -1256,15 +1858,16 @@
                 const data = await fetchInsightsData();
                 if (!data) return;
 
-                const { exams, scheduledExamsMap, examAnswers } = data;
+                const { exams, scheduledExamsMap, examAnswers, studentName, studentId, userId } = data;
                 const stats = calculateStats(exams, scheduledExamsMap, examAnswers);
 
-                // Store data globally for suggestions
-                window.insightsData = { exams, scheduledExamsMap, examAnswers, stats };
+                window.insightsData = { exams, scheduledExamsMap, examAnswers, stats, studentName, studentId, userId };
 
                 renderStats(stats, exams);
                 renderTopicPerformance(stats.topicPerformance);
                 renderRecentExams(exams, scheduledExamsMap);
+
+                await checkExistingAnalysis();
 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('insightsContent').style.display = 'block';
@@ -1279,126 +1882,6 @@
                 `;
                 setTimeout(() => window.location.href = 'index.html', 2000);
             }
-        }
-
-        // Function to prepare data for AI suggestions
-        function prepareDataForAI() {
-            const { exams, stats } = window.insightsData;
-
-            // Get weak topics (below 70% accuracy)
-            const weakTopics = Object.entries(stats.topicPerformance)
-                .map(([topic, data]) => ({
-                    topic,
-                    accuracy: Math.round((data.correct / data.total) * 100),
-                    total: data.total,
-                    correct: data.correct
-                }))
-                .filter(t => t.accuracy < 70)
-                .sort((a, b) => a.accuracy - b.accuracy);
-
-            // Get strong topics (above 80% accuracy)
-            const strongTopics = Object.entries(stats.topicPerformance)
-                .map(([topic, data]) => ({
-                    topic,
-                    accuracy: Math.round((data.correct / data.total) * 100)
-                }))
-                .filter(t => t.accuracy >= 80)
-                .sort((a, b) => b.accuracy - a.accuracy);
-
-            // Recent performance trend
-            const recentExams = exams.slice(0, 3);
-            const recentAvg = recentExams.reduce((sum, e) => sum + (e.score || 0), 0) / recentExams.length;
-
-            return {
-                overall_score: stats.averageScore,
-                pass_rate: stats.passRate,
-                total_exams: stats.totalExams,
-                total_questions: stats.totalQuestions,
-                recent_performance: Math.round(recentAvg),
-                weak_topics: weakTopics.slice(0, 5),
-                strong_topics: strongTopics.slice(0, 3),
-                topic_count: Object.keys(stats.topicPerformance).length
-            };
-        }
-
-        // Function to get AI suggestions via Make.com webhook
-        window.getSuggestions = async function () {
-            const btn = document.getElementById('getSuggestionsBtn');
-            const btnText = document.getElementById('suggestionsBtnText');
-            const spinner = document.getElementById('suggestionsSpinner');
-            const container = document.getElementById('suggestionsContainer');
-
-            try {
-                // Disable button and show loading
-                btn.disabled = true;
-                btnText.style.display = 'none';
-                spinner.style.display = 'inline-flex';
-
-                // Prepare performance data
-                const performanceData = prepareDataForAI();
-
-                console.log('Sending data to Make.com:', performanceData);
-
-                // TODO: Replace with your Make.com webhook URL
-                const WEBHOOK_URL = 'YOUR_MAKE_COM_WEBHOOK_URL_HERE';
-
-                // Send data to Make.com webhook
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(performanceData)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Webhook error: ${response.status}`);
-                }
-
-                const result = await response.json();
-                console.log('Received suggestions:', result);
-
-                // Display suggestions
-                displaySuggestions(result.suggestions || result.message || result);
-
-            } catch (error) {
-                console.error('Error getting suggestions:', error);
-
-                // Show error message
-                container.innerHTML = `
-                    <div class="error-message">
-                        <p><strong>⚠️ Unable to generate suggestions</strong></p>
-                        <p>Please check your webhook configuration or try again later.</p>
-                        <button class="refresh-suggestions" onclick="getSuggestions()">
-                            🔄 Try Again
-                        </button>
-                    </div>
-                `;
-            } finally {
-                // Re-enable button
-                btn.disabled = false;
-                btnText.style.display = 'inline';
-                spinner.style.display = 'none';
-            }
-        };
-
-        // Function to display AI-generated suggestions
-        function displaySuggestions(suggestionsText) {
-            const container = document.getElementById('suggestionsContainer');
-
-            container.innerHTML = `
-                <div class="suggestions-content">
-                    <div class="success-badge">✨ AI-Generated Suggestions</div>
-                    <div class="suggestion-section">
-                        <div style="white-space: pre-wrap; color: #e2e8f0; line-height: 1.8;">
-                            ${suggestionsText}
-                        </div>
-                    </div>
-                    <button class="refresh-suggestions" onclick="getSuggestions()">
-                        🔄 Refresh Suggestions
-                    </button>
-                </div>
-            `;
         }
 
         initInsights();

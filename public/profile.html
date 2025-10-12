@@ -32,12 +32,9 @@
         }
 
         @keyframes gradientShift {
-
-            0%,
-            100% {
+            0%, 100% {
                 background-position: 0% 50%;
             }
-
             50% {
                 background-position: 100% 50%;
             }
@@ -89,16 +86,12 @@
         }
 
         @keyframes float {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: translate(0, 0) scale(1);
             }
-
             33% {
                 transform: translate(50px, -50px) scale(1.1);
             }
-
             66% {
                 transform: translate(-30px, 30px) scale(0.9);
             }
@@ -131,8 +124,7 @@
             backdrop-filter: blur(20px) saturate(180%);
             padding: 2rem;
             border-radius: 20px;
-            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5),
-                0 0 0 1px rgba(167, 139, 250, 0.15);
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(167, 139, 250, 0.15);
             margin-bottom: 1.5rem;
             border: 1px solid rgba(167, 139, 250, 0.25);
             animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -144,7 +136,6 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -273,14 +264,11 @@
             max-width: 600px;
         }
 
-        /* Menu Section Styles */
-
         .menu-section {
             background: rgba(15, 23, 42, 0.5);
             backdrop-filter: blur(20px) saturate(180%);
             border-radius: 20px;
-            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5),
-                0 0 0 1px rgba(167, 139, 250, 0.15);
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(167, 139, 250, 0.15);
             overflow: hidden;
             border: 1px solid rgba(167, 139, 250, 0.25);
             animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -473,12 +461,52 @@
             return data;
         }
 
-        async function getUserStats(userId) {
-            return {
-                examsCompleted: 12,
-                totalPoints: 847,
-                averageScore: 85
-            };
+        async function getUserStats(userId, studentId) {
+            try {
+                // Fetch all completed exams
+                const { data: completedExams, error: examsError } = await supabase
+                    .from('exams')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('status', 'completed');
+
+                if (examsError) {
+                    console.error('Error fetching exams:', examsError);
+                    return { examsCompleted: 0, questionsAttempted: 0, averageScore: 0 };
+                }
+
+                const examsCompleted = completedExams ? completedExams.length : 0;
+                
+                // Calculate total questions attempted
+                let totalQuestionsAttempted = 0;
+                if (completedExams && completedExams.length > 0) {
+                    totalQuestionsAttempted = completedExams.reduce((sum, exam) => {
+                        return sum + (exam.total_questions || 0);
+                    }, 0);
+                }
+
+                // Calculate average score from completed exams
+                let averageScore = 0;
+                if (completedExams && completedExams.length > 0) {
+                    const scoresArray = completedExams
+                        .filter(exam => exam.score != null)
+                        .map(exam => exam.score);
+                    
+                    if (scoresArray.length > 0) {
+                        const totalScore = scoresArray.reduce((sum, score) => sum + score, 0);
+                        averageScore = Math.round(totalScore / scoresArray.length);
+                    }
+                }
+
+                return {
+                    examsCompleted,
+                    questionsAttempted: totalQuestionsAttempted,
+                    averageScore
+                };
+            } catch (error) {
+                console.error('Error in getUserStats:', error);
+                return { examsCompleted: 0, questionsAttempted: 0, averageScore: 0 };
+            }
         }
 
         function getInitials(name) {
@@ -619,7 +647,7 @@
             let currentProfile = await getUserProfile(currentUser.id);
             userProfile = currentProfile || navData.profile;
 
-            const stats = await getUserStats(currentUser.id);
+            const stats = await getUserStats(currentUser.id, userProfile?.student_id);
 
             const fullName = userProfile?.full_name || currentUser.user_metadata?.full_name || 'User';
             const email = currentUser.email;
@@ -650,8 +678,8 @@
                                     <span class="stat-label">exams</span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-value">${stats.totalPoints}</span>
-                                    <span class="stat-label">points</span>
+                                    <span class="stat-value">${stats.questionsAttempted}</span>
+                                    <span class="stat-label">questions</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-value">${stats.averageScore}%</span>
