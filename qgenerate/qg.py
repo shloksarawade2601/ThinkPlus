@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)  # Allow requests from your website
 
 # --- CONFIGURATION ---
-CSV_FILE_PATH = 'C:\TP\qgenerate\BLOCK_2_NumberSystem_Arranged.csv'  # Update this path to your CSV file location
+CSV_FILE_PATH = 'C:\TP\qgenerate\DS.csv'  # Update this path to your CSV file location
 TOTAL_QUESTIONS = 30
 DIFFICULTY_ALLOCATION = {"Very Easy": 6, "Easy": 6, "Medium": 9, "Hard": 9}
 
