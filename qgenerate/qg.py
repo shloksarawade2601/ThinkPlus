@@ -3,18 +3,52 @@ from flask_cors import CORS
 import random
 import csv
 import os
-import json
+import re
 
 app = Flask(__name__)
 CORS(app)  # Allow requests from your website
 
 # --- CONFIGURATION ---
-CSV_FILE_PATH = 'questions.csv'  # Update this path to your CSV file location
+CSV_FILE_PATH = 'C:\TP\qgenerate\BLOCK_2_NumberSystem_Arranged.csv'  # Update this path to your CSV file location
 TOTAL_QUESTIONS = 30
-DIFFICULTY_ALLOCATION = {"Easy": 6, "Medium": 9, "Hard": 9, "Expert": 6}
+DIFFICULTY_ALLOCATION = {"Very Easy": 6, "Easy": 6, "Medium": 9, "Hard": 9}
 
 # Global variable to store questions
 questions_db = None
+
+def parse_options(options_text):
+    """
+    Parse options from format like:
+    "(a) 0 (b) 9 (c) 7 (d) 2"
+    Returns: ['0', '9', '7', '2']
+    """
+    if not options_text or options_text == '-':
+        return []
+    
+    # Pattern to match (a) text (b) text (c) text (d) text
+    pattern = r'\([a-d]\)\s*([^(]+?)(?=\s*\([a-d]\)|$)'
+    matches = re.findall(pattern, options_text, re.IGNORECASE)
+    
+    # Clean up each option
+    options = [match.strip() for match in matches if match.strip()]
+    
+    return options
+
+def parse_correct_answer(answer_text):
+    """
+    Parse correct answer from format like:
+    "(a)" or "a" or "(a) 0"
+    Returns: The option letter like 'a'
+    """
+    if not answer_text:
+        return None
+    
+    # Extract letter from formats like "(a)" or "a" or "(a) Some text"
+    match = re.search(r'\(?([a-d])\)?', answer_text.lower())
+    if match:
+        return match.group(1)
+    
+    return None
 
 def load_questions_from_csv():
     """Load questions from CSV file into memory"""
@@ -23,23 +57,77 @@ def load_questions_from_csv():
     try:
         questions_db = []
         
-        # Read CSV file without pandas
+        # Read CSV file
         with open(CSV_FILE_PATH, 'r', encoding='utf-8') as file:
-            csv_reader = csv.reader(file)
+            csv_reader = csv.DictReader(file)
             
             for row in csv_reader:
-                if len(row) >= 7:  # Ensure row has all required columns
-                    questions_db.append({
-                        'id': row[0],
-                        'topic': row[1],
-                        'difficulty': row[2],
-                        'question': row[3],
-                        'options': row[4],
-                        'answer': row[5],
-                        'explanation': row[6]
-                    })
+                # Map new CSV columns to our structure
+                question_id = row.get('ID', '').strip()
+                block = row.get('Block', '').strip()
+                topic = row.get('Chapter / Subtopic', '').strip()
+                question_type = row.get('Question Type', '').strip()
+                question_text = row.get('Question Text', '').strip()
+                data_paragraph = row.get('Data / Paragraph', '').strip()
+                options_text = row.get('Options / Answer Choices', '').strip()
+                correct_answer_raw = row.get('Correct Answer', '').strip()
+                difficulty = row.get('Difficulty Level', '').strip()
+                
+                # Skip empty rows
+                if not question_id or not question_text:
+                    continue
+                
+                # Parse options and correct answer
+                options = parse_options(options_text)
+                correct_answer_letter = parse_correct_answer(correct_answer_raw)
+                
+                # Convert answer letter to actual option text
+                answer_map = {'a': 0, 'b': 1, 'c': 2, 'd': 3}
+                if correct_answer_letter and correct_answer_letter in answer_map:
+                    answer_index = answer_map[correct_answer_letter]
+                    correct_answer = options[answer_index] if answer_index < len(options) else None
+                else:
+                    correct_answer = None
+                
+                # Build full question text (include data/paragraph if present)
+                full_question = question_text
+                if data_paragraph and data_paragraph != '-':
+                    full_question = f"{data_paragraph}\n\n{question_text}"
+                
+                # Ensure we have exactly 4 options
+                if len(options) < 4:
+                    print(f"⚠️ Warning: Question {question_id} has only {len(options)} options")
+                    while len(options) < 4:
+                        options.append(f"Option {len(options) + 1}")
+                elif len(options) > 4:
+                    options = options[:4]
+                
+                question_obj = {
+                    'id': question_id,
+                    'block': block,
+                    'topic': topic,
+                    'question_type': question_type,
+                    'difficulty': difficulty,
+                    'question': full_question,
+                    'options': options,
+                    'answer': correct_answer,
+                    'explanation': ''  # Can be added later if needed
+                }
+                
+                questions_db.append(question_obj)
         
         print(f"✅ Successfully loaded {len(questions_db)} questions from CSV")
+        
+        # Print difficulty distribution
+        difficulty_counts = {}
+        for q in questions_db:
+            diff = q['difficulty']
+            difficulty_counts[diff] = difficulty_counts.get(diff, 0) + 1
+        
+        print("📊 Questions by difficulty:")
+        for diff, count in sorted(difficulty_counts.items()):
+            print(f"   {diff}: {count}")
+        
         return True
         
     except FileNotFoundError:
@@ -48,6 +136,8 @@ def load_questions_from_csv():
         return False
     except Exception as e:
         print(f"❌ Error loading CSV: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def get_random_questions_by_difficulty(difficulty, count):
@@ -65,58 +155,14 @@ def get_random_questions_by_difficulty(difficulty, count):
 
 def format_question(q_data, question_id):
     """Format question data into the required structure"""
-    # Parse options - they're in format "['opt1', 'opt2', 'opt3', 'opt4']"
-    options_str = q_data['options']
-    
-    # Try multiple parsing methods to handle different CSV formats
-    options = []
-    
-    try:
-        # Method 1: Try JSON parsing first (for proper JSON arrays)
-        options = json.loads(options_str)
-    except:
-        try:
-            # Method 2: Try eval for Python list format (safer with literal_eval)
-            import ast
-            options = ast.literal_eval(options_str)
-        except:
-            # Method 3: Manual parsing for string format like "['opt1', 'opt2', 'opt3', 'opt4']"
-            if isinstance(options_str, str):
-                # Remove outer brackets
-                cleaned = options_str.strip().strip('[]')
-                
-                # Split by comma, but handle quotes properly
-                if "','" in cleaned or '","' in cleaned:
-                    # Split by ',' or ","
-                    parts = cleaned.replace('","', "','").split("','")
-                    options = [opt.strip().strip('"\'') for opt in parts]
-                else:
-                    # Fallback: simple comma split
-                    options = [opt.strip().strip('"\'') for opt in cleaned.split(',')]
-            else:
-                options = ["Option A", "Option B", "Option C", "Option D"]
-    
-    # Clean up each option (remove extra quotes and whitespace)
-    options = [str(opt).strip().strip('"\'') for opt in options if opt]
-    
-    # Ensure we have exactly 4 options
-    if len(options) < 4:
-        print(f"⚠️ Warning: Question {question_id} has only {len(options)} options. Expected 4.")
-        # Pad with empty options if needed
-        while len(options) < 4:
-            options.append(f"Option {len(options) + 1}")
-    elif len(options) > 4:
-        print(f"⚠️ Warning: Question {question_id} has {len(options)} options. Using first 4.")
-        options = options[:4]
-    
     return {
         'id': question_id,
         'question': q_data['question'],
-        'options': options,
-        'answer': str(q_data['answer']).strip(),
+        'options': q_data['options'],
+        'answer': q_data['answer'],
         'topic': q_data['topic'],
         'difficulty': q_data['difficulty'],
-        'explanation': str(q_data.get('explanation', 'No explanation provided.')).strip()
+        'explanation': q_data.get('explanation', 'No explanation provided.')
     }
 
 @app.route('/generate-questions', methods=['GET'])
@@ -164,6 +210,8 @@ def generate_questions():
         })
         
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({
             "success": False,
             "error": str(e),
@@ -202,19 +250,23 @@ def get_stats():
     # Count questions by difficulty
     difficulty_counts = {}
     topic_counts = {}
+    block_counts = {}
     
     for q in questions_db:
         diff = q['difficulty']
         topic = q['topic']
+        block = q['block']
         
         difficulty_counts[diff] = difficulty_counts.get(diff, 0) + 1
         topic_counts[topic] = topic_counts.get(topic, 0) + 1
+        block_counts[block] = block_counts.get(block, 0) + 1
     
     return jsonify({
         "success": True,
         "total_questions": len(questions_db),
         "by_difficulty": difficulty_counts,
         "by_topic": topic_counts,
+        "by_block": block_counts,
         "required_per_exam": DIFFICULTY_ALLOCATION
     })
 
@@ -227,7 +279,21 @@ def home():
             "/reload-questions": "Reload questions from CSV",
             "/stats": "Get question database statistics"
         },
-        "csv_file": CSV_FILE_PATH
+        "csv_file": CSV_FILE_PATH,
+        "csv_format": {
+            "columns": [
+                "ID",
+                "Block",
+                "Chapter / Subtopic",
+                "Question Type",
+                "Question Text",
+                "Data / Paragraph",
+                "Options / Answer Choices",
+                "Correct Answer",
+                "Difficulty Level"
+            ],
+            "example": "Q001, Numbers, Number System, MCQ, Last digit of 81×82×83×…×89, -, (a) 0 (b) 9 (c) 7 (d) 2, (a), Very Easy"
+        }
     })
 
 if __name__ == '__main__':
