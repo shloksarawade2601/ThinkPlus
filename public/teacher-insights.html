@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,8 +32,15 @@
         }
 
         @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .orbs {
@@ -486,6 +494,17 @@
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
+
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
+        }
+
+        .modal-content::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari, Opera */
         }
 
         @keyframes modalSlideIn {
@@ -892,11 +911,11 @@
         let allExams = [];
         let allResults = [];
 
-        window.closeModal = function() {
+        window.closeModal = function () {
             document.getElementById('resultModal').classList.remove('active');
         };
 
-        document.getElementById('resultModal').addEventListener('click', function(e) {
+        document.getElementById('resultModal').addEventListener('click', function (e) {
             if (e.target === this) {
                 closeModal();
             }
@@ -1000,7 +1019,7 @@
             let results = [];
             if (exams && exams.length > 0) {
                 const examIds = exams.map(e => e.scheduled_exam_id);
-                
+
                 const { data: examResults, error: resultsError } = await supabase
                     .from('exam_results')
                     .select(`
@@ -1044,7 +1063,7 @@
             exams.forEach(exam => {
                 const examResults = results.filter(r => r.scheduled_exam_id === exam.scheduled_exam_id);
                 const uniqueStudents = new Set(examResults.map(r => r.student_id)).size;
-                const avgScore = examResults.length > 0 
+                const avgScore = examResults.length > 0
                     ? Math.round(examResults.reduce((sum, r) => sum + (r.percentage || 0), 0) / examResults.length)
                     : 0;
                 const passedCount = examResults.filter(r => r.status === 'passed').length;
@@ -1102,7 +1121,7 @@
 
         function renderExamPerformance(examPerformance) {
             const examList = document.getElementById('examList');
-            
+
             if (Object.keys(examPerformance).length === 0) {
                 examList.innerHTML = '<div class="no-data">No exam data available yet</div>';
                 return;
@@ -1110,7 +1129,7 @@
 
             examList.innerHTML = '';
             Object.values(examPerformance).forEach(exam => {
-                const passRate = exam.submissions > 0 
+                const passRate = exam.submissions > 0
                     ? Math.round((exam.passedCount / exam.submissions) * 100)
                     : 0;
 
@@ -1140,7 +1159,7 @@
 
         function renderTopStudents(students) {
             const container = document.getElementById('studentTableContainer');
-            
+
             if (students.length === 0) {
                 container.innerHTML = '<div class="no-data">No student performance data available yet</div>';
                 return;
@@ -1188,7 +1207,7 @@
             const examSelect = document.getElementById('examSelect');
 
             studentSelect.innerHTML = '<option value="">Choose a student...</option>';
-            
+
             if (allStudents.length === 0) {
                 const option = document.createElement('option');
                 option.value = '';
@@ -1207,7 +1226,7 @@
             }
 
             examSelect.innerHTML = '<option value="">Choose an exam...</option>';
-            
+
             if (allExams.length === 0) {
                 const option = document.createElement('option');
                 option.value = '';
@@ -1226,7 +1245,7 @@
 
         async function searchStudentPerformance(studentId, scheduledExamId) {
             console.log('Searching for:', { studentId, scheduledExamId });
-            
+
             let { data: resultData, error: resultError } = await supabase
                 .from('exam_results')
                 .select('*')
@@ -1244,7 +1263,7 @@
                     .select('full_name, student_id, id')
                     .eq('student_id', studentId)
                     .maybeSingle();
-                
+
                 if (profile) {
                     resultData.profiles = profile;
                 }
@@ -1400,7 +1419,7 @@
 
             if (answers && answers.length > 0) {
                 modalHTML += '<h3 style="color: #f1f5f9; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.2rem;">Answer Breakdown</h3>';
-                
+
                 answers.forEach(answer => {
                     const isCorrect = answer.is_correct;
                     modalHTML += `
@@ -1428,10 +1447,10 @@
 
         document.getElementById('searchForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const studentId = document.getElementById('studentSelect').value;
             const examId = document.getElementById('examSelect').value;
-            
+
             if (!studentId || !examId) {
                 alert('Please select both student and exam');
                 return;
@@ -1480,4 +1499,5 @@
         initInsights();
     </script>
 </body>
+
 </html>

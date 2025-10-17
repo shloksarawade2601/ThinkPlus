@@ -553,19 +553,45 @@
                 return { error: { message: "User not logged in." } };
             }
             
-            const { data, error } = await supabase
+            // First check if profile exists
+            const { data: existingProfile } = await supabase
                 .from('profiles')
-                .update(updates)
+                .select('id')
                 .eq('id', userId)
-                .select()
                 .single();
+            
+            if (!existingProfile) {
+                // Profile doesn't exist, insert it
+                const { data: insertData, error: insertError } = await supabase
+                    .from('profiles')
+                    .insert({
+                        id: userId,
+                        ...updates
+                    })
+                    .select();
+                
+                if (insertError) {
+                    console.error('Error inserting profile:', insertError.message);
+                    return { error: insertError };
+                }
+                
+                return { data: insertData && insertData.length > 0 ? insertData[0] : updates };
+            } else {
+                // Profile exists, update it
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .update(updates)
+                    .eq('id', userId)
+                    .select();
 
-            if (error) {
-                console.error('Error updating profile:', error.message);
-                return { error };
+                if (error) {
+                    console.error('Error updating profile:', error.message);
+                    return { error };
+                }
+
+                // Return the first item if data is an array
+                return { data: data && data.length > 0 ? data[0] : updates };
             }
-
-            return { data };
         }
 
 
