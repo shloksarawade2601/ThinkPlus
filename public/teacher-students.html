@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThinkPlus - Student Details</title>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <style>
         * {
             margin: 0;
@@ -34,8 +35,15 @@
         }
 
         @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .orbs {
@@ -75,9 +83,19 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(50px, -50px) scale(1.1); }
-            66% { transform: translate(-30px, 30px) scale(0.9); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
         }
 
         .grid-overlay {
@@ -87,7 +105,7 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
@@ -118,8 +136,15 @@
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .page-header h1 {
@@ -380,8 +405,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         .action-btn {
@@ -420,7 +452,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .no-students {
@@ -468,8 +502,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .modal-card {
@@ -497,6 +536,7 @@
                 opacity: 0;
                 transform: translateY(50px) scale(0.9);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -716,6 +756,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="gradient-bg"></div>
     <div class="orbs">
@@ -934,35 +975,41 @@
         async function fetchStudents() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return;
-
-                console.log('🔄 Fetching students from profiles table...');
-
-                const { data: profiles, error: profilesError } = await supabase
-                    .from('profiles')
-                    .select('id, full_name, student_id, phone, bio, created_at, updated_at, avatar_url')
-                    .neq('id', session.user.id);
-
-                if (profilesError) {
-                    console.error('❌ Error fetching profiles:', profilesError);
-                    throw profilesError;
+                if (!session) {
+                    console.log('❌ No session - redirecting to login');
+                    window.location.href = 'index.html';
+                    return;
                 }
 
-                console.log('✅ Profiles fetched:', profiles?.length || 0);
+                console.log('👤 Current user:', session.user.email);
+                console.log('🔍 Teacher email expected:', 'shloksarawade0@gmail.com');
+                console.log('✅ Email match:', session.user.email.toLowerCase() === 'shloksarawade0@gmail.com'.toLowerCase());
 
-                allStudents = profiles || [];
-                allStudents.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                
+                // First, just fetch ALL profiles to see what's in the database
+                const { data: allProfiles, error: allError } = await supabase
+                    .from('profiles')
+                    .select('*');
+
+                console.log('📊 ALL profiles in DB:', allProfiles?.length || 0);
+                console.log('Raw data:', allProfiles);
+
+                if (allError) {
+                    console.error('❌ Database error:', allError);
+                    throw allError;
+                }
+
+                // Now filter out teacher
+                allStudents = (allProfiles || []).filter(p => p.id !== session.user.id);
                 filteredStudents = allStudents;
-                
-                console.log('📊 Total students loaded:', allStudents.length);
-                
+
+                console.log('👥 Students after filtering teacher:', allStudents.length);
+
                 updateStats();
                 renderStudents();
 
             } catch (err) {
-                console.error('❌ Error in fetchStudents:', err);
-                alert('Error loading student data: ' + err.message);
+                console.error('❌ Error:', err);
+                document.getElementById('loadingMessage').innerHTML = 'Error: ' + err.message;
             }
         }
 
@@ -974,7 +1021,7 @@
             document.getElementById('totalStudents').textContent = total;
             document.getElementById('studentsWithId').textContent = withId;
             document.getElementById('studentsWithoutId').textContent = withoutId;
-            
+
             console.log('📈 Stats updated - Total:', total, 'With ID:', withId, 'Without ID:', withoutId);
         }
 
@@ -989,18 +1036,18 @@
 
         function formatDate(dateString) {
             if (!dateString) return 'N/A';
-            return new Date(dateString).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
             });
         }
 
         function formatDateTime(dateString) {
             if (!dateString) return 'N/A';
-            return new Date(dateString).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
@@ -1036,10 +1083,10 @@
                         </div>
                     </td>
                     <td>
-                        ${student.student_id ? 
-                            `<span class="student-id-badge">${student.student_id}</span>` : 
-                            `<span class="no-id-badge">Not Generated</span>`
-                        }
+                        ${student.student_id ?
+                        `<span class="student-id-badge">${student.student_id}</span>` :
+                        `<span class="no-id-badge">Not Generated</span>`
+                    }
                     </td>
                     <td>
                         <span class="date-text">${student.phone || 'N/A'}</span>
@@ -1059,15 +1106,15 @@
                 `;
                 tbody.appendChild(row);
             });
-            
+
             console.log('✅ Rendered', filteredStudents.length, 'student rows');
         }
 
         function filterStudents() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
+
             filteredStudents = allStudents.filter(student => {
-                const matchesSearch = 
+                const matchesSearch =
                     (student.full_name?.toLowerCase().includes(searchTerm) || false) ||
                     (student.student_id?.toLowerCase().includes(searchTerm) || false) ||
                     (student.phone?.toLowerCase().includes(searchTerm) || false);
@@ -1104,19 +1151,19 @@
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
-            
+
             link.setAttribute('href', url);
             link.setAttribute('download', `students_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
-            
+
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
             console.log('📥 Exported', filteredStudents.length, 'students to CSV');
         }
 
-        window.viewStudentDetails = function(studentId) {
+        window.viewStudentDetails = function (studentId) {
             const student = allStudents.find(s => s.id === studentId);
             if (!student) return;
 
@@ -1187,7 +1234,7 @@
         async function initPage() {
             try {
                 console.log('🚀 Initializing page...');
-                
+
                 const navData = await initNavbar('students');
                 if (!navData) return;
 
@@ -1211,7 +1258,7 @@
 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
-                
+
                 console.log('✅ Page initialization complete');
 
             } catch (err) {
@@ -1223,4 +1270,5 @@
         initPage();
     </script>
 </body>
+
 </html>

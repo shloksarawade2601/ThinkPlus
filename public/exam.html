@@ -279,7 +279,6 @@
 
         .timer-icon {
             font-size: 1.5rem;
-            color: #fca5a5;
         }
 
         .timer-text {
@@ -294,7 +293,6 @@
             animation: pulse 1s ease-in-out infinite;
         }
 
-        .timer.warning .timer-icon,
         .timer.warning .timer-text {
             color: #fbbf24;
         }
@@ -387,6 +385,7 @@
             color: #f1f5f9;
             line-height: 1.6;
             margin-bottom: 2rem;
+            white-space: pre-wrap;
         }
 
         .options-container {
@@ -878,7 +877,7 @@
             <div id="modalSummary"></div>
             <div class="modal-buttons">
                 <button class="btn btn-cancel" onclick="closeSubmitModal()">Cancel</button>
-                <button class="btn btn-confirm answered" onclick="submitExam()">Confirm & Submit</button>
+                <button class="btn btn-confirm" onclick="submitExam()">Confirm & Submit</button>
             </div>
         </div>
     </div>
@@ -887,23 +886,47 @@
         const SUPABASE_URL = 'https://mqosqiucfkrmscfkacto.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NxaXVjZmtybXNjZmthY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTQ4MDMsImV4cCI6MjA3NTQzMDgwM30.b6PYbitm8uUcQPd_Yc1qGbV6WGfZSQlDI_RxrHjzZC0';
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-            auth: {
-                storage: window.sessionStorage,
-                autoRefreshToken: true,
-                persistSession: true,
-                detectSessionInUrl: true
-            }
-        });
-
+        let supabase = null;
         let examData = null;
         let currentExamId = null;
         let currentQuestion = 0;
         let timeRemaining = 45 * 60;
-        let timerInterval;
+        let timerInterval = null;
         let examState = [];
         let tabSwitchCount = 0;
         let isExamActive = false;
+        let scheduledExamData = null;
+
+        function initSupabase() {
+            if (supabase) return supabase;
+
+            try {
+                if (!window.supabase) {
+                    throw new Error('Supabase library not loaded');
+                }
+
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+                    auth: {
+                        storage: window.sessionStorage,
+                        autoRefreshToken: true,
+                        persistSession: true,
+                        detectSessionInUrl: true
+                    }
+                });
+                console.log('✅ Supabase initialized');
+                return supabase;
+            } catch (error) {
+                console.error('❌ Supabase init error:', error);
+                throw error;
+            }
+        }
+
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
 
         // Anti-cheat: Tab switch detection
         document.addEventListener('visibilitychange', function () {
@@ -914,13 +937,11 @@
                 console.log('Tab switch detected. Count:', tabSwitchCount);
 
                 if (tabSwitchCount === 1) {
-                    // First warning
                     showWarning('You switched tabs during the exam. This is your first warning. If you switch tabs again, your exam will be automatically submitted.');
                 } else if (tabSwitchCount >= 2) {
-                    // Auto-submit on second offense
                     showWarning('You switched tabs again. Your exam is being automatically submitted for violating exam rules.');
                     setTimeout(() => {
-                        submitExam(true); // true = forced submission
+                        submitExam(true);
                     }, 3000);
                 }
             }
@@ -948,8 +969,8 @@
             try {
                 console.log('🔄 Initializing exam...');
 
-                const urlParams = new URLSearchParams(window.location.search);
-                currentExamId = urlParams.get('exam_id');
+                const supabaseClient = initSupabase();
+                currentExamId = getUrlParameter('exam_id');
 
                 console.log('Exam ID from URL:', currentExamId);
 
@@ -961,37 +982,37 @@
                 }
 
                 console.log('📡 Fetching exam from database...');
-                const { data, error } = await supabase
+                const { data: examRecord, error: examError } = await supabaseClient
                     .from('exams')
                     .select('*')
                     .eq('exam_id', currentExamId)
                     .single();
 
-                console.log('Database response:', data);
-                console.log('Database error:', error);
+                console.log('Database response:', examRecord);
+                console.log('Database error:', examError);
 
-                if (error) {
-                    console.error('❌ Supabase error:', error);
-                    throw error;
+                if (examError) {
+                    console.error('❌ Supabase error:', examError);
+                    throw examError;
                 }
 
-                if (!data) {
+                if (!examRecord) {
                     console.error('❌ No exam data found');
                     throw new Error('Exam not found');
                 }
 
-                if (data.status === 'completed') {
+                if (examRecord.status === 'completed') {
                     console.log('⚠️ Exam already completed');
                     alert('This exam has already been submitted.');
-                    window.location.href = 'report_card.html?exam_id=' + currentExamId;
+                    window.location.href = 'results.html?exam_id=' + currentExamId;
                     return;
                 }
 
-                // Fetch scheduled exam to get duration
-                const { data: scheduledExam, error: scheduledError } = await supabase
+                // Fetch scheduled exam to get duration and name
+                const { data: scheduledExam, error: scheduledError } = await supabaseClient
                     .from('scheduled_exams')
-                    .select('duration, exam_name')
-                    .eq('scheduled_exam_id', data.scheduled_exam_id)
+                    .select('duration, exam_name, passing_score')
+                    .eq('scheduled_exam_id', examRecord.scheduled_exam_id)
                     .single();
 
                 if (scheduledError) {
@@ -1002,15 +1023,19 @@
                 console.log('✅ Scheduled exam data loaded:', scheduledExam);
                 console.log('Duration from scheduled exam:', scheduledExam.duration, 'minutes');
 
-                examData = {
-                    title: scheduledExam.exam_name || "ThinkPlus MCQ Exam",
-                    duration: scheduledExam.duration, // Use duration from scheduled_exams
-                    questions: data.questions
-                };
+                // Get questions from exam record
+                const questions = examRecord.questions;
 
-                if (!examData.questions || examData.questions.length === 0) {
+                if (!questions || questions.length === 0) {
                     throw new Error('No questions found in exam');
                 }
+
+                scheduledExamData = scheduledExam;
+                examData = {
+                    title: scheduledExam.exam_name || "ThinkPlus MCQ Exam",
+                    duration: scheduledExam.duration,
+                    questions: questions
+                };
 
                 examState = examData.questions.map(() => ({
                     visited: false,
@@ -1019,7 +1044,7 @@
                     selectedAnswer: null
                 }));
 
-                timeRemaining = examData.duration * 60; // Convert minutes to seconds
+                timeRemaining = examData.duration * 60;
 
                 console.log('✅ Exam initialized successfully');
                 console.log('Total questions:', examData.questions.length);
@@ -1035,7 +1060,7 @@
                 document.getElementById('examTitle').textContent = examData.title;
                 updateQuestionGrid();
 
-                isExamActive = true; // Enable anti-cheat
+                isExamActive = true;
 
             } catch (error) {
                 console.error('❌ Error loading exam:', error);
@@ -1056,15 +1081,79 @@
             });
         }
 
+        // Replace the existing loadQuestion function with this fixed version
+
         function loadQuestion(index) {
             const question = examData.questions[index];
             document.getElementById('questionNumber').textContent = `Question ${index + 1} of ${examData.questions.length}`;
             document.getElementById('questionMarks').textContent = `${question.topic} - ${question.difficulty}`;
-            document.getElementById('questionText').innerHTML = question.question;
+
+            // Create container for paragraph and question
+            const questionContainer = document.getElementById('questionText');
+            questionContainer.innerHTML = '';
+
+            // Display data paragraph if it exists and is not just a dash
+            const paragraphText = question.data_paragraph ? question.data_paragraph.trim() : '';
+            if (paragraphText && paragraphText !== '-' && paragraphText.length > 0) {
+                const paragraphDiv = document.createElement('div');
+                paragraphDiv.style.cssText = `
+            color: #e2e8f0;
+            line-height: 1.8;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            text-align: justify;
+            white-space: pre-line;
+        `;
+                // Convert escape sequences to actual newlines and tabs
+                paragraphDiv.textContent = paragraphText.replace(/\\n/g, '\n').replace(/\\t/g, '\t');
+                questionContainer.appendChild(paragraphDiv);
+            }
+
+            // Add the actual question text
+            const questionTextDiv = document.createElement('div');
+            questionTextDiv.className = 'question-text';
+            questionTextDiv.textContent = question.question_text;
+            questionContainer.appendChild(questionTextDiv);
 
             const container = document.getElementById('optionsContainer');
             container.innerHTML = '';
-            question.options.forEach((option, i) => {
+
+            // Parse options - handle both JSON object and array formats
+            let optionsArray = [];
+
+            if (question.options) {
+                if (typeof question.options === 'string') {
+                    try {
+                        const parsed = JSON.parse(question.options);
+                        if (typeof parsed === 'object' && !Array.isArray(parsed)) {
+                            optionsArray = Object.values(parsed).filter(opt => opt && opt.trim().length > 0);
+                        } else if (Array.isArray(parsed)) {
+                            optionsArray = parsed.filter(opt => opt && opt.trim().length > 0);
+                        }
+                    } catch (e) {
+                        if (question.options.includes('|')) {
+                            optionsArray = question.options.split('|').map(o => o.trim()).filter(o => o.length > 0);
+                        } else if (question.options.includes(',')) {
+                            optionsArray = question.options.split(',').map(o => o.trim()).filter(o => o.length > 0);
+                        } else {
+                            optionsArray = [question.options.trim()];
+                        }
+                    }
+                } else if (Array.isArray(question.options)) {
+                    optionsArray = question.options.filter(opt => opt && opt.trim && opt.trim().length > 0);
+                }
+            }
+
+            if (optionsArray.length < 2) {
+                console.warn(`Question ${question.question_id} has insufficient options.`);
+                optionsArray = ['Option A', 'Option B', 'Option C', 'Option D'];
+            }
+
+            while (optionsArray.length < 4) {
+                optionsArray.push(`Option ${String.fromCharCode(65 + optionsArray.length)}`);
+            }
+
+            optionsArray.slice(0, 4).forEach((option, i) => {
                 const label = document.createElement('label');
                 label.className = 'option';
 
@@ -1080,7 +1169,7 @@
 
                 const span = document.createElement('span');
                 span.className = 'option-label';
-                span.innerHTML = option;
+                span.textContent = option;
 
                 label.appendChild(input);
                 label.appendChild(span);
@@ -1116,7 +1205,6 @@
 
             updateQuestionGrid();
         }
-
         function navigateToQuestion(index) {
             saveCurrentAnswer();
             loadQuestion(index);
@@ -1171,7 +1259,7 @@
                 if (timeRemaining <= 0) {
                     clearInterval(timerInterval);
                     alert('Time is up! Your exam will be submitted automatically.');
-                    submitExam(true); // Auto-submit when time runs out
+                    submitExam(true);
                 }
             }, 1000);
         }
@@ -1240,23 +1328,28 @@
 
         async function submitExam(isForced = false) {
             try {
-                isExamActive = false; // Disable anti-cheat
+                // Safety check: Make sure examData is loaded
+                if (!examData || !examData.questions) {
+                    throw new Error('Exam data not loaded. Please refresh the page and try again.');
+                }
+
+                isExamActive = false;
                 clearInterval(timerInterval);
                 closeSubmitModal();
 
                 document.getElementById('loadingScreen').classList.remove('hidden');
                 document.querySelector('.loading-text').textContent = isForced ? 'Auto-submitting your exam...' : 'Submitting your exam...';
 
+                const supabaseClient = initSupabase();
+
                 console.log('📊 Calculating results...');
 
-                // Get current user
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 if (!session) {
                     throw new Error('User session not found');
                 }
 
-                // Get student profile
-                const { data: profile } = await supabase
+                const { data: profile } = await supabaseClient
                     .from('profiles')
                     .select('student_id, full_name')
                     .eq('id', session.user.id)
@@ -1266,20 +1359,44 @@
                     throw new Error('Student ID not found');
                 }
 
-                // Calculate results
                 let correctAnswers = 0;
                 let answeredCount = 0;
+
                 const responses = examData.questions.map((q, index) => {
-                    const userAnswer = examState[index].selectedAnswer;
-                    const isCorrect = userAnswer === q.answer;
+                    const userAnswer = examState[index].selectedAnswer; // Full option text
+
+                    // Get the correct answer text by matching the letter to the option
+                    let correctAnswerText = null;
+                    let correctAnswerLetter = q.correct_answer || 'A';
+
+                    if (q.options && Array.isArray(q.options)) {
+                        // Convert letter (A, B, C, D) to index (0, 1, 2, 3)
+                        const correctIndex = correctAnswerLetter.charCodeAt(0) - 65;
+
+                        // Make sure index is valid
+                        if (correctIndex >= 0 && correctIndex < q.options.length) {
+                            correctAnswerText = q.options[correctIndex];
+                        }
+                    }
+
+                    // Compare user answer with correct answer
+                    const isCorrect = userAnswer && correctAnswerText ? (userAnswer === correctAnswerText) : false;
+
                     if (isCorrect) correctAnswers++;
                     if (userAnswer) answeredCount++;
 
+                    console.log(`Q${q.question_id}:`, {
+                        userAnswer: userAnswer || 'Not Answered',
+                        correctLetter: correctAnswerLetter,
+                        correctText: correctAnswerText,
+                        isCorrect: isCorrect
+                    });
+
                     return {
-                        question_id: q.id,
-                        question: q.question,
+                        question_id: q.question_id,
+                        question: q.question_text,
                         user_answer: userAnswer || 'Not Answered',
-                        correct_answer: q.answer,
+                        correct_answer: correctAnswerLetter,
                         is_correct: isCorrect,
                         topic: q.topic,
                         difficulty: q.difficulty
@@ -1292,28 +1409,22 @@
                 const percentage = Math.round((correctAnswers / totalQuestions) * 100);
                 const timeTaken = (examData.duration * 60) - timeRemaining;
 
-                // Get scheduled exam details
-                const { data: currentExamData } = await supabase
+                console.log('✅ Score calculated:', percentage + '%');
+                console.log('✅ Correct answers:', correctAnswers + '/' + totalQuestions);
+                console.log('✅ Incorrect answers:', incorrectAnswers);
+                console.log('✅ Unanswered:', unanswered);
+
+                const { data: { session: currentSession } } = await supabaseClient.auth.getSession();
+                const { data: currentExamData } = await supabaseClient
                     .from('exams')
                     .select('scheduled_exam_id')
                     .eq('exam_id', currentExamId)
                     .single();
 
-                const { data: scheduledExam } = await supabase
-                    .from('scheduled_exams')
-                    .select('passing_score, exam_name')
-                    .eq('scheduled_exam_id', currentExamData.scheduled_exam_id)
-                    .single();
-
-                const passingScore = scheduledExam?.passing_score || 60;
-                const examName = scheduledExam?.exam_name || 'ThinkPlus Exam';
+                const passingScore = scheduledExamData.passing_score || 60;
+                const examName = scheduledExamData.exam_name || 'ThinkPlus Exam';
                 const status = percentage >= passingScore ? 'passed' : 'failed';
 
-                console.log('✅ Score calculated:', percentage + '%');
-                console.log('✅ Status:', status);
-                console.log('✅ Correct answers:', correctAnswers + '/' + totalQuestions);
-
-                // 1. Save individual answers
                 console.log('💾 Saving individual answers...');
                 const answersToInsert = responses.map(r => ({
                     exam_id: currentExamId,
@@ -1325,7 +1436,7 @@
                     difficulty: r.difficulty
                 }));
 
-                const { error: answersError } = await supabase
+                const { error: answersError } = await supabaseClient
                     .from('exam_answers')
                     .insert(answersToInsert);
 
@@ -1335,9 +1446,8 @@
                 }
                 console.log('✅ Individual answers saved!');
 
-                // 2. Update exam status
                 console.log('💾 Updating exam status...');
-                const { error: updateError } = await supabase
+                const { error: updateError } = await supabaseClient
                     .from('exams')
                     .update({
                         status: 'completed',
@@ -1354,7 +1464,6 @@
                 }
                 console.log('✅ Exam status updated!');
 
-                // 3. Save to exam_results table (NEW!)
                 console.log('💾 Saving to exam_results table...');
                 const resultId = 'RESULT_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
@@ -1363,7 +1472,7 @@
                     exam_id: currentExamId,
                     scheduled_exam_id: currentExamData.scheduled_exam_id,
                     student_id: profile.student_id,
-                    user_id: session.user.id,
+                    user_id: currentSession.user.id,
                     exam_name: examName,
                     score: percentage,
                     percentage: percentage,
@@ -1377,9 +1486,7 @@
                     submitted_at: new Date().toISOString()
                 };
 
-                console.log('Result data to insert:', resultData);
-
-                const { data: insertedResult, error: resultError } = await supabase
+                const { data: insertedResult, error: resultError } = await supabaseClient
                     .from('exam_results')
                     .insert(resultData)
                     .select()
@@ -1390,9 +1497,8 @@
                     throw new Error('Failed to save exam result: ' + resultError.message);
                 }
 
-                console.log('✅ Result saved to exam_results table!');
+                console.log('✅ Result saved successfully!');
                 console.log('✅ Result ID:', resultId);
-                console.log('✅ Inserted result:', insertedResult);
 
                 await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -1403,7 +1509,7 @@
                 console.error('❌ Error submitting exam:', error);
                 document.getElementById('loadingScreen').classList.add('hidden');
                 alert('Error submitting exam: ' + error.message + '\n\nPlease try again or contact support.');
-                isExamActive = true; // Re-enable anti-cheat if submission failed
+                isExamActive = true;
             }
         }
 

@@ -185,13 +185,8 @@
             padding: 0.5rem 0;
         }
 
-        .navbar-menu a:hover {
-            color: #a78bfa;
-        }
-
-        .navbar-menu a.active {
-            color: #a78bfa;
-        }
+        .navbar-menu a:hover { color: #a78bfa; }
+        .navbar-menu a.active { color: #a78bfa; }
 
         .navbar-menu a.active::after {
             content: '';
@@ -236,10 +231,7 @@
             flex-shrink: 0;
         }
 
-        .user-avatar svg {
-            width: 60%;
-            height: 60%;
-        }
+        .user-avatar svg { width: 60%; height: 60%; }
 
         .user-name {
             color: #e2e8f0;
@@ -305,14 +297,8 @@
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .page-header h1 {
@@ -431,9 +417,7 @@
             box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
         }
 
-        .subject-info {
-            flex: 1;
-        }
+        .subject-info { flex: 1; }
 
         .subject-name {
             font-weight: 700;
@@ -502,9 +486,7 @@
             border-collapse: collapse;
         }
 
-        .exam-table thead {
-            background: rgba(30, 41, 59, 0.5);
-        }
+        .exam-table thead { background: rgba(30, 41, 59, 0.5); }
 
         .exam-table th {
             padding: 1rem;
@@ -522,13 +504,8 @@
             color: #cbd5e1;
         }
 
-        .exam-table tr {
-            transition: all 0.3s ease;
-        }
-
-        .exam-table tr:hover {
-            background: rgba(30, 41, 59, 0.5);
-        }
+        .exam-table tr { transition: all 0.3s ease; }
+        .exam-table tr:hover { background: rgba(30, 41, 59, 0.5); }
 
         .exam-status {
             padding: 0.4rem 1rem;
@@ -645,9 +622,7 @@
             margin-bottom: 2rem;
         }
 
-        .analysis-section:last-child {
-            margin-bottom: 0;
-        }
+        .analysis-section:last-child { margin-bottom: 0; }
 
         .analysis-section h3 {
             color: #a78bfa;
@@ -861,15 +836,9 @@
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
-            }
-            .page-header h1 {
-                font-size: 1.5rem;
-            }
-            .performance-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .container { padding: 1.5rem; }
+            .page-header h1 { font-size: 1.5rem; }
+            .performance-grid { grid-template-columns: repeat(2, 1fr); }
             .history-modal-content {
                 margin: 1rem;
                 max-height: calc(100vh - 2rem);
@@ -877,15 +846,11 @@
         }
 
         @media (max-width: 640px) {
-            .user-name {
-                display: none;
-            }
+            .user-name { display: none; }
         }
 
         @media (max-width: 480px) {
-            .performance-grid {
-                grid-template-columns: 1fr;
-            }
+            .performance-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -916,8 +881,7 @@
             <div class="user-menu">
                 <div class="user-info">
                     <div class="user-avatar" id="navUserAvatar">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                             <circle cx="12" cy="7" r="4" />
                         </svg>
@@ -987,7 +951,6 @@
                                 <span id="suggestionsBtnText">✨ Get AI Suggestions</span>
                                 <span id="suggestionsSpinner" style="display: none;">
                                     <div class="btn-spinner"></div>
-                                    Analyzing...
                                 </span>
                             </button>
                         </div>
@@ -1038,13 +1001,10 @@
         // Global state
         window.insightsData = null;
         window.currentAnalysis = null;
-
-        // Generate unique analysis ID
-        function generateAnalysisId() {
-            const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            const random = Math.random().toString(36).substring(2, 10).toUpperCase();
-            return `ANALYSIS_${date}_${random}`;
-        }
+        let isPolling = false;
+        let pollAttempts = 0;
+        const maxPollAttempts = 60; // 5 minutes with 5-second intervals
+        let latestAnalysisTimestamp = null;
 
         async function initNavbar() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -1112,7 +1072,7 @@
             const studentId = profile?.student_id;
             const studentName = profile?.full_name || session.user.email.split('@')[0];
             const userId = session.user.id;
-            
+
             if (!studentId) {
                 throw new Error('Student ID not found');
             }
@@ -1310,7 +1270,6 @@
             topicList.innerHTML = '';
             sortedTopics.forEach(topic => {
                 const accuracy = Math.round(topic.accuracy);
-
                 const topicItem = document.createElement('div');
                 topicItem.className = 'subject-item';
                 topicItem.innerHTML = `
@@ -1392,38 +1351,13 @@
             tableContainer.innerHTML = tableHTML;
         }
 
-        async function checkExistingAnalysis() {
-            const { studentId } = window.insightsData;
-
-            try {
-                const { data, error } = await supabase
-                    .from('ai_analysis')
-                    .select('*')
-                    .eq('student_id', studentId)
-                    .order('generated_at', { ascending: false })
-                    .limit(1)
-                    .single();
-
-                if (error && error.code !== 'PGRST116') {
-                    console.error('Error fetching existing analysis:', error);
-                    return;
-                }
-
-                if (data) {
-                    window.currentAnalysis = data;
-                    displayAnalysis(data);
-                }
-            } catch (err) {
-                console.error('Error in checkExistingAnalysis:', err);
-            }
-        }
-
         function prepareComprehensiveDataForAI() {
-            const { exams, stats, scheduledExamsMap, examAnswers, studentName, studentId } = window.insightsData;
+            const { exams, stats, scheduledExamsMap, examAnswers, studentName, studentId, userId } = window.insightsData;
 
             const overallSummary = {
                 student_name: studentName,
                 student_id: studentId,
+                user_id: userId,
                 total_exams_completed: stats.totalExams,
                 total_questions_attempted: stats.totalQuestions,
                 overall_average_score: stats.averageScore,
@@ -1434,12 +1368,12 @@
 
             const recentExams = exams.slice(0, Math.min(5, exams.length));
             const olderExams = exams.slice(5);
-            
-            const recentAvg = recentExams.length > 0 
-                ? recentExams.reduce((sum, e) => sum + (e.score || 0), 0) / recentExams.length 
+
+            const recentAvg = recentExams.length > 0
+                ? recentExams.reduce((sum, e) => sum + (e.score || 0), 0) / recentExams.length
                 : 0;
-            const olderAvg = olderExams.length > 0 
-                ? olderExams.reduce((sum, e) => sum + (e.score || 0), 0) / olderExams.length 
+            const olderAvg = olderExams.length > 0
+                ? olderExams.reduce((sum, e) => sum + (e.score || 0), 0) / olderExams.length
                 : recentAvg;
 
             const performanceTrend = {
@@ -1456,24 +1390,10 @@
                     correct_answers: data.correct,
                     incorrect_answers: data.incorrect,
                     accuracy_percentage: Math.round((data.correct / data.total) * 100),
-                    performance_category: ((data.correct / data.total) * 100) >= 80 ? 'strong' : 
-                                        ((data.correct / data.total) * 100) >= 60 ? 'moderate' : 'weak'
+                    performance_category: ((data.correct / data.total) * 100) >= 80 ? 'strong' :
+                        ((data.correct / data.total) * 100) >= 60 ? 'moderate' : 'weak'
                 }))
                 .sort((a, b) => a.accuracy_percentage - b.accuracy_percentage);
-
-            const examAnalysis = Object.entries(stats.examsByName)
-                .map(([examName, data]) => ({
-                    exam_name: examName,
-                    total_attempts: data.attempts,
-                    average_score: Math.round(data.totalScore / data.attempts),
-                    highest_score: Math.max(...data.scores),
-                    lowest_score: Math.min(...data.scores),
-                    passed_attempts: data.passed,
-                    failed_attempts: data.failed,
-                    average_time_minutes: Math.round((data.totalTime / data.attempts) / 60),
-                    last_attempt_date: data.lastAttempt
-                }))
-                .sort((a, b) => a.average_score - b.average_score);
 
             const weakAreas = topicAnalysis
                 .filter(t => t.accuracy_percentage < 70)
@@ -1486,6 +1406,8 @@
             const recentExamDetails = exams.slice(0, 5).map(exam => {
                 const scheduledExam = scheduledExamsMap[exam.scheduled_exam_id];
                 return {
+                    exam_id: exam.exam_id,
+                    scheduled_exam_id: exam.scheduled_exam_id,
                     exam_name: scheduledExam?.exam_name || 'Unknown',
                     score: exam.score,
                     passing_score: scheduledExam?.passing_score || 60,
@@ -1495,35 +1417,6 @@
                 };
             });
 
-            const avgTimePerQuestion = stats.totalQuestions > 0 
-                ? Math.round(exams.reduce((sum, e) => sum + (e.time_taken || 0), 0) / stats.totalQuestions)
-                : 0;
-
-            const timeManagement = {
-                average_time_per_question_seconds: avgTimePerQuestion,
-                total_study_time_minutes: Math.round(exams.reduce((sum, e) => sum + (e.time_taken || 0), 0) / 60)
-            };
-
-            const scores = exams.map(e => e.score || 0);
-            const scoreVariance = scores.length > 0 
-                ? Math.round(Math.sqrt(scores.reduce((sum, score) => sum + Math.pow(score - stats.averageScore, 2), 0) / scores.length))
-                : 0;
-
-            const consistencyAnalysis = {
-                score_variance: scoreVariance,
-                consistency_rating: scoreVariance < 10 ? 'highly_consistent' : 
-                                  scoreVariance < 20 ? 'moderately_consistent' : 'inconsistent',
-                highest_score: Math.max(...scores),
-                lowest_score: Math.min(...scores)
-            };
-
-            const studyContext = {
-                needs_improvement: weakAreas.length > 0,
-                has_strong_foundation: strongAreas.length > 0,
-                is_improving: performanceTrend.trend_direction === 'improving',
-                exam_readiness: stats.passRate >= 70 ? 'ready' : stats.passRate >= 50 ? 'needs_practice' : 'needs_significant_improvement'
-            };
-
             return {
                 timestamp: new Date().toISOString(),
                 overall_summary: overallSummary,
@@ -1531,123 +1424,128 @@
                 topic_analysis: topicAnalysis,
                 weak_areas: weakAreas,
                 strong_areas: strongAreas,
-                exam_analysis: examAnalysis,
                 recent_exams: recentExamDetails,
-                time_management: timeManagement,
-                consistency_analysis: consistencyAnalysis,
-                study_context: studyContext,
                 request_type: 'comprehensive_student_analysis'
             };
         }
 
-        async function saveAnalysisToDatabase(analysisData, comprehensiveData) {
-            const { studentId, userId } = window.insightsData;
-            const analysisId = generateAnalysisId();
+        async function pollForNewAnalysis() {
+            if (isPolling) {
+                pollAttempts++;
+                if (pollAttempts >= maxPollAttempts) {
+                    console.log('Max polling attempts reached');
+                    showAnalysisError('Analysis generation is taking longer than expected. Please try again later.');
+                    isPolling = false;
+                    return;
+                }
 
-            try {
-                const { data, error } = await supabase
-                    .from('ai_analysis')
-                    .insert([{
-                        analysis_id: analysisId,
-                        student_id: studentId,
-                        user_id: userId,
-                        ai_response: analysisData.ai_response || analysisData.suggestions || JSON.stringify(analysisData),
-                        overall_assessment: analysisData.overall_assessment || null,
-                        strengths: analysisData.strengths || null,
-                        areas_for_improvement: analysisData.areas_for_improvement || null,
-                        study_plan: analysisData.study_plan || null,
-                        motivational_message: analysisData.motivational_message || null,
-                        overall_score: comprehensiveData.overall_summary.overall_average_score,
-                        pass_rate: comprehensiveData.overall_summary.pass_rate,
-                        total_exams: comprehensiveData.overall_summary.total_exams_completed,
-                        total_questions: comprehensiveData.overall_summary.total_questions_attempted,
-                        performance_trend: comprehensiveData.performance_trend.trend_direction,
-                        weak_topics: JSON.stringify(comprehensiveData.weak_areas),
-                        strong_topics: JSON.stringify(comprehensiveData.strong_areas),
-                        data_snapshot: JSON.stringify(comprehensiveData)
-                    }])
-                    .select()
-                    .single();
+                try {
+                    const { studentId } = window.insightsData;
+                    const { data, error } = await supabase
+                        .from('ai_analysis')
+                        .select('*')
+                        .eq('student_id', studentId)
+                        .order('generated_at', { ascending: false })
+                        .limit(1)
+                        .single();
 
-                if (error) throw error;
+                    if (error && error.code !== 'PGRST116') {
+                        throw error;
+                    }
 
-                console.log('✅ Analysis saved to database:', data);
-                window.currentAnalysis = data;
-                return data;
+                    if (data && (!latestAnalysisTimestamp || new Date(data.generated_at) > new Date(latestAnalysisTimestamp))) {
+                        console.log('New analysis found!', data);
+                        latestAnalysisTimestamp = data.generated_at;
+                        window.currentAnalysis = data;
+                        isPolling = false;
+                        pollAttempts = 0;
+                        displayAnalysis(data);
+                        return;
+                    }
 
-            } catch (error) {
-                console.error('❌ Error saving analysis:', error);
-                throw error;
+                    // Keep polling
+                    setTimeout(pollForNewAnalysis, 5000);
+                } catch (err) {
+                    console.error('Error polling for analysis:', err);
+                    showAnalysisError('Error checking analysis status. Please refresh the page.');
+                    isPolling = false;
+                }
             }
         }
 
-        window.getSuggestions = async function() {
-            const btn = document.getElementById('getSuggestionsBtn');
-            const btnText = document.getElementById('suggestionsBtnText');
-            const spinner = document.getElementById('suggestionsSpinner');
+        function showAnalysisError(message) {
+            const container = document.getElementById('suggestionsContainer');
+            container.innerHTML = `
+                <div class="error-message">
+                    <p><strong>⚠️ ${message}</strong></p>
+                    <button class="refresh-suggestions" onclick="getSuggestions()">
+                        🔄 Try Again
+                    </button>
+                </div>
+            `;
+        }
+
+        window.getSuggestions = async function () {
             const container = document.getElementById('suggestionsContainer');
 
+            // Always reset to loading state first
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Generating AI analysis... This may take a minute or two.
+                </div>
+            `;
+
             try {
-                btn.disabled = true;
-                btnText.style.display = 'none';
-                spinner.style.display = 'inline-flex';
-
                 const comprehensiveData = prepareComprehensiveDataForAI();
-
                 console.log('📊 Sending comprehensive data to Make.com:', comprehensiveData);
 
+                // Send to webhook
                 const response = await fetch(MAKE_WEBHOOK_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(comprehensiveData)
                 });
 
+                console.log('Webhook Response Status:', response.status);
+                console.log('Webhook Response Headers:', response.headers);
+
+                const responseText = await response.text();
+                console.log('Webhook Response Body:', responseText);
+
                 if (!response.ok) {
-                    throw new Error(`Webhook responded with status: ${response.status}`);
+                    console.error('Webhook error details:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        body: responseText
+                    });
+                    throw new Error(`Webhook error: ${response.status} - ${responseText}`);
                 }
 
-                const result = await response.json();
-                console.log('✅ Received AI suggestions:', result);
-
-                const savedAnalysis = await saveAnalysisToDatabase(result, comprehensiveData);
-
-                displayAnalysis(savedAnalysis);
+                // Start polling for new analysis
+                isPolling = true;
+                pollAttempts = 0;
+                pollForNewAnalysis();
 
             } catch (error) {
-                console.error('❌ Error getting suggestions:', error);
-
-                container.innerHTML = `
-                    <div class="error-message">
-                        <p><strong>⚠️ Unable to generate suggestions</strong></p>
-                        <p>${error.message}</p>
-                        <p style="margin-top: 1rem; font-size: 0.9rem;">Please ensure your Make.com scenario is active and configured correctly.</p>
-                        <button class="refresh-suggestions" onclick="getSuggestions()">
-                            🔄 Try Again
-                        </button>
-                    </div>
-                `;
-            } finally {
-                btn.disabled = false;
-                btnText.style.display = 'inline';
-                spinner.style.display = 'none';
+                console.error('❌ Full Error:', error);
+                showAnalysisError(`Error: ${error.message}. Check console for details.`);
             }
         };
 
         function displayAnalysis(analysis) {
             const container = document.getElementById('suggestionsContainer');
+            const btn = document.getElementById('getSuggestionsBtn');
+            const btnText = document.getElementById('suggestionsBtnText');
+            const spinner = document.getElementById('suggestionsSpinner');
 
-            let aiResponse = analysis.ai_response;
-            
-            let structuredResponse = null;
-            try {
-                if (typeof aiResponse === 'string' && (aiResponse.startsWith('{') || aiResponse.startsWith('['))) {
-                    structuredResponse = JSON.parse(aiResponse);
-                }
-            } catch (e) {
-                // Not JSON, treat as plain text
+            if (btn) {
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
             }
+
+            console.log('Displaying analysis:', analysis);
 
             const generatedDate = new Date(analysis.generated_at);
             const formattedDate = generatedDate.toLocaleDateString('en-IN', {
@@ -1660,57 +1558,126 @@
 
             let contentHTML = '';
 
-            if (structuredResponse && typeof structuredResponse === 'object') {
-                if (analysis.overall_assessment) {
-                    contentHTML += `
-                        <div class="analysis-section">
-                            <h3>📊 Overall Assessment</h3>
-                            <p>${analysis.overall_assessment}</p>
-                        </div>
-                    `;
+            if (analysis.ai_response) {
+                let responseText = analysis.ai_response;
+                let parsedResponse = null;
+
+                // Try to parse as JSON
+                try {
+                    if (typeof responseText === 'string') {
+                        // Remove any markdown code blocks
+                        responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+                        
+                        if (responseText.startsWith('{') || responseText.startsWith('[')) {
+                            parsedResponse = JSON.parse(responseText);
+                        }
+                    }
+                } catch (e) {
+                    console.log('Could not parse as JSON:', e);
+                    parsedResponse = null;
                 }
 
-                if (analysis.strengths) {
-                    contentHTML += `
-                        <div class="analysis-section">
-                            <h3>💪 Your Strengths</h3>
-                            <p>${analysis.strengths}</p>
-                        </div>
-                    `;
-                }
+                // If we successfully parsed JSON
+                if (parsedResponse && typeof parsedResponse === 'object') {
+                    // Handle object with analysis sections
+                    if (parsedResponse.overall_assessment) {
+                        contentHTML += `
+                            <div class="analysis-section">
+                                <h3>📊 Overall Assessment</h3>
+                                <p>${parsedResponse.overall_assessment}</p>
+                            </div>
+                        `;
+                    }
 
-                if (analysis.areas_for_improvement) {
-                    contentHTML += `
-                        <div class="analysis-section">
-                            <h3>⚠️ Areas for Improvement</h3>
-                            <p>${analysis.areas_for_improvement}</p>
-                        </div>
-                    `;
-                }
+                    if (parsedResponse.strengths) {
+                        contentHTML += `
+                            <div class="analysis-section">
+                                <h3>💪 Your Strengths</h3>
+                                <p>${parsedResponse.strengths}</p>
+                            </div>
+                        `;
+                    }
 
-                if (analysis.study_plan) {
-                    contentHTML += `
-                        <div class="analysis-section">
-                            <h3>📚 Personalized Study Plan</h3>
-                            <p>${analysis.study_plan}</p>
-                        </div>
-                    `;
-                }
+                    if (parsedResponse.areas_for_improvement) {
+                        contentHTML += `
+                            <div class="analysis-section">
+                                <h3>⚠️ Areas for Improvement</h3>
+                                <p>${parsedResponse.areas_for_improvement}</p>
+                            </div>
+                        `;
+                    }
 
-                if (analysis.motivational_message) {
-                    contentHTML += `
+                    if (parsedResponse.weak_areas && Array.isArray(parsedResponse.weak_areas)) {
+                        const weakAreasText = parsedResponse.weak_areas
+                            .map(area => `<li>${area.topic_name}: ${area.accuracy_percentage}% accuracy</li>`)
+                            .join('');
+                        contentHTML += `
+                            <div class="analysis-section">
+                                <h3>⚠️ Weak Areas</h3>
+                                <ul style="list-style: none; padding-left: 0;">
+                                    ${weakAreasText}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    if (parsedResponse.study_plan) {
+                        contentHTML += `
+                            <div class="analysis-section">
+                                <h3>📚 Personalized Study Plan</h3>
+                                <p>${parsedResponse.study_plan}</p>
+                            </div>
+                        `;
+                    }
+
+                    if (parsedResponse.recommendations) {
+                        const recsText = Array.isArray(parsedResponse.recommendations)
+                            ? parsedResponse.recommendations.map(rec => `<li>${rec}</li>`).join('')
+                            : `<li>${parsedResponse.recommendations}</li>`;
+                        contentHTML += `
+                            <div class="analysis-section">
+                                <h3>💡 Recommendations</h3>
+                                <ul style="list-style: none; padding-left: 0;">
+                                    ${recsText}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    if (parsedResponse.motivational_message) {
+                        contentHTML += `
+                            <div class="analysis-section">
+                                <h3>✨ Keep Going!</h3>
+                                <p>${parsedResponse.motivational_message}</p>
+                            </div>
+                        `;
+                    }
+
+                    // If nothing was displayed, show the whole object
+                    if (!contentHTML) {
+                        contentHTML = `
+                            <div class="analysis-section">
+                                <div style="white-space: pre-wrap; color: #e2e8f0; line-height: 1.8; background: rgba(30, 41, 59, 0.5); padding: 1rem; border-radius: 8px; font-size: 0.95rem;">
+                                    ${JSON.stringify(parsedResponse, null, 2)}
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Plain text response
+                    const displayText = typeof responseText === 'string' ? responseText : JSON.stringify(responseText, null, 2);
+                    contentHTML = `
                         <div class="analysis-section">
-                            <h3>✨ Keep Going!</h3>
-                            <p>${analysis.motivational_message}</p>
+                            <div style="white-space: pre-wrap; color: #e2e8f0; line-height: 1.8; background: rgba(30, 41, 59, 0.5); padding: 1rem; border-radius: 8px; font-size: 0.95rem;">
+                                ${displayText}
+                            </div>
                         </div>
                     `;
                 }
             } else {
                 contentHTML = `
                     <div class="analysis-section">
-                        <div style="white-space: pre-wrap; color: #e2e8f0; line-height: 1.8;">
-                            ${aiResponse}
-                        </div>
+                        <p style="color: #94a3b8;">No analysis data available.</p>
                     </div>
                 `;
             }
@@ -1749,7 +1716,7 @@
             }
         }
 
-        window.viewAnalysisHistory = async function() {
+        window.viewAnalysisHistory = async function () {
             const modal = document.getElementById('historyModal');
             const historyList = document.getElementById('historyList');
 
@@ -1769,7 +1736,7 @@
                     .select('*')
                     .eq('student_id', studentId)
                     .order('generated_at', { ascending: false })
-                    .limit(20);
+                    .limit(50);
 
                 if (error) throw error;
 
@@ -1793,7 +1760,7 @@
                         minute: '2-digit'
                     });
 
-                    let preview = analysis.ai_response;
+                    let preview = analysis.overall_assessment || 'Analysis record';
                     if (preview.length > 150) {
                         preview = preview.substring(0, 150) + '...';
                     }
@@ -1821,7 +1788,7 @@
             }
         };
 
-        window.loadHistoricalAnalysis = async function(analysisId) {
+        window.loadHistoricalAnalysis = async function (analysisId) {
             try {
                 const { data, error } = await supabase
                     .from('ai_analysis')
@@ -1831,6 +1798,8 @@
 
                 if (error) throw error;
 
+                latestAnalysisTimestamp = data.generated_at;
+                window.currentAnalysis = data;
                 displayAnalysis(data);
                 closeHistoryModal();
 
@@ -1840,16 +1809,48 @@
             }
         };
 
-        window.closeHistoryModal = function() {
+        window.closeHistoryModal = function () {
             document.getElementById('historyModal').style.display = 'none';
         };
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('historyModal');
             if (event.target === modal) {
                 closeHistoryModal();
             }
         };
+
+        async function loadLatestAnalysis() {
+            try {
+                const { studentId } = window.insightsData;
+
+                const { data, error } = await supabase
+                    .from('ai_analysis')
+                    .select('*')
+                    .eq('student_id', studentId)
+                    .order('generated_at', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        console.log('No analysis found yet');
+                        return;
+                    }
+                    throw error;
+                }
+
+                if (data) {
+                    console.log('✅ Loaded latest analysis:', data);
+                    latestAnalysisTimestamp = data.generated_at;
+                    window.currentAnalysis = data;
+                    // Don't display it automatically - only show the button
+                    // displayAnalysis(data);
+                }
+            } catch (err) {
+                console.error('Error loading latest analysis:', err);
+            }
+        }
 
         async function initInsights() {
             try {
@@ -1867,7 +1868,8 @@
                 renderTopicPerformance(stats.topicPerformance);
                 renderRecentExams(exams, scheduledExamsMap);
 
-                await checkExistingAnalysis();
+                // Load latest analysis but don't show it on page load
+                await loadLatestAnalysis();
 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('insightsContent').style.display = 'block';

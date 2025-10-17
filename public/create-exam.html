@@ -388,17 +388,17 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="totalQuestions">Total Questions</label>
+                            <label for="totalQuestions">Total Questions *</label>
                             <input 
                                 type="number" 
                                 id="totalQuestions" 
                                 name="totalQuestions" 
                                 value="30"
-                                readonly
-                                disabled
-                                style="opacity: 0.7; cursor: not-allowed;"
+                                min="10"
+                                max="100"
+                                required
                             >
-                            <p class="helper-text">Fixed at 30 questions with mixed difficulty</p>
+                            <p class="helper-text">Number of questions to fetch from question bank (10-100)</p>
                         </div>
 
                         <div class="form-row">
@@ -486,7 +486,6 @@
             }
         });
 
-        // Verify teacher access
         async function verifyTeacher() {
             const { data: { session } } = await supabase.auth.getSession();
             
@@ -503,19 +502,16 @@
             return true;
         }
 
-        // Initialize page
         async function initPage() {
             const isTeacher = await verifyTeacher();
             if (!isTeacher) return;
 
-            // Set minimum datetime to now
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             document.getElementById('startTime').min = now.toISOString().slice(0, 16);
             document.getElementById('endTime').min = now.toISOString().slice(0, 16);
         }
 
-        // Show message
         function showMessage(message, type = 'success') {
             const successEl = document.getElementById('successMessage');
             const errorEl = document.getElementById('errorMessage');
@@ -531,11 +527,9 @@
                 errorEl.classList.add('show');
             }
 
-            // Scroll to message
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Handle form submission
         document.getElementById('createExamForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -543,17 +537,15 @@
             const loadingMessage = document.getElementById('loadingMessage');
             const mainContent = document.getElementById('mainContent');
 
-            // Get form data
             const examName = document.getElementById('examName').value.trim();
             const description = document.getElementById('examDescription').value.trim() || null;
             const startTime = document.getElementById('startTime').value;
             const endTime = document.getElementById('endTime').value;
             const duration = parseInt(document.getElementById('duration').value);
-            const totalQuestions = 30; // Fixed at 30 questions
+            const totalQuestions = parseInt(document.getElementById('totalQuestions').value);
             const passingScore = parseInt(document.getElementById('passingScore').value);
-            const difficulty = 'mixed'; // Always set to mixed
+            const difficulty = 'mixed';
 
-            // Validation
             const startDateTime = new Date(startTime);
             const endDateTime = new Date(endTime);
             const now = new Date();
@@ -568,21 +560,17 @@
                 return;
             }
 
-            // Disable form
             submitBtn.disabled = true;
             submitBtn.textContent = 'Scheduling...';
 
             try {
-                // Get current user session
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
                     throw new Error('Not authenticated');
                 }
 
-                // Generate unique scheduled_exam_id
                 const scheduledExamId = 'SCHEDULED_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
-                // Create scheduled exam data
                 const scheduledExamData = {
                     scheduled_exam_id: scheduledExamId,
                     exam_name: examName,
@@ -600,7 +588,6 @@
 
                 console.log('Creating scheduled exam with data:', scheduledExamData);
 
-                // Insert into scheduled_exams table (NOT exams table)
                 const { data, error } = await supabase
                     .from('scheduled_exams')
                     .insert([scheduledExamData])
@@ -613,14 +600,13 @@
 
                 console.log('Scheduled exam created successfully:', data);
 
-                // Show success
                 mainContent.style.display = 'none';
                 loadingMessage.style.display = 'block';
                 loadingMessage.innerHTML = `
                     <div style="text-align: center;">
                         <div style="font-size: 4rem; margin-bottom: 1rem;">✓</div>
                         <h2 style="color: #10b981; margin-bottom: 1rem;">Exam Scheduled Successfully!</h2>
-                        <p style="margin-bottom: 0.5rem;">The exam "<strong>${examName}</strong>" has been scheduled.</p>
+                        <p style="margin-bottom: 0.5rem;">The exam "<strong>${examName}</strong>" has been scheduled with <strong>${totalQuestions} questions</strong>.</p>
                         <p style="color: #94a3b8; margin-bottom: 1.5rem;">It will appear on all student dashboards and be available from ${startDateTime.toLocaleString()} to ${endDateTime.toLocaleString()}</p>
                         <button onclick="window.location.href='teacher-dashboard.html'" 
                                 style="padding: 1rem 2rem; background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%); 
@@ -639,7 +625,6 @@
             }
         });
 
-        // Validate end time when start time changes
         document.getElementById('startTime').addEventListener('change', function() {
             const startTime = this.value;
             if (startTime) {
@@ -647,7 +632,6 @@
             }
         });
 
-        // Initialize
         initPage();
     </script>
 </body>

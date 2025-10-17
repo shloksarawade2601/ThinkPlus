@@ -479,7 +479,6 @@
         const inputFullName = document.getElementById("inputFullName");
         const inputPhone = document.getElementById("inputPhone");
         const inputBio = document.getElementById("inputBio");
-        // MODIFICATION: Add new elements for Student ID
         const inputStudentId = document.getElementById("inputStudentId");
         const generateIdBtn = document.getElementById("generateIdBtn");
 
@@ -530,34 +529,25 @@
                 return;
             }
 
-            // Populate display fields
             document.getElementById('displayFullName').textContent = currentProfileData.full_name || 'N/A';
             document.getElementById('displayEmail').textContent = currentProfileData.email;
             document.getElementById('displayPhone').textContent = currentProfileData.phone || 'N/A';
             document.getElementById('displayBio').textContent = currentProfileData.bio || 'No biography set. Click \'Edit Details\' to add a short professional or academic summary about yourself.';
-            
-            // MODIFICATION: Display the stored student ID or a placeholder
             document.getElementById('displayStudentId').textContent = currentProfileData.student_id || 'N/A (Generate in Edit)';
-            
-            // Fixed / Derived values
             document.getElementById('displayDateJoined').textContent = formatDate(currentProfileData.created_at);
             document.getElementById('displayLastLogin').textContent = formatLastLogin(currentProfileData.last_sign_in_at);
 
-            // Populate modal inputs
             inputFullName.value = currentProfileData.full_name || '';
             inputPhone.value = currentProfileData.phone || '';
             inputBio.value = currentProfileData.bio || '';
-            // MODIFICATION: Populate the Student ID field in the modal
             inputStudentId.value = currentProfileData.student_id || '';
             
-            // MODIFICATION: Disable the generate button if an ID already exists
             generateIdBtn.disabled = !!currentProfileData.student_id;
         }
 
         // --- Supabase Data Functions ---
 
         async function fetchProfileData(id) {
-            // MODIFICATION: Also select the 'student_id' column
             const { data: profile, error } = await supabase
                 .from('profiles')
                 .select('full_name, phone, bio, student_id') 
@@ -581,15 +571,15 @@
                 .from('profiles')
                 .update(updates)
                 .eq('id', userId)
-                .select()
-                .single();
+                .select();
 
             if (error) {
                 console.error('Error updating profile:', error.message);
                 return { error };
             }
 
-            return { data };
+            const updatedData = Array.isArray(data) && data.length > 0 ? data[0] : data;
+            return { data: updatedData };
         }
 
 
@@ -602,7 +592,6 @@
         closeBtn.addEventListener('click', closeModal);
         cancelBtn.addEventListener('click', closeModal);
 
-        // MODIFICATION: Add event listener for the new "Generate ID" button
         generateIdBtn.addEventListener('click', () => {
             if (!currentProfileData.email) {
                 alert("Cannot generate ID, user email is not available.");
@@ -610,7 +599,7 @@
             }
             const newId = generateStudentId(currentProfileData.email);
             inputStudentId.value = newId;
-            generateIdBtn.disabled = true; // Disable after one click
+            generateIdBtn.disabled = true;
         });
 
         window.addEventListener('click', (event) => {
@@ -625,7 +614,6 @@
             saveBtn.textContent = 'Saving...';
             saveBtn.disabled = true;
 
-            // Collect new data from modal inputs
             const updates = {
                 full_name: inputFullName.value.trim(),
                 phone: inputPhone.value.trim() || null,
@@ -633,7 +621,6 @@
                 updated_at: new Date().toISOString()
             };
 
-            // MODIFICATION: Add the student_id to the updates object if it was newly generated
             const newStudentId = inputStudentId.value.trim();
             if (newStudentId && !currentProfileData.student_id) {
                 updates.student_id = newStudentId;
@@ -774,7 +761,7 @@
                     email: user.email,
                     phone: null,
                     bio: null,
-                    student_id: null, // Ensure this is null for new users
+                    student_id: null,
                     created_at: user.created_at,
                     last_sign_in_at: user.last_sign_in_at
                 };

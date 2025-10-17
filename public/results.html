@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,8 +33,15 @@
         }
 
         @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .loading-screen {
@@ -65,7 +73,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .loading-text {
@@ -217,6 +227,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -790,14 +801,14 @@
             const correctAnswers = examData.correct_answers || 0;
             const incorrectAnswers = totalQuestions - correctAnswers;
             const percentage = Math.round((correctAnswers / totalQuestions) * 100);
-            
+
             // Get passing score from scheduled exam, fallback to 60 if not available
             const passingScore = scheduledExamData?.passing_score || 60;
             const passed = percentage >= passingScore;
 
             document.getElementById('displayExamId').textContent = examData.exam_id;
             document.getElementById('displayStudentId').textContent = examData.student_id || 'N/A';
-            
+
             // Format the date properly
             document.getElementById('examDate').textContent = formatDate(examData.created_at || examData.started_at);
 
@@ -836,47 +847,77 @@
             }, 16);
         }
 
-        function displayQuestions() {
+        async function displayQuestions() {
             const questionsList = document.getElementById('questionsList');
             const questions = examData.questions || [];
 
-            if (questions.length === 0) {
+            if (questions.length === 0 || answersData.length === 0) {
                 questionsList.innerHTML = '<p style="color: #94a3b8; text-align: center;">No questions available</p>';
                 return;
             }
 
+            console.log('Displaying questions:', questions.length);
+            console.log('Answers data:', answersData);
+
             questionsList.innerHTML = questions.map((q, index) => {
-                const answer = answersData.find(a => a.question_id === q.id || a.question_id === (index + 1));
+                // Find the matching answer by question_id
+                const answer = answersData.find(a => {
+                    return a.question_id === q.question_id ||
+                        a.question_id === q.id ||
+                        a.question_id === (index + 1).toString();
+                });
+
+                console.log(`Q${index + 1}:`, {
+                    questionId: q.question_id,
+                    matchedAnswer: answer
+                });
+
                 const isCorrect = answer ? answer.is_correct : false;
-                const studentAnswer = answer ? answer.student_answer : 'Not answered';
-                const correctAnswer = q.correct_answer || answer?.correct_answer || 'N/A';
+                const studentAnswer = answer ? answer.student_answer : 'Not Answered';
+
+                // Convert correct_answer letter to actual option text
+                let correctAnswerText = 'N/A';
+                if (answer && answer.correct_answer && q.options && Array.isArray(q.options)) {
+                    // correct_answer is a letter like "A", "B", "C", "D"
+                    const letterIndex = answer.correct_answer.charCodeAt(0) - 65; // A=0, B=1, etc.
+                    if (letterIndex >= 0 && letterIndex < q.options.length) {
+                        correctAnswerText = q.options[letterIndex];
+                    }
+                } else if (answer && answer.correct_answer) {
+                    correctAnswerText = answer.correct_answer;
+                }
+
+                const topic = answer ? answer.topic : q.topic || 'General';
+                const difficulty = answer ? answer.difficulty : q.difficulty || 'N/A';
 
                 return `
-                    <div class="question-item">
-                        <div class="question-header">
-                            <span class="question-number">Question ${index + 1}</span>
-                            <span class="question-status ${isCorrect ? 'status-correct' : 'status-incorrect'}">
-                                ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
-                            </span>
-                        </div>
-                        <div class="question-text">${q.question || q.text || 'Question text not available'}</div>
-                        <div class="answer-info">
-                            <div class="answer-row">
-                                <span class="answer-label">Your Answer:</span>
-                                <span class="answer-value ${isCorrect ? 'correct' : 'incorrect'}">${studentAnswer}</span>
-                            </div>
-                            ${!isCorrect ? `
-                                <div class="answer-row">
-                                    <span class="answer-label">Correct Answer:</span>
-                                    <span class="answer-value correct">${correctAnswer}</span>
-                                </div>
-                            ` : ''}
-                        </div>
+            <div class="question-item">
+                <div class="question-header">
+                    <span class="question-number">Question ${index + 1}</span>
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <span style="color: #94a3b8; font-size: 0.85rem;">${topic} • ${difficulty}</span>
+                        <span class="question-status ${isCorrect ? 'status-correct' : 'status-incorrect'}">
+                            ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                        </span>
                     </div>
-                `;
+                </div>
+                <div class="question-text">${q.question_text || q.question || q.text || 'Question text not available'}</div>
+                <div class="answer-info">
+                    <div class="answer-row">
+                        <span class="answer-label">Your Answer:</span>
+                        <span class="answer-value ${isCorrect ? 'correct' : 'incorrect'}">${studentAnswer}</span>
+                    </div>
+                    ${!isCorrect ? `
+                        <div class="answer-row">
+                            <span class="answer-label">Correct Answer:</span>
+                            <span class="answer-value correct">${correctAnswerText}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
             }).join('');
         }
-
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabase.auth.signOut();
             window.location.href = 'login.html';
@@ -885,4 +926,5 @@
         init();
     </script>
 </body>
+
 </html>
